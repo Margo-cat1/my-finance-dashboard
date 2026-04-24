@@ -2,94 +2,110 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="Financial OS Intelligence", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Financial OS Intelligence", page_icon="💎", layout="wide")
 
-st.title("📊 Financial OS: Детальный баланс и аудит")
+st.title("💎 Financial Intelligence & Audit System")
 st.markdown("---")
 
 # --- СЕКЦИЯ 1: ВВОД ДАННЫХ (Sidebar) ---
-st.sidebar.header("📥 Ввод данных баланса")
+st.sidebar.header("📥 Ввод данных")
 
-st.sidebar.subheader("Активы (Assets)")
-fa = st.sidebar.number_input("Fixed Assets (Внеоборотные)", value=2100000, step=10000)
-ca = st.sidebar.number_input("Current Assets (Оборотные)", value=900000, step=10000)
+with st.sidebar.expander("💼 Активы (Assets)", expanded=True):
+    fa = st.sidebar.number_input("Fixed Assets (Внеоборотные)", value=2100000,
+                                 help="Здания, оборудование, долгосрочные вложения")
+    ca = st.sidebar.number_input("Current Assets (Оборотные)", value=900000, help="Кэш, дебиторка, запасы на складе")
 
-st.sidebar.subheader("Обязательства (Liabilities)")
-ltl = st.sidebar.number_input("Long-term (Долгосрочные)", value=800000, step=10000)
-stl = st.sidebar.number_input("Short-term (Краткосрочные)", value=400000, step=10000)
+with st.sidebar.expander("💸 Обязательства (Liabilities)", expanded=True):
+    ltl = st.sidebar.number_input("Long-term (Долгосрочные)", value=800000, help="Кредиты более года")
+    stl = st.sidebar.number_input("Short-term (Краткосрочные)", value=400000,
+                                  help="Задолженность перед поставщиками, налоги, короткие займы")
 
-st.sidebar.subheader("Доходы и расходы")
-rev = st.sidebar.number_input("Выручка (Revenue)", value=1500000, step=10000)
-exp = st.sidebar.number_input("Расходы (Expenses)", value=1100000, step=10000)
+with st.sidebar.expander("📈 Операционка", expanded=True):
+    rev = st.sidebar.number_input("Выручка (Revenue)", value=1500000)
+    exp = st.sidebar.number_input("Расходы (Expenses)", value=1100000)
 
-# --- СЕКЦИЯ 2: РАСЧЕТЫ ПОКАЗАТЕЛЕЙ ---
+# --- СЕКЦИЯ 2: РАСЧЕТЫ ---
 total_assets = fa + ca
 total_liabilities = ltl + stl
 equity = total_assets - total_liabilities
 profit = rev - exp
 
-# Коэффициенты
+# Рентабельность
 roi = (profit / exp * 100) if exp != 0 else 0
 roe = (profit / equity * 100) if equity > 0 else 0
 roa = (profit / total_assets * 100) if total_assets > 0 else 0
+
+# Устойчивость
 sol2 = (total_assets / total_liabilities) if total_liabilities != 0 else 0
 sol3 = (equity / total_liabilities) if total_liabilities != 0 else 0
-qr = (ca / stl) if stl != 0 else 0  # Ликвидность: оборотные к коротким долгам
+qr = (ca / stl) if stl != 0 else 0
 
-# --- СЕКЦИЯ 3: ТАБЛИЦА БАЛАНСА ---
-st.subheader("📑 Структура баланса (Balance Sheet)")
-col_table, col_metrics = st.columns([1.5, 1])
-
-with col_table:
-    balance_data = {
-        "Категория": ["Fixed Assets", "Current Assets", "TOTAL ASSETS", "Long-term Liabilities",
-                      "Short-term Liabilities", "TOTAL LIABILITIES", "EQUITY (Капитал)"],
-        "Сумма ($)": [f"{fa:,.0f}", f"{ca:,.0f}", f"{total_assets:,.0f}", f"{ltl:,.0f}", f"{stl:,.0f}",
-                      f"{total_liabilities:,.0f}", f"{equity:,.0f}"]
-    }
-    st.table(pd.DataFrame(balance_data))
-
-with col_metrics:
-    st.write("### 🏁 Итоги")
-    st.metric("Чистая прибыль", f"{profit:,.0f} $")
-    st.metric("ROI (Окупаемость)", f"{roi:.1f}%")
-    st.metric("ROE (Рентабельность)", f"{roe:.1f}%")
+# --- СЕКЦИЯ 3: ТАБЛО МЕТРИК ---
+st.subheader("🚀 Ключевые показатели эффективности")
+c1, c2, c3, c4, c5, c6 = st.columns(6)
+c1.metric("ROI", f"{roi:.1f}%")
+c2.metric("ROE", f"{roe:.1f}%")
+c3.metric("ROA", f"{roa:.1f}%")
+c4.metric("Sol2", f"{sol2:.2f}")
+c5.metric("Sol3", f"{sol3:.2f}")
+c6.metric("QR", f"{qr:.2f}")
 
 st.markdown("---")
 
-# --- СЕКЦИЯ 4: ВИЗУАЛИЗАЦИЯ И SWOT ---
-c1, c2 = st.columns(2)
+# --- СЕКЦИЯ 4: ТАБЛИЦА БАЛАНСА И SWOT ---
+col_table, col_swot = st.columns([1, 1.2])
 
-with c1:
-    st.write("### ⚖️ Golden Balance")
-    fig_gb = go.Figure(data=[go.Pie(
-        labels=['Собственный капитал (Equity)', 'Весь долг (Liabilities)'],
-        values=[max(0, equity), total_liabilities],
-        hole=.5,
-        marker_colors=['#00c49f', '#ff4b4b']
-    )])
-    fig_gb.update_layout(template="plotly_dark", showlegend=True)
-    st.plotly_chart(fig_gb, use_container_width=True)
+with col_table:
+    st.write("### 📑 Детализация баланса")
+    df_balance = pd.DataFrame({
+        "Показатель": ["Внеоборотные активы", "Оборотные активы", "ДОЛГИ (Всего)", "Собственный капитал"],
+        "Сумма ($)": [f"{fa:,.0f}", f"{ca:,.0f}", f"{total_liabilities:,.0f}", f"{equity:,.0f}"]
+    })
+    st.table(df_balance)
 
-with c2:
-    st.write("### 🕵️ Сильные и слабые стороны")
-    # Анализ ликвидности и устойчивости
-    if qr >= 1.0:
-        st.success(f"✅ **Ликвидность в норме:** Quick Ratio = {qr:.2f}. Ты можешь быстро закрыть краткосрочные долги.")
+    # Визуал Golden Balance
+    fig_pie = go.Figure(data=[go.Pie(labels=['Equity', 'Debt'], values=[max(0, equity), total_liabilities], hole=.4)])
+    fig_pie.update_layout(height=300, margin=dict(t=0, b=0, l=0, r=0), template="plotly_dark")
+    st.plotly_chart(fig_pie, use_container_width=True)
+
+with col_swot:
+    st.write("### 🕵️ Глубокий анализ (SWOT)")
+
+    # Логика ROI
+    if roi > 20:
+        st.success(
+            f"✅ **ROI {roi:.1f}%:** Отлично! Каждый доллар затрат приносит {roi / 100:.2f} прибыли. Эффективное производство.")
     else:
-        st.error(f"❌ **Риск ликвидности:** QR = {qr:.2f}. Оборотных активов не хватает для покрытия текущих долгов!")
+        st.warning(f"⚠️ **ROI {roi:.1f}%:** Ниже нормы (20%). Проверь себестоимость или наценку.")
 
-    if sol3 >= 1.0:
-        st.success(f"✅ **Sol3 в норме:** {sol3:.2f}. Капитал полностью перекрывает обязательства.")
+    # Логика ROE vs ROA
+    if roe > roa: st.info(
+        f"✅ **ROE > ROA:** Твои деньги работают эффективнее общих активов. Кредитное плечо помогает расти.")
+
+    # Логика Sol2
+    if sol2 > 1.5:
+        st.success(f"✅ **Sol2 {sol2:.2f}:** Бизнес очень устойчив. Активы перекрывают долги с запасом.")
     else:
-        st.warning(f"⚠️ **Sol3 низкий:** {sol3:.2f}. Бизнес сильно зависит от внешних займов.")
+        st.error(f"🚨 **Sol2 {sol2:.2f}:** Риск! У тебя слишком мало активов на такой объем долга. Норма > 1.5.")
 
-# --- СЕКЦИЯ 5: СПРАВОЧНИК ---
-with st.expander("🎓 Справочник показателей"):
+    # Логика Sol3 (Golden Balance)
+    if 1.0 <= sol3 <= 2.0:
+        st.success(f"✅ **Sol3 {sol3:.2f}:** Идеальный Golden Balance. Своих денег больше, чем чужих.")
+    elif sol3 < 1.0:
+        st.error(f"🚨 **Sol3 {sol3:.2f}:** Ты работаешь в основном на чужих деньгах. Это опасно при падении выручки.")
+
+st.markdown("---")
+
+# --- СЕКЦИЯ 5: БАЗА ЗНАНИЙ (Обучение) ---
+with st.expander("🎓 Справочник: Как читать эти данные?"):
     st.write("""
-    - **Fixed Assets:** Здания, оборудование, софт — то, что сложно быстро продать.
-    - **Current Assets:** Деньги на счету, товары, дебиторка — то, что быстро превращается в кэш.
-    - **Short-term Liabilities:** Долги, которые нужно отдать в течение года.
-    - **Long-term Liabilities:** Кредиты на долгий срок.
-    - **Golden Balance:** Идеально, когда Equity (зеленое) занимает больше половины круга.
+    ### Рентабельность (Profitability)
+    * **ROI (Return on Investment):** Показывает «выхлоп» от вложенных денег в проект. Если ROI 30%, значит на 1$ затрат ты получил 1.3$ выручки. **Норма: > 20%**.
+    * **ROE (Return on Equity):** Рентабельность ТВОИХ денег. Если ROE 40%, значит твои личные вложения приносят 40% годовых. **Должен быть выше ROA**.
+    * **ROA (Return on Assets):** Эффективность всех «станков и офисов». Если он низкий, значит активы «простаивают».
+
+    ### Устойчивость и Ликвидность (Stability)
+    * **Solvency 2 (Автономия):** Можешь ли ты продать всё имущество и закрыть долги. **Норма: 1.5 - 2.0**.
+    * **Solvency 3 (Golden Balance):** Соотношение Свое / Чужое. Если 1.0 — у тебя поровну своих и заемных денег. **Норма: > 1.0**.
+    * **Quick Ratio (Ликвидность):** Хватит ли тебе денег на счету и товаров, чтобы отдать долги, которые придут завтра. **Норма: > 1.0**.
     """)
