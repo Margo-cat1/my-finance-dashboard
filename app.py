@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
-
+# Updated version 2.0.
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
