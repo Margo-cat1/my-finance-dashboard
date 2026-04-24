@@ -2,119 +2,204 @@ import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
 
+# 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
-# Авторизация (margo / 456)
+# --- БЛОК АВТОРИЗАЦИИ ---
 credentials = {
-    'usernames': {'admin': {'name': 'Admin', 'password': '123'}, 'margo': {'name': 'Margo', 'password': '456'}}}
-authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
+    'usernames': {
+        'admin': {'name': 'Admin User', 'password': '123'},
+        'margo': {'name': 'Margo', 'password': '456'}
+    }
+}
+
+authenticator = stauth.Authenticate(
+    credentials,
+    'finance_cookie',
+    'auth_key',
+    cookie_expiry_days=30
+)
+
+# Вызов логина (без аргумента 'main', чтобы не было ошибки)
 authenticator.login()
 
-if st.session_state["authentication_status"]:
+if st.session_state["authentication_status"] is False:
+    st.error('Username/password is incorrect')
+elif st.session_state["authentication_status"] is None:
+    st.warning('Please enter your username and password')
+elif st.session_state["authentication_status"]:
+
+    # 2. Словарь переводов
     LANGS = {
         "Русский": {
             "title": "📊 Финансовый Интеллект",
-            "eff_head": "🚀 Эффективность и Окупаемость",
-            "sol_head": "🛡️ Устойчивость и Ликвидность",
-            "analys_head": "🔍 Автоматический финансовый анализ",
-            "guide_head": "📚 Справочник эксперта",
-            "assets": "💼 Активы", "liabs": "💸 Обязательства", "ops": "📈 Операционные показатели",
-            "qr_label": "Quick Ratio (Ликвидность)",
-            "qr_desc": "Показывает способность компании погасить краткосрочные долги за счет кэша.",
-            "qr_norm": "Норматив: > 2.0",
-            "roi_desc": "ROI (Return on Investment) — окупаемость вложений.",
-            "roe_desc": "ROE (Return on Equity) — рентабельность собственного капитала.",
-            "status_ok": "✅ Показатель в норме",
-            "status_warn": "⚠️ Требует внимания",
-            "qr_warn_msg": "Критическая нехватка кэша! QR ниже 2.0",
-            "qr_ok_msg": "Ликвидность отличная, кэша достаточно."
+            "settings": "⚙️ Ввод данных",
+            "assets": "💼 Активы", "liabilities": "💸 Долги", "ops": "📈 Операционка",
+            "fa": "Fixed Assets", "ca": "Current Assets",
+            "ltl": "Long-term Debt", "stl": "Short-term Debt",
+            "own_cap": "Собственный капитал", "init_inv": "Первоначальные инвестиции",
+            "cash": "Наличные (Cash)", "ebitda": "EBITDA",
+            "tab1": "🎯 Дашборд", "tab2": "📊 Структура", "tab3": "📚 Справочник",
+            "sec_eff": "🚀 Эффективность (EBITDA)",
+            "sec_sol": "🛡️ Устойчивость и Ликвидность",
+            "analysis_header": "🔍 Автоматический анализ",
+            "strong": "✅ Сильные стороны", "risks": "⚠️ Зоны внимания",
+            "msg_autonomy": "🌟 **Автономия:** Большая часть активов — ваши.",
+            "msg_roi": "📈 **Окупаемость:** Высокий уровень ROI",
+            "msg_liq": "💧 **Ликвидность:** Хороший запас наличности.",
+            "msg_dep": "🚩 **Зависимость:** Высокая доля долгов.",
+            "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
+            "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
+            "guide": {
+                "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**. Если ниже 15%, проект окупается слишком долго.",
+                "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**. Ваши личные деньги должны работать эффективнее, чем банковский депозит.",
+                "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**. Показывает, не «простаивает» ли ваше оборудование и имущество.",
+                "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**. Если сумма в минусе — вы работаете в убыток капиталу (банкротство).",
+                "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**. Ниже 30% — критическая зависимость от чужих денег.",
+                "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**. У вас должно быть в 2 раза больше кэша, чем срочных долгов."
+            }
+        },
+        "English": {
+            "title": "📊 Financial Intelligence",
+            "settings": "⚙️ Data Input",
+            "assets": "💼 Assets", "liabilities": "💸 Liabilities", "ops": "📈 Operations",
+            "fa": "Fixed Assets", "ca": "Current Assets",
+            "ltl": "Long-term Debt", "stl": "Short-term Debt",
+            "own_cap": "Own Capital", "init_inv": "Initial Investment",
+            "cash": "Cash", "ebitda": "EBITDA",
+            "tab1": "🎯 Dashboard", "tab2": "📊 Structure", "tab3": "📚 Guide",
+            "sec_eff": "🚀 Efficiency (EBITDA)",
+            "sec_sol": "🛡️ Solvency & Liquidity",
+            "analysis_header": "🔍 Automated Analysis",
+            "strong": "✅ Strengths", "risks": "⚠️ Risks",
+            "msg_autonomy": "🌟 **Autonomy:** Most assets belong to you.",
+            "msg_roi": "📈 **Profitability:** High ROI level",
+            "msg_liq": "💧 **Liquidity:** Good cash reserve.",
+            "msg_dep": "🚩 **Dependency:** High debt ratio.",
+            "msg_cash_low": "💸 **Cash Deficit:** Low cash for quick payments.",
+            "msg_bankrupt": "❌ **Critical Risk:** Liabilities exceed assets!",
+            "guide": {
+                "roi": "**ROI:** EBITDA / Investments. **Target: > 25%**. Below 15% is considered slow payback.",
+                "roe": "**ROE:** EBITDA / Own Capital. **Target: > 20%**. Your money should earn more than a bank deposit.",
+                "roa": "**ROA:** EBITDA / Total Assets. **Target: > 10%**. Efficiency of all company resources.",
+                "sol2": "**Solvency 2:** Assets - Liabilities. **Minimum: > 0**. Negative value means technical bankruptcy.",
+                "sol3": "**Solvency 3:** Net Assets / Total Assets. **Minimum: 50%**. Below 30% is high risk.",
+                "qr": "**Quick Ratio:** Cash / Short-term Debt. **Minimum: 2.0**. You need 2x more cash than urgent debts."
+            }
         },
         "ქართული": {
             "title": "📊 ფინანსური ინტელექტი",
-            "eff_head": "🚀 ეფექტურობა და უკუგება",
-            "sol_head": "🛡️ მდგრადობა და ლიკვიდურობა",
-            "analys_head": "🔍 ავტომატური ფინანსური ანალიზი",
-            "guide_head": "📚 ექსპერტის ცნობარი",
-            "assets": "💼 აქტივები", "liabs": "💸 ვალდებულებები", "ops": "📈 ოპერაციული მაჩვენებლები",
-            "qr_label": "Quick Ratio (ლიკვიდობა)",
-            "qr_desc": "აჩვენებს კომპანიის უნარს დაფაროს მოკლევადიანი ვალები ნაღდი ფულით.",
-            "qr_norm": "ნორმატივი: > 2.0",
-            "roi_desc": "ROI — ინვესტიციის უკუგება.",
-            "roe_desc": "ROE — საკუთარი კაპიტალის რენტაბელობა.",
-            "status_ok": "✅ მაჩვენებელი ნორმაშია",
-            "status_warn": "⚠️ საჭიროებს ყურადღებას",
-            "qr_warn_msg": "ნაღდი ფულის კრიტიკული ნაკლებობა! QR < 2.0",
-            "qr_ok_msg": "ლიკვიდობა შესანიშნავია, ნაღდი ფული საკმარისია."
+            "settings": "⚙️ მონაცემები",
+            "assets": "💼 აქტივები", "liabilities": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
+            "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
+            "ltl": "გრძელვადიანი ვალი", "stl": "მოკლევადიანი ვალი",
+            "own_cap": "საკუთარი კაპიტალი", "init_inv": "საწყისი ინვესტიცია",
+            "cash": "Cash", "ebitda": "EBITDA",
+            "tab1": "🎯 მთავარი", "tab2": "📊 ბალანსი", "tab3": "📚 ცნობარი",
+            "sec_eff": "🚀 ეფექტურობა (EBITDA)",
+            "sec_sol": "🛡️ მდგრადობა და ლიკვიდურობა",
+            "analysis_header": "🔍 ავტომატური ანალიზი",
+            "strong": "✅ ძლიერი მხარეები", "risks": "⚠️ რისკები",
+            "msg_autonomy": "🌟 **ავტონომია:** აქტივების უმეტესი ნაწილი თქვენია.",
+            "msg_roi": "📈 **უკუგება:** ROI-ს მაღალი დონე",
+            "msg_liq": "💧 **ლიკვიდურობა:** ნაღდი ფულის კარგი მარაგი.",
+            "msg_dep": "🚩 **დამოკიდებულება:** ვალების მაღალი წილი.",
+            "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ცოტა ფული გადახდებისთვის.",
+            "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემაება აქტივებს!",
+            "guide": {
+                "roi": "**ROI:** EBITDA / ინვესტიცია. **მიზანი: > 25%**.",
+                "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. **მიზანი: > 20%**.",
+                "roa": "**ROA:** EBITDA / ჯამური აქტივები. **მიზანი: > 10%**.",
+                "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. **მინიმუმი: > 0**.",
+                "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. **მინიმუმი: 50%**.",
+                "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მინიმუმი: 2.0**."
+            }
         }
     }
 
+    # 3. CSS
+    st.markdown("""
+        <style>
+        [data-testid="stMetric"] {
+            background-color: #ffffff; border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #00d4ff;
+        }
+        .stTabs [aria-selected="true"] { background-color: #1e2130 !important; color: white !important; }
+        .section-header { font-size: 22px; font-weight: 700; color: #1e2130; margin: 20px 0; }
+        </style>
+        """, unsafe_allow_html=True)
+
+    # 4. SIDEBAR
     with st.sidebar:
-        lang = st.selectbox("🌐 Language / ენა", list(LANGS.keys()))
-        t = LANGS[lang]
+        st.write(f'Welcome, *{st.session_state["name"]}*')
+        lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
+        t = LANGS[lang_choice]
 
-        with st.expander(t["assets"]):
-            fa = st.number_input("Fixed Assets", value=2100000)
-            ca = st.number_input("Current Assets", value=900000)
-        with st.expander(t["liabs"]):
-            stl = st.number_input("Short-term Debt", value=400000)
-            ltl = st.number_input("Long-term Debt", value=1100000)
-        with st.expander(t["ops"]):
-            cash = st.number_input("Cash", value=300000)
-            ebitda = st.number_input("EBITDA", value=450000)
-            revenue = st.number_input("Revenue", value=2000000)
-            own_cap = st.number_input("Equity", value=1000000)
+        with st.expander(t["assets"], expanded=True):
+            fa = st.number_input(t["fa"], value=2100000)
+            ca = st.number_input(t["ca"], value=900000)
+        with st.expander(t["liabilities"], expanded=True):
+            ltl = st.number_input(t["ltl"], value=800000)
+            stl = st.number_input(t["stl"], value=400000)
+        with st.expander(t["ops"], expanded=True):
+            own_cap = st.number_input(t["own_cap"], value=1000000)
+            init_inv = st.number_input(t["init_inv"], value=1500000)
+            cash_val = st.number_input(t["cash"], value=300000)
+            ebitda_val = st.number_input(t["ebitda"], value=450000)
 
+        sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
         authenticator.logout('Logout', 'sidebar')
 
-    # --- МАТЕМАТИЧЕСКИЕ ФОРМУЛЫ ---
-    qr = cash / stl if stl != 0 else 0
-    roi = (ebitda / (fa + ca) * 100) if (fa + ca) != 0 else 0
-    roe = (ebitda / own_cap * 100) if own_cap != 0 else 0
-    ros = (ebitda / revenue * 100) if revenue != 0 else 0
+    # 5. РАСЧЕТЫ
+    total_assets = fa + ca
+    total_liabilities = ltl + stl
+    current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
+    roi = (current_ebitda / init_inv * 100) if init_inv != 0 else 0
+    roe = (current_ebitda / own_cap * 100) if own_cap != 0 else 0
+    roa = (current_ebitda / total_assets * 100) if total_assets != 0 else 0
+    sol2_val = total_assets - total_liabilities
+    sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
+    qr = (cash_val / stl) if stl != 0 else 0
 
+    # 6. ИНТЕРФЕЙС
     st.title(t["title"])
-    tab1, tab2, tab3 = st.tabs(["🎯 Dashboard", "🔍 Analysis", "📚 Guide"])
+    tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
     with tab1:
-        st.subheader(t["eff_head"])
+        st.markdown(f'<div class="section-header">{t["sec_eff"]}</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        c1.metric("ROI", f"{roi:.1f}%")
+        c1.metric("ROI", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
         c2.metric("ROE", f"{roe:.1f}%")
-        c3.metric("ROS", f"{ros:.1f}%")
+        c3.metric("ROA", f"{roa:.1f}%")
 
-        st.subheader(t["sol_head"])
-        st.metric(t["qr_label"], f"{qr:.2f}", delta=round(qr - 2.0, 2))
-        if qr < 2.0:
-            st.error(t["qr_warn_msg"])
-        else:
-            st.success(t["qr_ok_msg"])
+        st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
+        c4, c5, c6 = st.columns(3)
+        c4.metric("Solvency 2 (Net)", f"{sol2_val:,.0f} $")
+        c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
+        c6.metric("Quick Ratio", f"{qr:.2f}")
+
+        # Блок Анализа
+        st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
+        col_s, col_r = st.columns(2)
+        with col_s:
+            st.success(f"### {t['strong']}")
+            if sol3_pct >= 50: st.write(t["msg_autonomy"])
+            if roi >= 25: st.write(f"{t['msg_roi']} ({roi:.1f}%)")
+            if qr >= 2.0: st.write(t["msg_liq"])
+        with col_r:
+            st.warning(f"### {t['risks']}")
+            if sol3_pct < 30: st.write(t["msg_dep"])
+            if qr < 2.0: st.write(t["msg_cash_low"] + f" (Current: {qr:.2f})")
+            if sol2_val < 0: st.error(t["msg_bankrupt"])
 
     with tab2:
-        st.header(t["analys_head"])
-        # Автоматический анализ QR по твоему нормативу 2.0
-        if qr < 2.0:
-            st.error(f"❌ **Quick Ratio ({qr:.2f})**: {t['status_warn']}. {t['qr_norm']}.")
-        else:
-            st.success(f"💎 **Quick Ratio ({qr:.2f})**: {t['status_ok']}.")
-
-        # Анализ рентабельности
-        if roe > 20:
-            st.success(f"🔥 **ROE ({roe:.1f}%)**: Высокая эффективность капитала.")
-        else:
-            st.warning(f"📉 **ROE ({roe:.1f}%)**: Ниже целевых 20%.")
+        st.table(pd.DataFrame({
+            "Parameter": ["Assets", "Liabilities", "Equity", "Net Assets", "EBITDA"],
+            "Value ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
+                          f"{current_ebitda:,.0f}"]
+        }))
 
     with tab3:
-        st.header(t["guide_head"])
-        st.markdown(f"### {t['qr_label']}")
-        st.write(t["qr_desc"])
-        st.code("Formula: Cash / Short-term Debt")
-        st.info(f"**{t['qr_norm']}**")
-
-        st.markdown("---")
-        st.markdown(f"### ROI & ROE")
-        st.write(t["roi_desc"])
-        st.write(t["roe_desc"])
-        st.info("**Цель для ROE: > 20%**")
-
-elif st.session_state["authentication_status"] is False:
-    st.error('Username/password is incorrect')
+        st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
+        for key in t["guide"]:
+            st.info(t["guide"][key])
