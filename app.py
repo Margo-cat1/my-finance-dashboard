@@ -3,168 +3,190 @@ import plotly.graph_objects as go
 import pandas as pd
 
 # 1. Настройка страницы
-st.set_page_config(page_title="Financial OS Intelligence", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Financial Intelligence Dashboard", page_icon="📈", layout="wide")
 
-# 2. Полный мультиязычный словарь (RU, EN, GE)
+# 2. Полный мультиязычный словарь
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
         "settings": "⚙️ Ввод данных",
-        "invest_header": "💰 Капитал и Инвестиции",
-        "ops_header": "📈 Операционные показатели",
-        "sim_header": "🔮 Симулятор рисков",
+        "assets": "💼 Активы (Assets)",
+        "liabilities": "💸 Долги (Liabilities)",
+        "ops": "📈 Операционка & Капитал",
+        "sim": "🔮 Симулятор",
+        "fa": "Fixed Assets (Внеоборотные)",
+        "ca": "Current Assets (Оборотные)",
+        "ltl": "Long-term (Долгосрочные)",
+        "stl": "Short-term (Краткосрочные)",
         "own_cap": "Собственный капитал (Own Capital)",
         "init_inv": "Первоначальные инвестиции",
         "cash": "Наличные (Cash)",
         "ebitda": "EBITDA",
-        "net_profit": "Чистая прибыль",
-        "tab_main": "🎯 Дашборд",
-        "tab_balance": "📊 Структура",
-        "tab_info": "📚 Справочник",
+        "np": "Чистая прибыль (Net Profit)",
+        "tab1": "🎯 Дашборд",
+        "tab2": "📊 Детали баланса",
+        "tab3": "📚 Справочник",
         "strong": "✅ Сильные стороны",
         "risks": "⚠️ Зоны внимания",
-        "guide": {
-            "roi": "**ROI (Return on Investment):** (EBITDA / Первоначальные инвестиции) × 100. Показывает окупаемость вложенных средств.",
-            "roe": "**ROE (Return on Equity):** (Чистая прибыль / Собственный капитал) × 100. Эффективность использования ваших личных денег.",
-            "cash": "**Cash:** Наличные средства в распоряжении бизнеса. Важнейший показатель ликвидности.",
-            "ebitda": "**EBITDA:** Прибыль до вычета процентов, налогов и амортизации. Показывает реальную мощь операционки."
-        }
+        "guide": [
+            "**ROI:** (EBITDA / Первоначальные инвестиции) × 100. Окупаемость проекта.",
+            "**ROE:** (Net Profit / Собственный капитал) × 100. Эффективность ваших денег.",
+            "**ROA:** Чистая прибыль / Всего активов.",
+            "**Solvency 3:** Собственный капитал / Общие долги. Если > 1.0 — это Золотой Баланс.",
+            "**Quick Ratio:** Оборотные активы / Краткосрочные долги. Способность платить по счетам."
+        ]
     },
     "English": {
         "title": "📊 Financial Intelligence",
         "settings": "⚙️ Data Input",
-        "invest_header": "💰 Equity & Investment",
-        "ops_header": "📈 Operations",
-        "sim_header": "🔮 Risk Simulator",
+        "assets": "💼 Assets",
+        "liabilities": "💸 Liabilities",
+        "ops": "📈 Ops & Equity",
+        "sim": "🔮 Simulator",
+        "fa": "Fixed Assets",
+        "ca": "Current Assets",
+        "ltl": "Long-term Debt",
+        "stl": "Short-term Debt",
         "own_cap": "Own Capital",
         "init_inv": "Initial Investment",
         "cash": "Cash",
         "ebitda": "EBITDA",
-        "net_profit": "Net Profit",
-        "tab_main": "🎯 Dashboard",
-        "tab_balance": "📊 Structure",
-        "tab_info": "📚 Guide",
+        "np": "Net Profit",
+        "tab1": "🎯 Dashboard",
+        "tab2": "📊 Balance Details",
+        "tab3": "📚 Guide",
         "strong": "✅ Strengths",
         "risks": "⚠️ Risks",
-        "guide": {
-            "roi": "**ROI:** (EBITDA / Initial Investment) × 100. Measures return on the total project cost.",
-            "roe": "**ROE:** (Net Profit / Own Capital) × 100. Efficiency of your personal equity.",
-            "cash": "**Cash:** Liquid funds available for immediate use.",
-            "ebitda": "**EBITDA:** Earnings before interest, taxes, depreciation, and amortization."
-        }
+        "guide": [
+            "**ROI:** (EBITDA / Initial Investment) × 100.",
+            "**ROE:** (Net Profit / Own Capital) × 100.",
+            "**ROA:** Net Profit / Total Assets.",
+            "**Solvency 3:** Own Capital / Total Liabilities.",
+            "**Quick Ratio:** Current Assets / Short-term Debt."
+        ]
     },
     "ქართული": {
         "title": "📊 ფინანსური ინტელექტი",
         "settings": "⚙️ მონაცემები",
-        "invest_header": "💰 კაპიტალი და ინვესტიცია",
-        "ops_header": "📈 ოპერაციები",
-        "sim_header": "🔮 რისკების სიმულატორი",
+        "assets": "💼 აქტივები",
+        "liabilities": "💸 ვალდებულებები",
+        "ops": "📈 ოპერაციები და კაპიტალი",
+        "sim": "🔮 სიმულატორი",
+        "fa": "გრძელვადიანი აქტივები",
+        "ca": "მიმდინარე აქტივები",
+        "ltl": "გრძელვადიანი ვალი",
+        "stl": "მოკლევადიანი ვალი",
         "own_cap": "საკუთარი კაპიტალი",
         "init_inv": "საწყისი ინვესტიცია",
         "cash": "ნაღდი ფული (Cash)",
         "ebitda": "EBITDA",
-        "net_profit": "წმინდა მოგება",
-        "tab_main": "🎯 მთავარი",
-        "tab_balance": "📊 სტრუქტურა",
-        "tab_info": "📚 ცნობარი",
+        "np": "წმინდა მოგება",
+        "tab1": "🎯 მთავარი",
+        "tab2": "📊 ბალანსი",
+        "tab3": "📚 ცნობარი",
         "strong": "✅ ძლიერი მხარეები",
         "risks": "⚠️ რისკები",
-        "guide": {
-            "roi": "**ROI:** (EBITDA / საწყისი ინვესტიცია) × 100.",
-            "roe": "**ROE:** (წმინდა მოგება / საკუთარი კაპიტალი) × 100.",
-            "cash": "**Cash:** ბიზნესის ხელთ არსებული ნაღდი ფული.",
-            "ebitda": "**EBITDA:** მოგება გადასახადებამდე და ამორტიზაციამდე."
-        }
+        "guide": [
+            "**ROI:** (EBITDA / საწყისი ინვესტიცია) × 100.",
+            "**ROE:** (წმინდა მოგება / საკუთარი კაპიტალი) × 100.",
+            "**ROA:** წმინდა მოგება / ჯამური აქტივები.",
+            "**Solvency 3:** საკუთარი კაპიტალი / ჯამური ვალდებულებები.",
+            "**Quick Ratio:** მიმდინარე აქტივები / მოკლევადიანი ვალი."
+        ]
     }
 }
 
-# 3. Мощный CSS (с тенями и карточками)
+# 3. Стильный CSS
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
     [data-testid="stMetric"] {
         background-color: #ffffff; border-radius: 15px; padding: 20px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #00d4ff;
-    }
-    .stTabs [data-baseweb="tab"] {
-        height: 50px; background-color: #ffffff; border-radius: 10px 10px 0 0;
-        padding: 10px 30px; font-weight: 600;
     }
     .stTabs [aria-selected="true"] { background-color: #1e2130 !important; color: white !important; }
     .section-header { font-size: 22px; font-weight: 700; color: #1e2130; margin: 20px 0; }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. SIDEBAR: Ввод данных по твоей методике
+# 4. SIDEBAR: Полный набор данных
 with st.sidebar:
-    lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
+    lang_choice = st.selectbox("🌐 Choose Language", list(LANGS.keys()))
     t = LANGS[lang_choice]
-
     st.header(t["settings"])
-    with st.expander(t["invest_header"], expanded=True):
+
+    with st.expander(t["assets"], expanded=True):
+        fa = st.number_input(t["fa"], value=2100000)
+        ca = st.number_input(t["ca"], value=900000)
+
+    with st.expander(t["liabilities"], expanded=True):
+        ltl = st.number_input(t["ltl"], value=800000)
+        stl = st.number_input(t["stl"], value=400000)
+
+    with st.expander(t["ops"], expanded=True):
         own_cap = st.number_input(t["own_cap"], value=1000000)
         init_inv = st.number_input(t["init_inv"], value=1500000)
         cash_val = st.number_input(t["cash"], value=300000)
-
-    with st.expander(t["ops_header"], expanded=True):
         ebitda_val = st.number_input(t["ebitda"], value=450000)
-        np_val = st.number_input(t["net_profit"], value=320000)
+        np_val = st.number_input(t["np"], value=320000)
 
     st.markdown("---")
-    st.header(t["sim_header"])
-    sim_ebitda_pct = st.slider("EBITDA Change %", -50, 50, 0)
+    st.header(t["sim"])
+    sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
-# 5. ЛОГИКА РАСЧЕТОВ (по методике)
-# Симулируем EBITDA
-current_ebitda = ebitda_val * (1 + sim_ebitda_pct / 100)
+# 5. РАСЧЕТЫ (Классическая школа)
+current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
+total_assets = fa + ca
+total_liabilities = ltl + stl
 
-# ROI = EBITDA / Initial Investment
 roi = (current_ebitda / init_inv * 100) if init_inv != 0 else 0
-# ROE = Net Profit / Own Capital
 roe = (np_val / own_cap * 100) if own_cap != 0 else 0
+roa = (np_val / total_assets * 100) if total_assets != 0 else 0
+sol3 = (own_cap / total_liabilities) if total_liabilities != 0 else 0
+qr = (ca / stl) if stl != 0 else 0
 
 # 6. ГЛАВНЫЙ ИНТЕРФЕЙС
 st.title(t["title"])
-tab1, tab2, tab3 = st.tabs([t["tab_main"], t["tab_balance"], t["tab_info"]])
+tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
 with tab1:
-    st.markdown(f'<div class="section-header">🚀 Key Performance Indicators</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">🔥 Рентабельность и Эффективность</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
-    c1.metric("ROI", f"{roi:.1f}%", help="EBITDA / Initial Investment", delta=f"{sim_ebitda_pct}%")
-    c2.metric("ROE", f"{roe:.1f}%", help="Net Profit / Own Capital")
-    c3.metric(t["cash"], f"{cash_val:,.0f} $")
+    c1.metric("ROI (Project)", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
+    c2.metric("ROE (Equity)", f"{roe:.1f}%")
+    c3.metric("ROA (Assets)", f"{roa:.1f}%")
 
-    st.markdown("---")
-    # Визуальный анализ EBITDA
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=current_ebitda,
-        title={'text': f"{t['ebitda']} (Simulated)"},
-        gauge={'axis': {'range': [None, ebitda_val * 2]}, 'bar': {'color': "#00d4ff"}}
-    ))
-    st.plotly_chart(fig, use_container_width=True)
+    st.markdown('<div class="section-header">🛡️ Устойчивость и Ликвидность</div>', unsafe_allow_html=True)
+    c4, c5, c6 = st.columns(3)
+    c4.metric("Solvency 3", f"{sol3:.2f}")
+    c5.metric("Quick Ratio", f"{qr:.2f}")
+    c6.metric(t["cash"], f"{cash_val:,.0f} $")
 
     st.markdown("---")
     s1, s2 = st.columns(2)
     with s1:
         st.success(f"#### {t['strong']}")
-        if roi > 20: st.write(f"High ROI: {roi:.1f}% ✅")
-        if cash_val > (init_inv * 0.1): st.write("Healthy Cash Reserve ✅")
+        if sol3 >= 1.0: st.write("Golden Balance ✅")
+        if roi > 25: st.write("Excellent Project ROI ✅")
     with s2:
         st.warning(f"#### {t['risks']}")
-        if current_ebitda < (ebitda_val * 0.7): st.error("Critical EBITDA Drop 🚨")
+        if qr < 1.0: st.error("Liquidity Risk 🚨")
+        if cash_val < (stl * 0.5): st.error("Low Cash Buffer 🚨")
 
 with tab2:
-    st.markdown(f'<div class="section-header">📊 {t["tab_balance"]}</div>', unsafe_allow_html=True)
-    df = pd.DataFrame({
-        "Parameter": [t["own_cap"], t["init_inv"], t["cash"], t["ebitda"]],
-        "Value ($)": [f"{own_cap:,.0f}", f"{init_inv:,.0f}", f"{cash_val:,.0f}", f"{ebitda_val:,.0f}"]
-    })
-    st.table(df)
+    st.markdown(f"#### {t['tab2']}")
+    col_t, col_p = st.columns([1, 1.2])
+    with col_t:
+        st.table(pd.DataFrame({
+            "Category": ["Fixed Assets", "Current Assets", "Own Capital", "Total Liabilities"],
+            "Value ($)": [f"{fa:,.0f}", f"{ca:,.0f}", f"{own_cap:,.0f}", f"{total_liabilities:,.0f}"]
+        }))
+    with col_p:
+        fig = go.Figure(data=[go.Pie(labels=['Own Capital', 'Total Debt'],
+                                     values=[max(0, own_cap), total_liabilities], hole=.4)])
+        fig.update_layout(height=350, margin=dict(t=0, b=0, l=0, r=0))
+        st.plotly_chart(fig, use_container_width=True)
 
 with tab3:
-    st.markdown(f'<div class="section-header">📚 {t["tab_info"]}</div>', unsafe_allow_html=True)
-    st.write(t["guide"]["roi"])
-    st.write(t["guide"]["roe"])
-    st.write(t["guide"]["cash"])
-    st.write(t["guide"]["ebitda"])
+    st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
+    for item in t["guide"]:
+        st.write(item)
