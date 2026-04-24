@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
-
+# Позволяет телефону распознать сайт как приложение
+st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
@@ -125,43 +126,31 @@ elif st.session_state["authentication_status"]:
         }
     }
 
-    # Повторная стилизация дашборда
     st.markdown("""
-        <style>
-        /* 1. Адаптивность для мобилок */
-        @media (max-width: 640px) {
-            .main .block-container {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-                padding-top: 20px !important;
+            <style>
+            /* Оптимизация под мобильное приложение */
+            @media (max-width: 640px) {
+                .main .block-container {
+                    padding: 10px !important;
+                }
+                [data-testid="stMetricValue"] {
+                    font-size: 1.5rem !important;
+                }
             }
-            /* Делаем метрики крупнее на телефоне */
-            [data-testid="stMetricValue"] {
-                font-size: 1.8rem !important;
+
+            /* Запрет системного меню на иконках и тексте (эффект нативности) */
+            * { -webkit-tap-highlight-color: transparent; }
+
+            [data-testid="stMetric"] {
+                background-color: #ffffff; 
+                border-radius: 15px; 
+                padding: 15px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+                border-left: 5px solid #00d4ff;
+                margin-bottom: 10px;
             }
-        }
-
-        /* 2. Красивые карточки метрик (уже знакомые тебе) */
-        [data-testid="stMetric"] {
-            background-color: #ffffff; 
-            border-radius: 15px; 
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            border-left: 5px solid #00d4ff;
-            margin-bottom: 10px;
-        }
-
-        /* 3. Стиль вкладок */
-        .stTabs [aria-selected="true"] { 
-            background-color: #1e2130 !important; 
-            color: white !important; 
-        }
-
-        /* 4. Скрытие лишних элементов Streamlit (опционально для чистоты) */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        </style>
-        """, unsafe_allow_html=True)
+            </style>
+            """, unsafe_allow_html=True)
 
     with st.sidebar:
         st.write(f'👤 *{st.session_state["name"]}*')
