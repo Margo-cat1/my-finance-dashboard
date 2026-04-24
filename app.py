@@ -128,12 +128,38 @@ elif st.session_state["authentication_status"]:
     # Повторная стилизация дашборда
     st.markdown("""
         <style>
-        [data-testid="stMetric"] {
-            background-color: #ffffff; border-radius: 15px; padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #00d4ff;
+        /* 1. Адаптивность для мобилок */
+        @media (max-width: 640px) {
+            .main .block-container {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                padding-top: 20px !important;
+            }
+            /* Делаем метрики крупнее на телефоне */
+            [data-testid="stMetricValue"] {
+                font-size: 1.8rem !important;
+            }
         }
-        .stTabs [aria-selected="true"] { background-color: #1e2130 !important; color: white !important; }
-        .section-header { font-size: 22px; font-weight: 700; color: #1e2130; margin: 20px 0; }
+
+        /* 2. Красивые карточки метрик (уже знакомые тебе) */
+        [data-testid="stMetric"] {
+            background-color: #ffffff; 
+            border-radius: 15px; 
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            border-left: 5px solid #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        /* 3. Стиль вкладок */
+        .stTabs [aria-selected="true"] { 
+            background-color: #1e2130 !important; 
+            color: white !important; 
+        }
+
+        /* 4. Скрытие лишних элементов Streamlit (опционально для чистоты) */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
         </style>
         """, unsafe_allow_html=True)
 
