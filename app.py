@@ -1,114 +1,95 @@
 import streamlit as st
 import plotly.graph_objects as go
+import pandas as pd
 
-st.set_page_config(page_title="Financial OS PRO", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Financial OS Intelligence", page_icon="📊", layout="wide")
 
-st.title("📈 Financial Intelligence: Полный анализ и аудит")
+st.title("📊 Financial OS: Детальный баланс и аудит")
 st.markdown("---")
 
-# --- СЕКЦИЯ 1: УПРАВЛЕНИЕ (Sidebar) ---
-st.sidebar.header("🕹️ Симулятор сценариев")
-d_rev = st.sidebar.slider("Выручка (%)", -50, 100, 0) / 100
-d_exp = st.sidebar.slider("Расходы (%)", -50, 50, 0) / 100
-d_assets = st.sidebar.slider("Активы (%)", -20, 50, 0) / 100
-d_debt = st.sidebar.slider("Долги (%)", -50, 100, 0) / 100
+# --- СЕКЦИЯ 1: ВВОД ДАННЫХ (Sidebar) ---
+st.sidebar.header("📥 Ввод данных баланса")
 
-# --- СЕКЦИЯ 2: БАЗОВЫЕ ДАННЫЕ (Твой фундамент) ---
-base = {
-    "rev": 1500000,
-    "exp": 1100000,
-    "total_assets": 3000000,
-    "current_assets": 900000,
-    "liabilities": 1200000
-}
+st.sidebar.subheader("Активы (Assets)")
+fa = st.sidebar.number_input("Fixed Assets (Внеоборотные)", value=2100000, step=10000)
+ca = st.sidebar.number_input("Current Assets (Оборотные)", value=900000, step=10000)
 
-# --- СЕКЦИЯ 3: РАСЧЕТЫ ---
-rev = base["rev"] * (1 + d_rev)
-exp = base["exp"] * (1 + d_exp)
-total_assets = base["total_assets"] * (1 + d_assets)
-debt = base["liabilities"] * (1 + d_debt)
-equity = total_assets - debt
+st.sidebar.subheader("Обязательства (Liabilities)")
+ltl = st.sidebar.number_input("Long-term (Долгосрочные)", value=800000, step=10000)
+stl = st.sidebar.number_input("Short-term (Краткосрочные)", value=400000, step=10000)
+
+st.sidebar.subheader("Доходы и расходы")
+rev = st.sidebar.number_input("Выручка (Revenue)", value=1500000, step=10000)
+exp = st.sidebar.number_input("Расходы (Expenses)", value=1100000, step=10000)
+
+# --- СЕКЦИЯ 2: РАСЧЕТЫ ПОКАЗАТЕЛЕЙ ---
+total_assets = fa + ca
+total_liabilities = ltl + stl
+equity = total_assets - total_liabilities
 profit = rev - exp
 
 # Коэффициенты
 roi = (profit / exp * 100) if exp != 0 else 0
 roe = (profit / equity * 100) if equity > 0 else 0
 roa = (profit / total_assets * 100) if total_assets > 0 else 0
-sol2 = (total_assets / debt) if debt != 0 else 0
-sol3 = (equity / debt) if debt != 0 else 0
-qr = (base["current_assets"] * (1 + d_assets) / debt) if debt != 0 else 0
+sol2 = (total_assets / total_liabilities) if total_liabilities != 0 else 0
+sol3 = (equity / total_liabilities) if total_liabilities != 0 else 0
+qr = (ca / stl) if stl != 0 else 0  # Ликвидность: оборотные к коротким долгам
 
-# --- СЕКЦИЯ 4: ТАБЛО ПОКАЗАТЕЛЕЙ ---
-st.subheader("🚀 Рентабельность и Устойчивость")
-m1, m2, m3, m4, m5 = st.columns(5)
-m1.metric("ROI", f"{roi:.1f}%")
-m2.metric("ROE", f"{roe:.1f}%")
-m3.metric("ROA", f"{roa:.1f}%")
-m4.metric("Sol2", f"{sol2:.2f}")
-m5.metric("Quick Ratio", f"{qr:.2f}")
+# --- СЕКЦИЯ 3: ТАБЛИЦА БАЛАНСА ---
+st.subheader("📑 Структура баланса (Balance Sheet)")
+col_table, col_metrics = st.columns([1.5, 1])
 
-st.markdown("---")
+with col_table:
+    balance_data = {
+        "Категория": ["Fixed Assets", "Current Assets", "TOTAL ASSETS", "Long-term Liabilities",
+                      "Short-term Liabilities", "TOTAL LIABILITIES", "EQUITY (Капитал)"],
+        "Сумма ($)": [f"{fa:,.0f}", f"{ca:,.0f}", f"{total_assets:,.0f}", f"{ltl:,.0f}", f"{stl:,.0f}",
+                      f"{total_liabilities:,.0f}", f"{equity:,.0f}"]
+    }
+    st.table(pd.DataFrame(balance_data))
 
-# --- СЕКЦИЯ 5: ВИЗУАЛИЗАЦИЯ (Активы vs Долги) ---
-col_left, col_right = st.columns(2)
-
-with col_left:
-    # График структуры баланса
-    fig_balance = go.Figure(data=[
-        go.Bar(name='Активы (Assets)', x=['Баланс'], y=[total_assets], marker_color='#00b4d8'),
-        go.Bar(name='Долги (Liabilities)', x=['Баланс'], y=[debt], marker_color='#ef476f'),
-        go.Bar(name='Капитал (Equity)', x=['Баланс'], y=[equity], marker_color='#06d6a0')
-    ])
-    fig_balance.update_layout(title="Структура: Где активы и где долги", barmode='group', template="plotly_dark")
-    st.plotly_chart(fig_balance, use_container_width=True)
-
-with col_right:
-    # Сравнение ROE / ROA
-    fig_rent = go.Figure(data=[
-        go.Bar(name='ROE', x=['Рентабельность %'], y=[roe], marker_color='#ffd166'),
-        go.Bar(name='ROA', x=['Рентабельность %'], y=[roa], marker_color='#118ab2')
-    ])
-    fig_rent.update_layout(title="ROE vs ROA", template="plotly_dark", yaxis_ticksuffix="%")
-    st.plotly_chart(fig_rent, use_container_width=True)
-
-# --- СЕКЦИЯ 6: SWOT-АНАЛИЗ (Сильные и слабые стороны) ---
-st.subheader("🕵️ Анализ сильных и слабых сторон")
-swot_1, swot_2 = st.columns(2)
-
-with swot_1:
-    st.write("### ✅ Сильные стороны")
-    if roi > 20: st.write("- **Высокая маржинальность:** Твой ROI выше 20%, это отличный показатель.")
-    if sol2 > 1.5: st.write("- **Устойчивость:** Активов значительно больше, чем долгов.")
-    if roe > roa: st.write("- **Финансовый рычаг:** Ты эффективно используешь заемный капитал для роста прибыли.")
-
-with swot_2:
-    st.write("### ⚠️ Слабые стороны / Риски")
-    if debt > total_assets * 0.6: st.write("- **Задолженность:** Долги составляют более 60% активов. Опасно!")
-    if qr < 1.0: st.write("- **Ликвидность:** Денег «здесь и сейчас» может не хватить на покрытие долгов.")
-    if profit < 0: st.error("- **Убыточность:** В данной модели расходы превышают доходы!")
+with col_metrics:
+    st.write("### 🏁 Итоги")
+    st.metric("Чистая прибыль", f"{profit:,.0f} $")
+    st.metric("ROI (Окупаемость)", f"{roi:.1f}%")
+    st.metric("ROE (Рентабельность)", f"{roe:.1f}%")
 
 st.markdown("---")
 
-# --- СЕКЦИЯ 7: ОБУЧЕНИЕ (Справочник) ---
-with st.expander("🎓 Что значат эти буквы? (Справочник и нормы)"):
+# --- СЕКЦИЯ 4: ВИЗУАЛИЗАЦИЯ И SWOT ---
+c1, c2 = st.columns(2)
+
+with c1:
+    st.write("### ⚖️ Golden Balance")
+    fig_gb = go.Figure(data=[go.Pie(
+        labels=['Собственный капитал (Equity)', 'Весь долг (Liabilities)'],
+        values=[max(0, equity), total_liabilities],
+        hole=.5,
+        marker_colors=['#00c49f', '#ff4b4b']
+    )])
+    fig_gb.update_layout(template="plotly_dark", showlegend=True)
+    st.plotly_chart(fig_gb, use_container_width=True)
+
+with c2:
+    st.write("### 🕵️ Сильные и слабые стороны")
+    # Анализ ликвидности и устойчивости
+    if qr >= 1.0:
+        st.success(f"✅ **Ликвидность в норме:** Quick Ratio = {qr:.2f}. Ты можешь быстро закрыть краткосрочные долги.")
+    else:
+        st.error(f"❌ **Риск ликвидности:** QR = {qr:.2f}. Оборотных активов не хватает для покрытия текущих долгов!")
+
+    if sol3 >= 1.0:
+        st.success(f"✅ **Sol3 в норме:** {sol3:.2f}. Капитал полностью перекрывает обязательства.")
+    else:
+        st.warning(f"⚠️ **Sol3 низкий:** {sol3:.2f}. Бизнес сильно зависит от внешних займов.")
+
+# --- СЕКЦИЯ 5: СПРАВОЧНИК ---
+with st.expander("🎓 Справочник показателей"):
     st.write("""
-    ### 1. ROI (Return on Investment)
-    * **Что это:** Окупаемость затрат. Сколько прибыли приносит каждый вложенный доллар в производство.
-    * **Норма:** > 15-20%.
-
-    ### 2. ROE (Return on Equity)
-    * **Что это:** Рентабельность собственного капитала. Самый важный показатель для владельца.
-    * **Норма:** Должен быть выше ROA и выше банковского депозита (обычно > 15%).
-
-    ### 3. ROA (Return on Assets)
-    * **Что это:** Насколько эффективно компания использует всё, чем владеет (здания, технику, деньги).
-    * **Норма:** Зависит от отрасли, но в среднем > 5-10%.
-
-    ### 4. Solvency 2 (Устойчивость)
-    * **Что это:** Соотношение активов к долгам.
-    * **Норма:** > 1.5. Если меньше — компания живет "в долг".
-
-    ### 5. Quick Ratio (Ликвидность)
-    * **Что это:** Сможешь ли ты завтра отдать долги, если бизнес внезапно закроется.
-    * **Норма:** > 1.0.
+    - **Fixed Assets:** Здания, оборудование, софт — то, что сложно быстро продать.
+    - **Current Assets:** Деньги на счету, товары, дебиторка — то, что быстро превращается в кэш.
+    - **Short-term Liabilities:** Долги, которые нужно отдать в течение года.
+    - **Long-term Liabilities:** Кредиты на долгий срок.
+    - **Golden Balance:** Идеально, когда Equity (зеленое) занимает больше половины круга.
     """)
