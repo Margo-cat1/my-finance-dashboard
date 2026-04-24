@@ -36,45 +36,31 @@ elif st.session_state["authentication_status"]:
     LANGS = {
         "Русский": {
             "title": "📊 Финансовый Интеллект",
-            "eff_head": "🚀 Эффективность (EBITDA)",
-            "sol_head": "🛡️ Устойчивость и Ликвидность",
-            "analys_head": "🔍 Автоматический анализ",
-            "guide_head": "📚 Справочник нормативов",
+            "eff": "🚀 Эффективность (EBITDA)",
+            "sol": "🛡️ Устойчивость и Ликвидность",
+            "analys": "🔍 Автоматический анализ",
+            "guide": "📚 Справочник",
             "assets": "💼 Активы", "liabs": "💸 Долги", "ops": "📈 Операционка",
             "qr_label": "Quick Ratio (Ликвидность)",
-            "qr_guide": "**Quick Ratio:** Минимум: **2.0**. У вас должно быть в 2 раза больше кэша, чем срочных долгов.",
-            "roi_guide": "**ROI:** Цель: **> 25%**. Показывает окупаемость вложений.",
-            "roe_guide": "**ROE:** Цель: **> 20%**. Эффективность использования капитала.",
+            "qr_info": "**Quick Ratio:** Минимум: **2.0**. Показывает, хватит ли кэша закрыть долги дважды.",
+            "roi_info": "**ROI:** Цель: **> 25%**. Окупаемость инвестиций.",
+            "roe_info": "**ROE:** Цель: **> 20%**. Эффективность капитала.",
             "warn_qr": "⚠️ QR ниже нормы 2.0!",
-            "success_qr": "✅ Ликвидность в норме (QR > 2.0)"
-        },
-        "English": {
-            "title": "📊 Financial Intelligence",
-            "eff_head": "🚀 Efficiency (EBITDA)",
-            "sol_head": "🛡️ Solvency & Liquidity",
-            "analys_head": "🔍 Automated Analysis",
-            "guide_head": "📚 Benchmarks Guide",
-            "assets": "💼 Assets", "liabs": "💸 Liabilities", "ops": "📈 Operations",
-            "qr_label": "Quick Ratio",
-            "qr_guide": "**Quick Ratio:** Minimum: **2.0**. Cash should cover urgent debts twice.",
-            "roi_guide": "**ROI:** Target: **> 25%**. Measures investment return.",
-            "roe_guide": "**ROE:** Target: **> 20%**. Measures equity efficiency.",
-            "warn_qr": "⚠️ QR below 2.0 benchmark!",
-            "success_qr": "✅ Liquidity is healthy (QR > 2.0)"
+            "ok_qr": "✅ Ликвидность в норме"
         },
         "ქართული": {
             "title": "📊 ფინანსური ინტელექტი",
-            "eff_head": "🚀 ეფექტურობა (EBITDA)",
-            "sol_head": "🛡️ მდგრადობა და ლიკვიდურობა",
-            "analys_head": "🔍 ავტომატური ანალიზი",
-            "guide_head": "📚 ცნობარი",
+            "eff": "🚀 ეფექტურობა (EBITDA)",
+            "sol": "🛡️ მდგრადობა და ლიკვიდურობა",
+            "analys": "🔍 ავტომატური ანალიზი",
+            "guide": "📚 ცნობარი",
             "assets": "💼 აქტივები", "liabs": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
             "qr_label": "Quick Ratio (ლიკვიდობა)",
-            "qr_guide": "**Quick Ratio:** მინიმუმი: **2.0**. ნაღდი ფული უნდა ფარავდეს ვალებს ორმაგად.",
-            "roi_guide": "**ROI:** მიზანი: **> 25%**.",
-            "roe_guide": "**ROE:** მიზანი: **> 20%**.",
+            "qr_info": "**Quick Ratio:** მინიმუმი: **2.0**. ნაღდი ფული უნდა ფარავდეს ვალებს ორმაგად.",
+            "roi_info": "**ROI:** მიზანი: **> 25%**.",
+            "roe_info": "**ROE:** მიზანი: **> 20%**.",
             "warn_qr": "⚠️ QR ნორმაზე (2.0) დაბალია!",
-            "success_qr": "✅ ლიკვიდობა ნორმაშია (QR > 2.0)"
+            "ok_qr": "✅ ლიკვიდობა ნორმაშია"
         }
     }
 
@@ -99,23 +85,23 @@ elif st.session_state["authentication_status"]:
     roe = (ebitda / own_cap * 100) if own_cap != 0 else 0
 
     st.title(t["title"])
-    tab1, tab3 = st.tabs(["🎯 Dashboard", "📚 Guide"])
+    tab1, tab3 = st.tabs(["🎯 Dashboard", t["guide"]])
 
     with tab1:
-        st.subheader(t["eff_head"])
+        st.subheader(t["eff"])
         c1, c2 = st.columns(2)
         c1.metric("ROI", f"{roi:.1f}%")
         c2.metric("ROE", f"{roe:.1f}%")
 
-        st.subheader(t["sol_head"])
+        st.subheader(t["sol"])
         st.metric(t["qr_label"], f"{qr:.2f}")
         if qr < 2.0:
             st.warning(f"{t['warn_qr']} (Current: {qr:.2f})")
         else:
-            st.success(t["success_qr"])
+            st.success(t["ok_qr"])
 
     with tab3:
-        st.header(t["guide_head"])
-        st.info(t["qr_guide"])
-        st.info(t["roi_guide"])
-        st.info(t["roe_guide"])
+        st.header(t["guide"])
+        st.info(t["qr_info"])
+        st.info(t["roi_info"])
+        st.info(t["roe_info"])
