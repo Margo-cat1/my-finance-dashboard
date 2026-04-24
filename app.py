@@ -225,24 +225,50 @@ elif st.session_state["authentication_status"]:
     st.title(t["title"])
     tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
-    with tab1:
-        # Блок Анализа с иконками
-        st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
-        col_s, col_r = st.columns(2)
-        with col_s:
-            if sol3_pct >= 50:
-                st.info(f"💎 {t['msg_autonomy']}")
-            if roi >= 25:
-                st.info(f"🚀 {t['msg_roi']} ({roi:.1f}%)")
-            if qr >= 2.0:
-                st.info(f"💧 {t['msg_liq']}")
-        with col_r:
-            if sol3_pct < 30:
-                st.warning(f"⚠️ {t['msg_dep']}")
-            if qr < 2.0:
-                st.error(f"🚨 {t['msg_cash_low']} (Current: {qr:.2f})")
-            if sol2_val < 0:
-                st.error(f"💣 {t['msg_bankrupt']}")
+
+        with tab1:
+            # --- СЕКЦИЯ 1: ЭФФЕКТИВНОСТЬ (ROI, ROE, ROA) ---
+            st.markdown(f'<div class="section-header">{t["sec_eff"]}</div>', unsafe_allow_html=True)
+            c1, c2, c3 = st.columns(3)
+
+            # Расчеты (убедись, что переменные определены выше в коде)
+            # roi = (current_ebitda / init_inv * 100)
+            # roe = (current_ebitda / own_cap * 100)
+            # roa = (current_ebitda / total_assets * 100)
+
+            c1.metric("ROI (Окупаемость)", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
+            c2.metric("ROE (Капитал)", f"{roe:.1f}%")
+            c3.metric("ROA (Активы)", f"{roa:.1f}%")
+
+            # --- СЕКЦИЯ 2: УСТОЙЧИВОСТЬ ---
+            st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
+            c4, c5, c6 = st.columns(3)
+            c4.metric("Solvency 2 (Net Assets)", f"{sol2_val:,.0f} $")
+            c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
+            c6.metric("Quick Ratio (Ликвидность)", f"{qr:.2f}")
+
+            # --- СЕКЦИЯ 3: АВТОМАТИЧЕСКИЙ АНАЛИЗ (Как на твоем фото) ---
+            st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
+
+            col_s, col_r = st.columns(2)
+
+            with col_s:
+                st.success(f"### {t['strong']}")
+                if sol3_pct >= 50:
+                    st.info(f"💎 {t['msg_autonomy']}")
+                if roi >= 25:
+                    st.info(f"🚀 {t['msg_roi']} ({roi:.1f}%)")
+                if qr >= 2.0:
+                    st.info(f"💧 {t['msg_liq']}")
+
+            with col_r:
+                st.warning(f"### {t['risks']}")
+                if sol3_pct < 30:
+                    st.error(f"🚩 {t['msg_dep']}")
+                if qr < 2.0:
+                    st.error(f"🚨 {t['msg_cash_low']} (Current: {qr:.2f})")
+                if sol2_val < 0:
+                    st.error(f"💣 {t['msg_bankrupt']}")
         with col_s:
             st.success(f"### {t['strong']}")
             if sol3_pct >= 50: st.write(t["msg_autonomy"])
