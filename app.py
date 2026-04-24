@@ -5,7 +5,7 @@ import streamlit_authenticator as stauth
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
-# --- БЛОК АВТОРИЗАЦИИ ---
+# --- БЛОК АВТОРИЗАЦИИ (admin123 / margo456) ---
 credentials = {
     'usernames': {
         'admin': {
@@ -20,8 +20,6 @@ credentials = {
 }
 
 authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
-
-# Вызов окна логина
 authenticator.login()
 
 if st.session_state["authentication_status"] is False:
@@ -38,53 +36,65 @@ elif st.session_state["authentication_status"]:
     LANGS = {
         "Русский": {
             "title": "📊 Финансовый Интеллект",
-            "eff": "🚀 Эффективность (EBITDA)",
-            "sol": "🛡️ Устойчивость и Ликвидность",
-            "fa": "Внеоборотные активы", "ca": "Оборотные активы",
-            "stl": "Краткосрочные долги", "cash": "Наличные",
-            "guide_title": "📚 Справочник нормативов",
-            "qr_text": "**Quick Ratio:** Минимум: **2.0**. Показывает, хватит ли кэша закрыть долги дважды.",
-            "roi_text": "**ROI:** Цель: **> 25%**. Окупаемость инвестиций.",
-            "roe_text": "**ROE:** Цель: **> 20%**. Эффективность ваших личных денег."
+            "eff_head": "🚀 Эффективность (EBITDA)",
+            "sol_head": "🛡️ Устойчивость и Ликвидность",
+            "analys_head": "🔍 Автоматический анализ",
+            "guide_head": "📚 Справочник нормативов",
+            "assets": "💼 Активы", "liabs": "💸 Долги", "ops": "📈 Операционка",
+            "qr_label": "Quick Ratio (Ликвидность)",
+            "qr_guide": "**Quick Ratio:** Минимум: **2.0**. У вас должно быть в 2 раза больше кэша, чем срочных долгов.",
+            "roi_guide": "**ROI:** Цель: **> 25%**. Показывает окупаемость вложений.",
+            "roe_guide": "**ROE:** Цель: **> 20%**. Эффективность использования капитала.",
+            "warn_qr": "⚠️ QR ниже нормы 2.0!",
+            "success_qr": "✅ Ликвидность в норме (QR > 2.0)"
         },
         "English": {
             "title": "📊 Financial Intelligence",
-            "eff": "🚀 Efficiency (EBITDA)",
-            "sol": "🛡️ Solvency & Liquidity",
-            "fa": "Fixed Assets", "ca": "Current Assets",
-            "stl": "Short-term Debt", "cash": "Cash",
-            "guide_title": "📚 Benchmarks Guide",
-            "qr_text": "**Quick Ratio:** Minimum: **2.0**. Cash should cover urgent debts twice.",
-            "roi_text": "**ROI:** Target: **> 25%**. Return on Investment.",
-            "roe_text": "**ROE:** Target: **> 20%**. Return on Equity."
+            "eff_head": "🚀 Efficiency (EBITDA)",
+            "sol_head": "🛡️ Solvency & Liquidity",
+            "analys_head": "🔍 Automated Analysis",
+            "guide_head": "📚 Benchmarks Guide",
+            "assets": "💼 Assets", "liabs": "💸 Liabilities", "ops": "📈 Operations",
+            "qr_label": "Quick Ratio",
+            "qr_guide": "**Quick Ratio:** Minimum: **2.0**. Cash should cover urgent debts twice.",
+            "roi_guide": "**ROI:** Target: **> 25%**. Measures investment return.",
+            "roe_guide": "**ROE:** Target: **> 20%**. Measures equity efficiency.",
+            "warn_qr": "⚠️ QR below 2.0 benchmark!",
+            "success_qr": "✅ Liquidity is healthy (QR > 2.0)"
         },
         "ქართული": {
             "title": "📊 ფინანსური ინტელექტი",
-            "eff": "🚀 ეფექტურობა (EBITDA)",
-            "sol": "🛡️ მდგრადობა და ლიკვიდურობა",
-            "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
-            "stl": "მოკლევადიანი ვალი", "cash": "ნაღდი ფული",
-            "guide_title": "📚 ცნობარი",
-            "qr_text": "**Quick Ratio:** მინიმუმი: **2.0**.",
-            "roi_text": "**ROI:** მიზანი: **> 25%**.",
-            "roe_text": "**ROE:** მიზანი: **> 20%**."
+            "eff_head": "🚀 ეფექტურობა (EBITDA)",
+            "sol_head": "🛡️ მდგრადობა და ლიკვიდურობა",
+            "analys_head": "🔍 ავტომატური ანალიზი",
+            "guide_head": "📚 ცნობარი",
+            "assets": "💼 აქტივები", "liabs": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
+            "qr_label": "Quick Ratio (ლიკვიდობა)",
+            "qr_guide": "**Quick Ratio:** მინიმუმი: **2.0**. ნაღდი ფული უნდა ფარავდეს ვალებს ორმაგად.",
+            "roi_guide": "**ROI:** მიზანი: **> 25%**.",
+            "roe_guide": "**ROE:** მიზანი: **> 20%**.",
+            "warn_qr": "⚠️ QR ნორმაზე (2.0) დაბალია!",
+            "success_qr": "✅ ლიკვიდობა ნორმაშია (QR > 2.0)"
         }
     }
 
-    # Интерфейс
     with st.sidebar:
         lang = st.selectbox("🌐 Language", list(LANGS.keys()))
         t = LANGS[lang]
-        fa_val = st.number_input(t["fa"], value=2100000)
-        ca_val = st.number_input(t["ca"], value=900000)
-        stl_val = st.number_input(t["stl"], value=400000)
-        cash_v = st.number_input(t["cash"], value=300000)
-        ebitda = st.number_input("EBITDA", value=450000)
-        init_inv = st.number_input("Initial Investment", value=1500000)
-        own_cap = st.number_input("Own Capital", value=1000000)
+
+        with st.expander(t["assets"]):
+            fa = st.number_input("Fixed Assets", value=2100000)
+            ca = st.number_input("Current Assets", value=900000)
+        with st.expander(t["liabs"]):
+            stl = st.number_input("Short-term Debt", value=400000)
+        with st.expander(t["ops"]):
+            cash = st.number_input("Cash", value=300000)
+            ebitda = st.number_input("EBITDA", value=450000)
+            init_inv = st.number_input("Investment", value=1500000)
+            own_cap = st.number_input("Equity", value=1000000)
 
     # Расчеты
-    qr = cash_v / stl_val if stl_val != 0 else 0
+    qr = cash / stl if stl != 0 else 0
     roi = (ebitda / init_inv * 100) if init_inv != 0 else 0
     roe = (ebitda / own_cap * 100) if own_cap != 0 else 0
 
@@ -92,20 +102,20 @@ elif st.session_state["authentication_status"]:
     tab1, tab3 = st.tabs(["🎯 Dashboard", "📚 Guide"])
 
     with tab1:
-        st.subheader(t["eff"])
+        st.subheader(t["eff_head"])
         c1, c2 = st.columns(2)
         c1.metric("ROI", f"{roi:.1f}%")
         c2.metric("ROE", f"{roe:.1f}%")
 
-        st.subheader(t["sol"])
-        st.metric("Quick Ratio", f"{qr:.2f}")
+        st.subheader(t["sol_head"])
+        st.metric(t["qr_label"], f"{qr:.2f}")
         if qr < 2.0:
-            st.warning(f"⚠️ QR ниже нормы 2.0! Текущий: {qr:.2f}")
+            st.warning(f"{t['warn_qr']} (Current: {qr:.2f})")
         else:
-            st.success(f"✅ Ликвидность в норме (QR > 2.0)")
+            st.success(t["success_qr"])
 
     with tab3:
-        st.header(t["guide_title"])
-        st.info(t["qr_text"])
-        st.info(t["roi_text"])
-        st.info(t["roe_text"])
+        st.header(t["guide_head"])
+        st.info(t["qr_guide"])
+        st.info(t["roi_guide"])
+        st.info(t["roe_guide"])
