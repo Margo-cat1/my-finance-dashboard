@@ -128,7 +128,7 @@ elif st.session_state["authentication_status"]:
 
     st.markdown("""
         <style>
-        /* 1. ШРИФТЫ И ОБЩИЙ ФОН */
+        /* 1. ОБЩИЕ НАСТРОЙКИ ШРИФТА И ФОНА */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
         html, body, [data-testid="stAppViewContainer"] {
@@ -136,79 +136,59 @@ elif st.session_state["authentication_status"]:
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
         }
 
-        /* 2. ФИКС САЙДБАРА (Чтобы не перекрывал контент на мобилках) */
+        /* 2. ВОЗВРАЩАЕМ КНОПКУ МЕНЮ И НАСТРАИВАЕМ САЙДБАР */
+        header {
+            visibility: visible !important; /* Кнопка меню должна быть видна! */
+            background: transparent !important;
+        }
+
+        [data-testid="stSidebar"] {
+            background-color: white !important;
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* 3. ФИКС ДЛЯ МОБИЛОК (Чтобы не было каши) */
         @media (max-width: 640px) {
-            /* Уменьшаем ширину сайдбара, чтобы оставался зазор справа */
             [data-testid="stSidebar"] {
-                width: 85vw !important;
-                background-color: white !important;
-                box-shadow: 10px 0 20px rgba(0,0,0,0.1);
+                width: 80vw !important; /* Меню занимает 80% экрана */
+                z-index: 1000001 !important;
             }
 
-            /* Сдвигаем основной контент или затемняем его при открытом меню */
-            [data-testid="stSidebar"][aria-expanded="true"] ~ .main {
-                filter: blur(2px) brightness(0.8);
+            /* Добавляем отступ сверху в меню, чтобы элементы не вылазили под кнопку закрытия */
+            [data-testid="stSidebar"] .block-container {
+                padding-top: 3rem !important;
             }
 
-            /* Уменьшаем шрифт метрик, чтобы влезали в ряд */
+            /* Метрики чуть мельче на мобилке, чтобы не наезжали друг на друга */
             [data-testid="stMetricValue"] {
-                font-size: 1.6rem !important;
+                font-size: 1.4rem !important;
             }
         }
 
-        /* 3. КАРТОЧКИ (Glassmorphism + Hover) */
+        /* 4. КАРТОЧКИ (Glassmorphism) */
         [data-testid="stMetric"] {
             background: rgba(255, 255, 255, 0.7) !important;
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px !important;
-            padding: 20px !important;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1) !important;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            padding: 15px !important;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05) !important;
         }
 
-        [data-testid="stMetric"]:hover {
-            transform: translateY(-5px) scale(1.02);
-            background: rgba(255, 255, 255, 0.9) !important;
-            border-left: 6px solid #090979 !important;
-        }
-
-        /* 4. ЗАГОЛОВКИ И ТЕКСТ */
-        .section-header {
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(90deg, #1e2130, #090979);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
-            letter-spacing: -1px;
-        }
-
-        /* 5. ПОЛЯ ВВОДА И КЛАВИАТУРА */
+        /* 5. ПОЛЯ ВВОДА */
         input {
             -webkit-user-select: text !important;
             user-select: text !important;
-            border-radius: 12px !important;
-            border: 1px solid #e0e0e0 !important;
         }
 
-        div[data-baseweb="input"] {
-            background-color: white !important;
-            border-radius: 12px !important;
-        }
-
-        /* 6. СТИЛЬНЫЕ ТАБЫ */
+        /* 6. КРАСИВЫЕ ТАБЫ */
         .stTabs [aria-selected="true"] {
             background: linear-gradient(90deg, #00d4ff 0%, #090979 100%) !important;
             color: white !important;
             border-radius: 12px !important;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
-        /* Убираем лишние кнопки Streamlit сверху для чистоты */
-        header {visibility: hidden;}
-        #MainMenu {visibility: hidden;}
+        /* Скрываем только футер (сделано в Streamlit) */
         footer {visibility: hidden;}
         </style>
         """, unsafe_allow_html=True)
