@@ -70,8 +70,11 @@ with c2:
         go.Bar(name='ROE', x=['Рентабельность'], y=[roe], marker_color='#f1c40f'),
         go.Bar(name='ROA', x=['Рентабельность'], y=[roa], marker_color='#3498db')
     ])
-    fig_compare.update_layout(title="ROE vs ROA", template="plotly_dark", yaxis_suffix="%")
-    st.plotly_chart(fig_compare, use_container_width=True)
+    fig_compare.update_layout(
+        title="ROE vs ROA",
+        template="plotly_dark",
+        yaxis_ticksuffix="%"  # Вот так правильно писать суффикс в Plotly
+    )
 
 # --- СЕКЦИЯ 6: АВТО-АНАЛИЗ ---
 st.subheader("🔍 Что это значит?")
