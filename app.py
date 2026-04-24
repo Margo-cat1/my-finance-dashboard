@@ -128,7 +128,19 @@ elif st.session_state["authentication_status"]:
 
     st.markdown("""
             <style>
-            /* Оптимизация под мобильное приложение */
+            /* Фикс для появления клавиатуры на мобилках */
+            input {
+                -webkit-user-select: text !important;
+                -moz-user-select: text !important;
+                -ms-user-select: text !important;
+                user-select: text !important;
+            }
+
+            /* Улучшаем кликабельность полей */
+            div[data-baseweb="input"] {
+                cursor: text !important;
+            }
+
             @media (max-width: 640px) {
                 .main .block-container {
                     padding: 10px !important;
@@ -138,16 +150,15 @@ elif st.session_state["authentication_status"]:
                 }
             }
 
-            /* Запрет системного меню на иконках и тексте (эффект нативности) */
-            * { -webkit-tap-highlight-color: transparent; }
-
-            [data-testid="stMetric"] {
-                background-color: #ffffff; 
-                border-radius: 15px; 
-                padding: 15px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-                border-left: 5px solid #00d4ff;
-                margin-bottom: 10px;
+            /* Стили формы логина (центрирование) */
+            [data-testid="stForm"] {
+                border: none;
+                padding: 20px;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                background-color: #ffffff;
+                max-width: 400px;
+                margin: 0 auto;
             }
             </style>
             """, unsafe_allow_html=True)
