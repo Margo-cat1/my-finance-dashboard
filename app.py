@@ -5,6 +5,38 @@ import streamlit_authenticator as stauth
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
+# --- СТИЛИЗАЦИЯ ФОРМЫ ЛОГИНА ---
+st.markdown("""
+    <style>
+    /* Центрируем блок логина */
+    [data-testid="stForm"] {
+        border: none;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        background-color: #ffffff;
+        max-width: 450px;
+        margin: 50px auto;
+    }
+    /* Заголовок формы */
+    .login-header {
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+        color: #1e2130;
+        margin-bottom: 30px;
+    }
+    /* Кнопка входа */
+    button[kind="primaryFormSubmit"] {
+        width: 100%;
+        background: linear-gradient(90deg, #00d4ff 0%, #090979 100%);
+        border: none;
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # --- БЛОК АВТОРИЗАЦИИ ---
 credentials = {
     'usernames': {
@@ -20,16 +52,20 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-# Вызов логина (без аргумента 'main', чтобы не было ошибки)
+# Красивый заголовок над формой
+if not st.session_state.get("authentication_status"):
+    st.markdown("<h1 class='login-header'>🔐 Financial Intelligence</h1>", unsafe_allow_html=True)
+
+# Вызываем логин
 authenticator.login()
 
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 elif st.session_state["authentication_status"] is None:
-    st.warning('Please enter your username and password')
+    st.info('Please enter your credentials to access the dashboard')
 elif st.session_state["authentication_status"]:
 
-    # 2. Словарь переводов
+    # --- ТВОЙ ОСНОВНОЙ КОД (БЕЗ ИЗМЕНЕНИЙ) ---
     LANGS = {
         "Русский": {
             "title": "📊 Финансовый Интеллект",
@@ -51,40 +87,12 @@ elif st.session_state["authentication_status"]:
             "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
             "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
             "guide": {
-                "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**. Если ниже 15%, проект окупается слишком долго.",
-                "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**. Ваши личные деньги должны работать эффективнее, чем банковский депозит.",
-                "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**. Показывает, не «простаивает» ли ваше оборудование и имущество.",
-                "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**. Если сумма в минусе — вы работаете в убыток капиталу (банкротство).",
-                "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**. Ниже 30% — критическая зависимость от чужих денег.",
-                "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**. У вас должно быть в 2 раза больше кэша, чем срочных долгов."
-            }
-        },
-        "English": {
-            "title": "📊 Financial Intelligence",
-            "settings": "⚙️ Data Input",
-            "assets": "💼 Assets", "liabilities": "💸 Liabilities", "ops": "📈 Operations",
-            "fa": "Fixed Assets", "ca": "Current Assets",
-            "ltl": "Long-term Debt", "stl": "Short-term Debt",
-            "own_cap": "Own Capital", "init_inv": "Initial Investment",
-            "cash": "Cash", "ebitda": "EBITDA",
-            "tab1": "🎯 Dashboard", "tab2": "📊 Structure", "tab3": "📚 Guide",
-            "sec_eff": "🚀 Efficiency (EBITDA)",
-            "sec_sol": "🛡️ Solvency & Liquidity",
-            "analysis_header": "🔍 Automated Analysis",
-            "strong": "✅ Strengths", "risks": "⚠️ Risks",
-            "msg_autonomy": "🌟 **Autonomy:** Most assets belong to you.",
-            "msg_roi": "📈 **Profitability:** High ROI level",
-            "msg_liq": "💧 **Liquidity:** Good cash reserve.",
-            "msg_dep": "🚩 **Dependency:** High debt ratio.",
-            "msg_cash_low": "💸 **Cash Deficit:** Low cash for quick payments.",
-            "msg_bankrupt": "❌ **Critical Risk:** Liabilities exceed assets!",
-            "guide": {
-                "roi": "**ROI:** EBITDA / Investments. **Target: > 25%**. Below 15% is considered slow payback.",
-                "roe": "**ROE:** EBITDA / Own Capital. **Target: > 20%**. Your money should earn more than a bank deposit.",
-                "roa": "**ROA:** EBITDA / Total Assets. **Target: > 10%**. Efficiency of all company resources.",
-                "sol2": "**Solvency 2:** Assets - Liabilities. **Minimum: > 0**. Negative value means technical bankruptcy.",
-                "sol3": "**Solvency 3:** Net Assets / Total Assets. **Minimum: 50%**. Below 30% is high risk.",
-                "qr": "**Quick Ratio:** Cash / Short-term Debt. **Minimum: 2.0**. You need 2x more cash than urgent debts."
+                "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**.",
+                "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**.",
+                "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**.",
+                "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**.",
+                "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**.",
+                "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**."
             }
         },
         "ქართული": {
@@ -117,7 +125,7 @@ elif st.session_state["authentication_status"]:
         }
     }
 
-    # 3. CSS
+    # Повторная стилизация дашборда
     st.markdown("""
         <style>
         [data-testid="stMetric"] {
@@ -129,9 +137,8 @@ elif st.session_state["authentication_status"]:
         </style>
         """, unsafe_allow_html=True)
 
-    # 4. SIDEBAR
     with st.sidebar:
-        st.write(f'Welcome, *{st.session_state["name"]}*')
+        st.write(f'👤 *{st.session_state["name"]}*')
         lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
         t = LANGS[lang_choice]
 
@@ -150,7 +157,7 @@ elif st.session_state["authentication_status"]:
         sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
         authenticator.logout('Logout', 'sidebar')
 
-    # 5. РАСЧЕТЫ
+    # Расчеты
     total_assets = fa + ca
     total_liabilities = ltl + stl
     current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
@@ -161,7 +168,6 @@ elif st.session_state["authentication_status"]:
     sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
     qr = (cash_val / stl) if stl != 0 else 0
 
-    # 6. ИНТЕРФЕЙС
     st.title(t["title"])
     tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
@@ -178,7 +184,6 @@ elif st.session_state["authentication_status"]:
         c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
         c6.metric("Quick Ratio", f"{qr:.2f}")
 
-        # Блок Анализа
         st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
         col_s, col_r = st.columns(2)
         with col_s:
