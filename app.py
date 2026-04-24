@@ -5,7 +5,7 @@ import pandas as pd
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence Dashboard", page_icon="📈", layout="wide")
 
-# 2. Словарь переводов
+# 2. Полный мультиязычный словарь с исправленными пояснениями
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
@@ -18,15 +18,18 @@ LANGS = {
         "own_cap": "Собственный капитал",
         "init_inv": "Первоначальные инвестиции",
         "cash": "Наличные (Cash)",
-        "ebitda": "EBITDA", "np": "Чистая прибыль",
+        "ebitda": "EBITDA",
         "tab1": "🎯 Дашборд", "tab2": "📊 Структура", "tab3": "📚 Справочник",
+        "strong": "✅ Сильные стороны",
+        "risks": "⚠️ Зоны внимания",
+        "analysis_header": "🔍 Автоматический анализ",
         "guide": {
-            "roi": "**ROI:** EBITDA / Первоначальные инвестиции * 100%.",
-            "roe": "**ROE:** EBITDA / Собственный капитал * 100%.",
-            "roa": "**ROA:** EBITDA / Всего долгов (Total Liabilities) * 100%.",
-            "sol2": "**Solvency 2:** Активы - Долги (Чистые активы).",
-            "sol3": "**Solvency 3 (%):** (Чистые активы / Общие активы) * 100%.",
-            "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
+            "roi": "**ROI (Return on Investment):** EBITDA / Первоначальные инвестиции * 100%. Показывает общую доходность проекта на вложенный капитал.",
+            "roe": "**ROE (Return on Equity):** EBITDA / Собственный капитал * 100%. Показывает эффективность использования именно ваших средств.",
+            "roa": "**ROA (Return on Assets):** EBITDA / Общие активы (Total Assets) * 100%. Отражает отдачу от каждого доллара, вложенного в имущество компании.",
+            "sol2": "**Solvency 2 (Чистые активы):** Общие активы минус Общие долги (LTL + STL). Это реальная стоимость вашего участия в бизнесе в денежном эквиваленте.",
+            "sol3": "**Solvency 3 (%):** (Чистые активы / Общие активы) * 100%. Коэффициент автономии, показывающий долю собственности в общем балансе.",
+            "qr": "**Quick Ratio (Мгновенная ликвидность):** Наличные (Cash) / Краткосрочные долги (STL). Сможете ли вы заплатить по счетам прямо сейчас."
         }
     },
     "English": {
@@ -37,15 +40,18 @@ LANGS = {
         "fa": "Fixed Assets", "ca": "Current Assets",
         "ltl": "Long-term Debt", "stl": "Short-term Debt",
         "own_cap": "Own Capital", "init_inv": "Initial Investment",
-        "cash": "Cash", "ebitda": "EBITDA", "np": "Net Profit",
+        "cash": "Cash", "ebitda": "EBITDA",
         "tab1": "🎯 Dashboard", "tab2": "📊 Structure", "tab3": "📚 Guide",
+        "strong": "✅ Strengths",
+        "risks": "⚠️ Risks",
+        "analysis_header": "🔍 Automated Analysis",
         "guide": {
-            "roi": "**ROI:** EBITDA / Initial Investment * 100%.",
-            "roe": "**ROE:** EBITDA / Own Capital * 100%.",
-            "roa": "**ROA:** EBITDA / Total Liabilities * 100%.",
-            "sol2": "**Solvency 2:** Total Assets - Total Liabilities.",
-            "sol3": "**Solvency 3 (%):** (Net Assets / Total Assets) * 100%.",
-            "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
+            "roi": "**ROI:** EBITDA / Initial Investment * 100%. Measures total project profitability.",
+            "roe": "**ROE:** EBITDA / Own Capital * 100%. Efficiency of personal equity.",
+            "roa": "**ROA:** EBITDA / Total Assets * 100%. Efficiency of total asset usage.",
+            "sol2": "**Solvency 2 (Net Assets):** Total Assets - Total Liabilities. The real value of your business stake.",
+            "sol3": "**Solvency 3 (%):** (Net Assets / Total Assets) * 100%. Self-sufficiency ratio.",
+            "qr": "**Quick Ratio:** Cash / Short-term Liabilities. Immediate payment ability."
         }
     },
     "ქართული": {
@@ -54,20 +60,23 @@ LANGS = {
         "assets": "💼 აქტივები", "liabilities": "💸 ვალდებულებები",
         "ops": "📈 ოპერაციები",
         "own_cap": "საკუთარი კაპიტალი", "init_inv": "საწყისი ინვესტიცია",
-        "cash": "Cash", "ebitda": "EBITDA", "np": "წმინდა მოგება",
+        "cash": "Cash", "ebitda": "EBITDA",
         "tab1": "🎯 მთავარი", "tab2": "📊 ბალანსი", "tab3": "📚 ცნობარი",
+        "strong": "✅ ძლიერი მხარეები",
+        "risks": "⚠️ რისკები",
+        "analysis_header": "🔍 ავტომატური ანალიზი",
         "guide": {
             "roi": "**ROI:** EBITDA / საწყისი ინვესტიცია * 100%.",
             "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი * 100%.",
-            "roa": "**ROA:** EBITDA / ჯამური ვალდებულებები * 100%.",
-            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები.",
+            "roa": "**ROA:** EBITDA / ჯამური აქტივები * 100%.",
+            "sol2": "**Solvency 2 (წმინდა აქტივები):** ჯამური აქტივები - ჯამური ვალდებულებები.",
             "sol3": "**Solvency 3 (%):** (წმინდა აქტივები / ჯამური აქტივები) * 100%.",
             "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი."
         }
     }
 }
 
-# 3. Стильный CSS
+# 3. CSS
 st.markdown("""
     <style>
     [data-testid="stMetric"] {
@@ -98,35 +107,24 @@ with st.sidebar:
 
     sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
-# 5. ИСПРАВЛЕННЫЕ ФОРМУЛЫ (Строго по твоему запросу)
+# 5. ЛОГИКА РАСЧЕТОВ
 total_assets = fa + ca
 total_liabilities = ltl + stl
 current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
 
-# ROI = EBITDA / Initial Investment
 roi = (current_ebitda / init_inv * 100) if init_inv != 0 else 0
-
-# ROE = EBITDA / Own Capital
 roe = (current_ebitda / own_cap * 100) if own_cap != 0 else 0
-
-# ROA = EBITDA / Total Liabilities
-roa = (current_ebitda / total_liabilities * 100) if total_liabilities != 0 else 0
-
-# Solvency 2 (Net Assets)
+roa = (current_ebitda / total_assets * 100) if total_assets != 0 else 0
 sol2_val = total_assets - total_liabilities
-
-# Solvency 3 (%)
 sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
-
-# Quick Ratio (Cash / STL)
 qr = (cash_val / stl) if stl != 0 else 0
 
-# 6. ИНТЕРФЕЙС
+# 6. ГЛАВНЫЙ ИНТЕРФЕЙС
 st.title(t["title"])
 tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
 with tab1:
-    st.markdown('<div class="section-header">🚀 Эффективность (на базе EBITDA)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">🚀 Эффективность (EBITDA)</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     c1.metric("ROI", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
     c2.metric("ROE", f"{roe:.1f}%")
@@ -138,6 +136,21 @@ with tab1:
     c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
     c6.metric("Quick Ratio (Cash/STL)", f"{qr:.2f}")
 
+    # Блок Анализа
+    st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
+    col_s, col_r = st.columns(2)
+    with col_s:
+        st.success(f"### {t['strong']}")
+        if sol3_pct > 50: st.write("🌟 **Высокая независимость:** Более половины активов принадлежат вам.")
+        if roi > 25: st.write(f"📈 **ROI ({roi:.1f}%):** Проект очень быстро окупает инвестиции.")
+        if qr >= 0.5: st.write("💧 **Ликвидность:** Достаточно наличных для покрытия срочных долгов.")
+
+    with col_r:
+        st.warning(f"### {t['risks']}")
+        if sol3_pct < 30: st.write("🚩 **Низкая автономия:** Бизнес сильно зависит от заемных средств.")
+        if qr < 0.2: st.write("💸 **Дефицит Cash:** Наличных критически мало для текущих обязательств.")
+        if sol2_val < 0: st.error("❌ **Отрицательный капитал:** Долги превышают активы!")
+
 with tab2:
     st.markdown(f"#### {t['tab2']}")
     st.table(pd.DataFrame({
@@ -148,9 +161,6 @@ with tab2:
 
 with tab3:
     st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
-    st.write(t["guide"]["roi"])
-    st.write(t["guide"]["roe"])
-    st.write(t["guide"]["roa"])
-    st.write(t["guide"]["sol2"])
-    st.write(t["guide"]["sol3"])
-    st.write(t["guide"]["qr"])
+    # Выводим исправленные пояснения из словаря
+    for key in t["guide"]:
+        st.info(t["guide"][key])
