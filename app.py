@@ -4,7 +4,7 @@ import streamlit_authenticator as stauth
 # Позволяет телефону распознать сайт как приложение
 st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
 # 1. Настройка страницы
-st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
+st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
 
 # --- СТИЛИЗАЦИЯ ФОРМЫ ЛОГИНА ---
 st.markdown("""
