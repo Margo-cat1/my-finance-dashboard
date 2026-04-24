@@ -2,36 +2,42 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-st.set_page_config(page_title="Financial OS PRO", page_icon="📈", layout="wide")
+# Настройка страницы
+st.set_page_config(page_title="Financial OS Intelligence", page_icon="📈", layout="wide")
 
-st.title("📈 Financial Intelligence: Анализ и Симуляция")
+# Исправленный CSS для красоты
+st.markdown("""
+    <style>
+    [data-testid="stMetricValue"] { font-size: 1.8rem; color: #00d4ff; }
+    .stTabs [data-baseweb="tab-list"] { gap: 20px; }
+    .stTabs [data-baseweb="tab"] { 
+        height: 50px; white-space: pre-wrap; background-color: #1e2130; 
+        border-radius: 5px; color: white; padding: 10px 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("📈 Financial Intelligence Dashboard")
 st.markdown("---")
 
-# --- СЕКЦИЯ 1: ВВОД ДАННЫХ И СИМУЛЯТОР (Sidebar) ---
-st.sidebar.header("📥 1. Текущий Баланс")
-with st.sidebar.expander("Активы и Долги", expanded=True):
-    fa = st.number_input("Fixed Assets", value=2100000)
-    ca = st.number_input("Current Assets", value=900000)
-    ltl = st.number_input("Long-term Debt", value=800000)
-    stl = st.number_input("Short-term Debt", value=400000)
+# --- SIDEBAR: УДОБНЫЙ ВВОД ---
+with st.sidebar:
+    st.header("📥 Ввод данных")
+    with st.expander("💼 Активы (Assets)", expanded=True):
+        fa = st.number_input("Fixed Assets (Внеоборотные)", value=2100000)
+        ca = st.number_input("Current Assets (Оборотные)", value=900000)
+    with st.expander("💸 Долги (Liabilities)", expanded=True):
+        ltl = st.number_input("Long-term (Долгие)", value=800000)
+        stl = st.number_input("Short-term (Короткие)", value=400000)
+    with st.expander("📈 Продажи и Косты", expanded=True):
+        rev = st.number_input("Выручка", value=1500000)
+        exp = st.number_input("Расходы", value=1100000)
 
-st.sidebar.header("🔮 2. Симулятор Рисков")
-sim_rev = st.sidebar.slider("Изменение Выручки (%)", -50, 50, 0) / 100
-sim_exp = st.sidebar.slider("Изменение Расходов (%)", -50, 50, 0) / 100
-
-# --- СЕКЦИЯ 2: РАСЧЕТЫ ---
-# Базовые операционные данные
-base_rev = 1500000
-base_exp = 1100000
-
-# Применяем симуляцию
-rev = base_rev * (1 + sim_rev)
-exp = base_exp * (1 + sim_exp)
-profit = rev - exp
-
+# --- РАСЧЕТЫ ---
 total_assets = fa + ca
 total_liabilities = ltl + stl
 equity = total_assets - total_liabilities
+profit = rev - exp
 
 # Коэффициенты
 roi = (profit / exp * 100) if exp != 0 else 0
@@ -41,70 +47,64 @@ sol2 = (total_assets / total_liabilities) if total_liabilities != 0 else 0
 sol3 = (equity / total_liabilities) if total_liabilities != 0 else 0
 qr = (ca / stl) if stl != 0 else 0
 
-# --- СЕКЦИЯ 3: ГЛАВНЫЕ МЕТРИКИ ---
-st.subheader("🏁 Ключевые показатели (с учетом симуляции)")
-m1, m2, m3, m4, m5, m6 = st.columns(6)
-m1.metric("ROI", f"{roi:.1f}%")
-m2.metric("ROE", f"{roe:.1f}%")
-m3.metric("ROA", f"{roa:.1f}%")
-m4.metric("Sol2", f"{sol2:.2f}")
-m5.metric("Sol3", f"{sol3:.2f}")
-m6.metric("QR", f"{qr:.2f}")
+# --- ГЛАВНЫЙ ИНТЕРФЕЙС ---
+tab1, tab2, tab3 = st.tabs(["🎯 Главные показатели", "📊 Детали баланса", "📚 Обучение"])
 
-st.markdown("---")
+with tab1:
+    # Блок Рентабельности (ROI, ROE, ROA)
+    st.subheader("🔥 Рентабельность")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("ROI (Окупаемость)", f"{roi:.1f}%", help="Норма > 20%")
+    col2.metric("ROE (Твой капитал)", f"{roe:.1f}%", help="Должен быть > ROA")
+    col3.metric("ROA (Все активы)", f"{roa:.1f}%", help="Эффективность имущества")
 
-# --- СЕКЦИЯ 4: ТАБЛИЦА БАЛАНСА И АНАЛИЗ ---
-col_left, col_right = st.columns([1.2, 1])
+    st.markdown("---")
 
-with col_left:
-    st.write("### 📑 Таблица баланса")
-    balance_data = {
-        "Категория": ["Fixed Assets", "Current Assets", "TOTAL ASSETS", "Long-term Liabilities",
-                      "Short-term Liabilities", "TOTAL LIABILITIES", "EQUITY (Капитал)"],
-        "Сумма ($)": [f"{fa:,.0f}", f"{ca:,.0f}", f"{total_assets:,.0f}", f"{ltl:,.0f}", f"{stl:,.0f}",
-                      f"{total_liabilities:,.0f}", f"{equity:,.0f}"]
-    }
-    st.table(pd.DataFrame(balance_data))
+    # Блок Устойчивости (Sol2, Sol3, QR)
+    st.subheader("🛡️ Устойчивость и Ликвидность")
+    col4, col5, col6 = st.columns(3)
+    col4.metric("Solvency 2", f"{sol2:.2f}", delta_color="normal", help="Норма > 1.5")
+    col5.metric("Solvency 3", f"{sol3:.2f}", help="Golden Balance: норма > 1.0")
+    col6.metric("Quick Ratio", f"{qr:.2f}", help="Ликвидность: норма > 1.0")
 
-    st.write("### ⚖️ Golden Balance")
-    fig_gb = go.Figure(data=[go.Pie(
-        labels=['Equity (Свои)', 'Debt (Долги)'],
-        values=[max(0, equity), total_liabilities],
-        hole=.5,
-        marker_colors=['#00c49f', '#ff4b4b']
-    )])
-    fig_gb.update_layout(height=300, template="plotly_dark", margin=dict(t=0, b=0, l=0, r=0))
-    st.plotly_chart(fig_gb, use_container_width=True)
+    st.markdown("---")
 
-with col_right:
-    st.write("### 🕵️ Анализ сильных и слабых сторон")
+    # Визуальный SWOT
+    c_left, c_right = st.columns(2)
+    with c_left:
+        st.info("### ✅ Почему бизнес молодец:")
+        if roi > 20: st.write(f"**ROI {roi:.1f}%:** Прибыль на высоком уровне.")
+        if roe > roa: st.write("**Эффект рычага:** Ты зарабатываешь на чужих деньгах больше, чем они стоят.")
+        if sol3 > 1.0: st.write("**Golden Balance:** Твой капитал перекрывает все долги.")
 
-    # Динамические подсказки
-    if roi > 20:
-        st.success(f"✅ **Сильный ROI:** Даже при текущем сценарии бизнес генерирует отличную прибыль.")
-    else:
-        st.warning(f"⚠️ **Низкий ROI:** Прибыльность под угрозой. Нужно снижать косты или растить чек.")
+    with c_right:
+        st.warning("### ⚠️ Где нужно поднажать:")
+        if qr < 1.0: st.write(f"**Ликвидность:** QR {qr:.2f} — маловато оборотных средств.")
+        if sol2 < 1.5: st.write(f"**Риск:** Sol2 ниже 1.5 — активы слишком зависят от долгов.")
 
-    if sol3 >= 1.0:
-        st.success(f"✅ **Golden Balance соблюден:** {sol3:.2f}. Ваш капитал перекрывает долги.")
-    else:
-        st.error(f"🚨 **Нарушение Sol3:** {sol3:.2f}. Бизнес живет в долг. Риск потери устойчивости.")
+with tab2:
+    # График баланса
+    st.subheader("📊 Баланс: Активы vs Обязательства")
+    fig_b = go.Figure(data=[
+        go.Bar(name='Активы', x=['Assets'], y=[total_assets], marker_color='#00d4ff'),
+        go.Bar(name='Долги', x=['Liabilities'], y=[total_liabilities], marker_color='#ff4b4b'),
+        go.Bar(name='Капитал', x=['Equity'], y=[equity], marker_color='#00ff88')
+    ])
+    fig_b.update_layout(barmode='group', template="plotly_dark", height=400)
+    st.plotly_chart(fig_b, use_container_width=True)
 
-    if qr < 1.0:
-        st.error(f"🚨 **Кризис ликвидности:** QR {qr:.2f}. Денег не хватит на оплату коротких долгов.")
+    # Таблица
+    st.write("### 📑 Подробная структура")
+    st.table(pd.DataFrame({
+        "Категория": ["Fixed Assets", "Current Assets", "Long-term Debt", "Short-term Debt", "EQUITY"],
+        "Сумма ($)": [fa, ca, ltl, stl, equity]
+    }))
 
-    if roe > roa:
-        st.info("💡 **Рычаг:** Вы эффективно используете заемные средства для роста доходности капитала.")
-
-st.markdown("---")
-
-# --- СЕКЦИЯ 5: СПРАВОЧНИК ---
-with st.expander("🎓 Справочник: Что это значит?"):
-    st.write("""
-    - **ROI:** Окупаемость затрат. Норма > 20%.
-    - **ROE:** Доходность твоих личных денег. Норма > 15%.
-    - **ROA:** Насколько эффективно работают «станки и офисы».
-    - **Solvency 2:** Активы / Долги. Если ниже 1.5 — банк владеет тобой.
-    - **Solvency 3 (Sol3):** Капитал / Долги. Идеал > 1.0.
-    - **Quick Ratio (QR):** Можешь ли ты завтра отдать короткие долги. Норма > 1.0.
+with tab3:
+    st.markdown("""
+    ### 🎓 Мини-справочник
+    * **ROI:** Если он 25%, значит на каждый потраченный $1 ты получил $0.25 чистой прибыли.
+    * **ROE:** Твоя личная доходность как владельца. Сравнивай её со ставкой в банке.
+    * **Sol2:** Коэффициент автономии. Если он < 1.5, значит банк владеет твоим бизнесом больше, чем ты.
+    * **Golden Balance (Sol3):** Когда своих денег больше, чем долгов. Это база спокойного сна.
     """)
