@@ -1,11 +1,10 @@
 import streamlit as st
-import pd as pd
 import pandas as pd
 
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
-# 2. Словарь переводов (Обновлен блок Guide с нормативами)
+# 2. Словарь переводов (С расширенными нормативами в Guide)
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
@@ -27,12 +26,12 @@ LANGS = {
         "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
         "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
         "guide": {
-            "roi": "**ROI (Return on Investment):** EBITDA / Инвестиции. Норма: >20%. Показывает, как быстро окупаются вложения.",
-            "roe": "**ROE (Return on Equity):** EBITDA / Собственный капитал. Норма: >15-20%. Эффективность ваших личных денег.",
-            "roa": "**ROA (Return on Assets):** EBITDA / Общие активы. Норма: >5-10%. Насколько эффективно работает всё имущество.",
-            "sol2": "**Solvency 2 (Чистые активы):** Активы - Долги. Должно быть > 0. Если значение отрицательное — бизнес в зоне банкротства.",
-            "sol3": "**Solvency 3 (Автономия):** Чистые активы / Общие активы. Норма: >50%. Показывает вашу независимость от кредиторов.",
-            "qr": "**Quick Ratio:** Cash / Краткосрочные долги. Норма: >0.5 - 1.0. Способность погасить долги немедленно."
+            "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**. Если ниже 15%, проект окупается слишком долго.",
+            "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**. Ваши личные деньги должны работать эффективнее, чем банковский депозит.",
+            "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**. Показывает, не «простаивает» ли ваше оборудование и имущество.",
+            "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**. Если сумма в минусе — вы работаете в убыток капиталу (банкротство).",
+            "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**. Ниже 30% — критическая зависимость от чужих денег.",
+            "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**. У вас должно быть в 2 раза больше кэша, чем срочных долгов."
         }
     },
     "English": {
@@ -55,12 +54,12 @@ LANGS = {
         "msg_cash_low": "💸 **Cash Deficit:** Low cash for quick payments.",
         "msg_bankrupt": "❌ **Critical Risk:** Liabilities exceed assets!",
         "guide": {
-            "roi": "**ROI:** EBITDA / Investments. Target: >20%. Shows how fast the project pays back.",
-            "roe": "**ROE:** EBITDA / Own Capital. Target: >15-20%. Efficiency of your own funds.",
-            "roa": "**ROA:** EBITDA / Total Assets. Target: >5-10%. How well all company assets perform.",
-            "sol2": "**Solvency 2 (Net Assets):** Assets - Liabilities. Must be > 0. Negative means technical bankruptcy.",
-            "sol3": "**Solvency 3 (Autonomy):** Net Assets / Total Assets. Target: >50%. Shows independence from creditors.",
-            "qr": "**Quick Ratio:** Cash / Short-term Debt. Target: >0.5 - 1.0. Ability to pay bills instantly."
+            "roi": "**ROI:** EBITDA / Investments. **Target: > 25%**. Below 15% is considered slow payback.",
+            "roe": "**ROE:** EBITDA / Own Capital. **Target: > 20%**. Your money should earn more than a bank deposit.",
+            "roa": "**ROA:** EBITDA / Total Assets. **Target: > 10%**. Efficiency of all company resources.",
+            "sol2": "**Solvency 2:** Assets - Liabilities. **Minimum: > 0**. Negative value means technical bankruptcy.",
+            "sol3": "**Solvency 3:** Net Assets / Total Assets. **Minimum: 50%**. Below 30% is high risk.",
+            "qr": "**Quick Ratio:** Cash / Short-term Debt. **Minimum: 2.0**. You need 2x more cash than urgent debts."
         }
     },
     "ქართული": {
@@ -81,14 +80,14 @@ LANGS = {
         "msg_liq": "💧 **ლიკვიდურობა:** ნაღდი ფულის კარგი მარაგი.",
         "msg_dep": "🚩 **დამოკიდებულება:** ვალების მაღალი წილი.",
         "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ცოტა ფული გადახდებისთვის.",
-        "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემატება აქტივებს!",
+        "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემაება აქტივებს!",
         "guide": {
-            "roi": "**ROI:** EBITDA / ინვესტიცია. ნორმა: >20%.",
-            "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. ნორმა: >15-20%.",
-            "roa": "**ROA:** EBITDA / ჯამური აქტივები. ნორმა: >5-10%.",
-            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. უნდა იყოს > 0.",
-            "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. ნორმა: >50%.",
-            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. ნორმა: >0.5 - 1.0."
+            "roi": "**ROI:** EBITDA / ინვესტიცია. **მიზანი: > 25%**.",
+            "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. **მიზანი: > 20%**.",
+            "roa": "**ROA:** EBITDA / ჯამური აქტივები. **მიზანი: > 10%**.",
+            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. **მინიმუმი: > 0**.",
+            "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. **მინიმუმი: 50%**.",
+            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მინიმუმი: 2.0**."
         }
     }
 }
@@ -123,7 +122,7 @@ with st.sidebar:
         ebitda_val = st.number_input(t["ebitda"], value=450000)
     sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
-# 5. РАСЧЕТЫ (Твоя логика EBITDA / Total Assets * 100)
+# 5. РАСЧЕТЫ
 total_assets = fa + ca
 total_liabilities = ltl + stl
 current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
@@ -147,30 +146,29 @@ with tab1:
 
     st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
     c4, c5, c6 = st.columns(3)
-    c4.metric("Solvency 2 (Net Assets)", f"{sol2_val:,.0f} $")
+    c4.metric("Solvency 2 (Net)", f"{sol2_val:,.0f} $")
     c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-    c6.metric("Quick Ratio (Cash/STL)", f"{qr:.2f}")
+    c6.metric("Quick Ratio", f"{qr:.2f}")
 
     # Блок Анализа
     st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
     col_s, col_r = st.columns(2)
     with col_s:
         st.success(f"### {t['strong']}")
-        if sol3_pct > 50: st.write(t["msg_autonomy"])
-        if roi > 20: st.write(f"{t['msg_roi']} ({roi:.1f}%)")
-        if qr >= 0.5: st.write(t["msg_liq"])
+        if sol3_pct >= 50: st.write(t["msg_autonomy"])
+        if roi >= 25: st.write(f"{t['msg_roi']} ({roi:.1f}%)")
+        if qr >= 2.0: st.write(t["msg_liq"])
     with col_r:
         st.warning(f"### {t['risks']}")
         if sol3_pct < 30: st.write(t["msg_dep"])
-        if qr < 0.2: st.write(t["msg_cash_low"])
+        if qr < 2.0: st.write(t["msg_cash_low"] + f" (Current: {qr:.2f})")
         if sol2_val < 0: st.error(t["msg_bankrupt"])
 
 with tab2:
-    st.markdown(f"#### {t['tab2']}")
     st.table(pd.DataFrame({
-        "Parameter": ["Total Assets", "Total Liabilities", "Own Capital", "Net Assets (Sol2)", "Cash", "EBITDA"],
+        "Parameter": ["Assets", "Liabilities", "Equity", "Net Assets", "EBITDA"],
         "Value ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
-                      f"{cash_val:,.0f}", f"{current_ebitda:,.0f}"]
+                      f"{current_ebitda:,.0f}"]
     }))
 
 with tab3:
