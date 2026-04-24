@@ -1,13 +1,13 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Financial OS Ultimate", page_icon="💎", layout="wide")
+st.set_page_config(page_title="Financial OS Premium", page_icon="⚖️", layout="wide")
 
-st.title("💎 Financial Intelligence Dashboard")
+st.title("⚖️ Financial OS: Глубокая аналитика")
 st.markdown("---")
 
 # --- СЕКЦИЯ 1: УПРАВЛЕНИЕ (Sidebar) ---
-st.sidebar.header("🕹️ Управление сценариями")
+st.sidebar.header("🕹️ Настройка сценария")
 d_rev = st.sidebar.slider("Изменение Выручки (%)", -50, 100, 0) / 100
 d_exp = st.sidebar.slider("Изменение Расходов (%)", -50, 50, 0) / 100
 d_assets = st.sidebar.slider("Изменение Активов (%)", -20, 50, 0) / 100
@@ -26,27 +26,34 @@ base = {
 rev = base["rev"] * (1 + d_rev)
 exp = base["exp"] * (1 + d_exp)
 total_assets = base["total_assets"] * (1 + d_assets)
+current_assets = base["current_assets"] * (1 + d_assets)
 debt = base["liabilities"] * (1 + d_debt)
 equity = total_assets - debt
 profit = rev - exp
 
-# Новые формулы:
-# ROE = Чистая прибыль / Собственный капитал
+# 1. ROE / ROA / ROI
 roe = (profit / equity * 100) if equity > 0 else 0
-
-# ROA = Чистая прибыль / Общие активы
 roa = (profit / total_assets * 100) if total_assets > 0 else 0
-
-# Старые формулы для полноты картины:
 roi = (profit / exp * 100) if exp != 0 else 0
-sol2 = (total_assets / debt) if debt != 0 else 0
 
-# --- СЕКЦИЯ 4: ГЛАВНЫЕ МЕТРИКИ (ROE, ROA, ROI) ---
-st.subheader("📈 Показатели рентабельности")
-m1, m2, m3 = st.columns(3)
-m1.metric("ROE (Капитал)", f"{roe:.1f}%", help="Насколько эффективно работают деньги собственников")
-m2.metric("ROA (Активы)", f"{roa:.1f}%", help="Эффективность использования всех ресурсов компании")
-m3.metric("ROI (Инвестиции)", f"{roi:.1f}%", help="Окупаемость затрат")
+# 2. Solvency 2 (Assets / Debt) - Коэффициент автономии
+sol2 = (total_assets / debt) if debt != 0 else 10
+# 3. Solvency 3 (Equity / Debt) - Финансовый леверидж
+sol3 = (equity / debt) if debt != 0 else 10
+# 4. Quick Ratio (Current Assets / Debt) - Быстрая ликвидность
+qr = (current_assets / debt) if debt != 0 else 0
+# 5. Gearing Ratio (Debt / Equity * 100) - Зависимость от займов
+gearing = (debt / equity * 100) if equity > 0 else 0
+
+# --- СЕКЦИЯ 4: ТАБЛО ПОКАЗАТЕЛЕЙ ---
+st.subheader("🏁 Ключевые коэффициенты")
+col1, col2, col3, col4, col5 = st.columns(5)
+
+col1.metric("Solvency 2", f"{sol2:.2f}", help="Цель: > 1.5")
+col2.metric("Solvency 3", f"{sol3:.2f}", help="Цель: > 1.0")
+col3.metric("Quick Ratio", f"{qr:.2f}", help="Цель: > 1.0")
+col4.metric("Gearing", f"{gearing:.1f}%", help="Цель: < 50%")
+col5.metric("ROE", f"{roe:.1f}%")
 
 st.markdown("---")
 
@@ -54,40 +61,51 @@ st.markdown("---")
 c1, c2 = st.columns(2)
 
 with c1:
-    # График структуры (Капитал vs Долг)
-    fig_structure = go.Figure(data=[go.Pie(
-        labels=['Собственный капитал', 'Долги'],
-        values=[max(0, equity), debt],
-        hole=.4,
-        marker_colors=['#2ecc71', '#e74c3c']
-    )])
-    fig_structure.update_layout(title="Структура финансирования", template="plotly_dark")
-    st.plotly_chart(fig_structure, use_container_width=True)
+    # Радар устойчивости (сравнение с нормой)
+    fig_radar = go.Figure()
+    fig_radar.add_trace(go.Scatterpolar(
+        r=[sol2, sol3, qr, min(gearing/10, 5)],
+        theta=['Sol 2', 'Sol 3', 'QR', 'Gearing (scaled)'],
+        fill='toself',
+        name='Текущее состояние',
+        line_color='#00d4ff'
+    ))
+    fig_radar.update_layout(
+        polar=dict(radialaxis=dict(visible=True, range=[0, 3])),
+        showlegend=False,
+        title="Радар финансовой устойчивости",
+        template="plotly_dark"
+    )
+    st.plotly_chart(fig_radar, use_container_width=True)
 
 with c2:
-    # Сравнение ROE и ROA
-    fig_compare = go.Figure(data=[
-        go.Bar(name='ROE', x=['Рентабельность'], y=[roe], marker_color='#f1c40f'),
-        go.Bar(name='ROA', x=['Рентабельность'], y=[roa], marker_color='#3498db')
-    ])
-    fig_compare.update_layout(
-        title="ROE vs ROA",
-        template="plotly_dark",
-        yaxis_ticksuffix="%"  # Вот так правильно писать суффикс в Plotly
-    )
+    # Индикатор прибыли
+    fig_gauge = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = profit,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Чистая прибыль ($)"},
+        gauge = {'axis': {'range': [None, 1000000]},
+                 'bar': {'color': "#00ff88"},
+                 'steps' : [
+                     {'range': [0, 200000], 'color': "#333"},
+                     {'range': [200000, 500000], 'color': "#444"}]}))
+    fig_gauge.update_layout(template="plotly_dark")
+    st.plotly_chart(fig_gauge, use_container_width=True)
 
-# --- СЕКЦИЯ 6: АВТО-АНАЛИЗ ---
-st.subheader("🔍 Что это значит?")
-col_text1, col_text2 = st.columns(2)
+# --- СЕКЦИЯ 6: ПОДРОБНЫЙ ВЕРДИКТ ---
+st.subheader("📢 Аналитический отчет")
+if gearing > 100:
+    st.error(f"🚨 КРИТИЧЕСКИЙ ГЕРИНГ: Долги превышают капитал ({gearing:.1f}%). Срочно рассмотрите возможность докапитализации.")
+elif qr < 1.0:
+    st.warning(f"⚠️ ПРОБЛЕМА ЛИКВИДНОСТИ: Quick Ratio ({qr:.2f}) ниже нормы. Денег может не хватить на срочные выплаты.")
+else:
+    st.success("✅ ФИНАНСОВОЕ ЗДОРОВЬЕ: Все показатели устойчивости и ликвидности находятся в зеленой зоне.")
 
-with col_text1:
-    if roe > roa:
-        st.info(f"ROE ({roe:.1f}%) выше ROA ({roa:.1f}%). Это значит, что компания успешно использует 'эффект рычага' — заемные средства помогают зарабатывать больше для собственников.")
-    else:
-        st.warning("ROE ниже или равен ROA. Вероятно, долги обходятся компании слишком дорого или капитал используется неэффективно.")
-
-with col_text2:
-    if sol2 < 1.5:
-        st.error(f"Внимание! Коэффициент устойчивости Sol2 ({sol2:.2f}) ниже нормы. Риск слишком высокой долговой нагрузки.")
-    else:
-        st.success(f"Финансовая устойчивость в норме (Sol2: {sol2:.2f}).")
+expander = st.expander("Посмотреть расшифровку формул")
+expander.write("""
+- **Solvency 2 (Автономия):** Способность покрыть все долги общими активами.
+- **Solvency 3 (Плечо):** Соотношение собственных денег к заемным.
+- **Quick Ratio:** Моментальная готовность платить по счетам текущими активами.
+- **Gearing Ratio:** Степень финансового риска и зависимости от кредиторов.
+""")
