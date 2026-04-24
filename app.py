@@ -4,7 +4,7 @@ import pandas as pd
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
-# 2. Словарь переводов (Теперь СОВСЕМ ВСЁ внутри здесь)
+# 2. Словарь переводов (RU, EN, GE)
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
@@ -31,6 +31,34 @@ LANGS = {
             "roa": "**ROA:** EBITDA / Общие активы * 100%.",
             "sol2": "**Solvency 2:** Активы - Долги (Чистые активы).",
             "sol3": "**Solvency 3 (%):** (Чистые активы / Общие активы) * 100%.",
+            "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
+        }
+    },
+    "English": {
+        "title": "📊 Financial Intelligence",
+        "settings": "⚙️ Data Input",
+        "assets": "💼 Assets", "liabilities": "💸 Liabilities", "ops": "📈 Operations",
+        "fa": "Fixed Assets", "ca": "Current Assets",
+        "ltl": "Long-term Debt", "stl": "Short-term Debt",
+        "own_cap": "Own Capital", "init_inv": "Initial Investment",
+        "cash": "Cash", "ebitda": "EBITDA",
+        "tab1": "🎯 Dashboard", "tab2": "📊 Structure", "tab3": "📚 Guide",
+        "sec_eff": "🚀 Efficiency (EBITDA)",
+        "sec_sol": "🛡️ Solvency & Liquidity",
+        "analysis_header": "🔍 Automated Analysis",
+        "strong": "✅ Strengths", "risks": "⚠️ Risks",
+        "msg_autonomy": "🌟 **Autonomy:** Most assets belong to you.",
+        "msg_roi": "📈 **Profitability:** High ROI level",
+        "msg_liq": "💧 **Liquidity:** Good cash reserve.",
+        "msg_dep": "🚩 **Dependency:** High debt ratio.",
+        "msg_cash_low": "💸 **Cash Deficit:** Low cash for quick payments.",
+        "msg_bankrupt": "❌ **Critical Risk:** Liabilities exceed assets!",
+        "guide": {
+            "roi": "**ROI:** EBITDA / Initial Investment * 100%.",
+            "roe": "**ROE:** EBITDA / Own Capital * 100%.",
+            "roa": "**ROA:** EBITDA / Total Assets * 100%.",
+            "sol2": "**Solvency 2:** Total Assets - Total Liabilities.",
+            "sol3": "**Solvency 3 (%):** (Net Assets / Total Assets) * 100%.",
             "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
         }
     },
@@ -122,7 +150,7 @@ with tab1:
     c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
     c6.metric("Quick Ratio", f"{qr:.2f}")
 
-    # Блок Анализа (ТЕПЕРЬ ВСЁ НА ВЫБРАННОМ ЯЗЫКЕ)
+    # Блок Анализа
     st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
     col_s, col_r = st.columns(2)
     with col_s:
