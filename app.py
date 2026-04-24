@@ -2,38 +2,38 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 
-# Настройка страницы
-st.set_page_config(page_title="Financial OS Intelligence", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Financial Intelligence OS", page_icon="📈", layout="wide")
 
-# Исправленный CSS для красоты
+# Дизайн метрик
 st.markdown("""
     <style>
-    [data-testid="stMetricValue"] { font-size: 1.8rem; color: #00d4ff; }
-    .stTabs [data-baseweb="tab-list"] { gap: 20px; }
-    .stTabs [data-baseweb="tab"] { 
-        height: 50px; white-space: pre-wrap; background-color: #1e2130; 
-        border-radius: 5px; color: white; padding: 10px 20px;
-    }
+    [data-testid="stMetricValue"] { font-size: 1.6rem; font-weight: 700; }
+    .stAlert { border-radius: 10px; border: none; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("📈 Financial Intelligence Dashboard")
-st.markdown("---")
+st.title("📈 Financial Intelligence: Advanced Analytics")
 
-# --- SIDEBAR: УДОБНЫЙ ВВОД ---
+# --- SIDEBAR: ВВОД ДАННЫХ И СИМУЛЯТОР ---
 with st.sidebar:
-    st.header("📥 Ввод данных")
-    with st.expander("💼 Активы (Assets)", expanded=True):
-        fa = st.number_input("Fixed Assets (Внеоборотные)", value=2100000)
-        ca = st.number_input("Current Assets (Оборотные)", value=900000)
-    with st.expander("💸 Долги (Liabilities)", expanded=True):
-        ltl = st.number_input("Long-term (Долгие)", value=800000)
-        stl = st.number_input("Short-term (Короткие)", value=400000)
-    with st.expander("📈 Продажи и Косты", expanded=True):
-        rev = st.number_input("Выручка", value=1500000)
-        exp = st.number_input("Расходы", value=1100000)
+    st.header("📥 Ввод текущих данных")
+    with st.expander("💼 Баланс (Активы и Долги)", expanded=True):
+        fa = st.number_input("Fixed Assets", value=2100000)
+        ca = st.number_input("Current Assets", value=900000)
+        ltl = st.number_input("Long-term Debt", value=800000)
+        stl = st.number_input("Short-term Debt", value=400000)
 
-# --- РАСЧЕТЫ ---
+    st.header("🔮 Симулятор рисков")
+    sim_rev = st.slider("Изменение выручки (%)", -50, 50, 0) / 100
+    sim_exp = st.slider("Изменение расходов (%)", -50, 50, 0) / 100
+
+# --- БАЗОВЫЕ РАСЧЕТЫ ---
+base_rev = 1500000
+base_exp = 1100000
+# Прогнозные значения
+rev = base_rev * (1 + sim_rev)
+exp = base_exp * (1 + sim_exp)
+
 total_assets = fa + ca
 total_liabilities = ltl + stl
 equity = total_assets - total_liabilities
@@ -47,64 +47,71 @@ sol2 = (total_assets / total_liabilities) if total_liabilities != 0 else 0
 sol3 = (equity / total_liabilities) if total_liabilities != 0 else 0
 qr = (ca / stl) if stl != 0 else 0
 
-# --- ГЛАВНЫЙ ИНТЕРФЕЙС ---
-tab1, tab2, tab3 = st.tabs(["🎯 Главные показатели", "📊 Детали баланса", "📚 Обучение"])
+# --- ИНТЕРФЕЙС ---
+t1, t2 = st.tabs(["🚀 Аналитический Дашборд", "⚖️ Глубокий Аудит"])
 
-with tab1:
-    # Блок Рентабельности (ROI, ROE, ROA)
-    st.subheader("🔥 Рентабельность")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("ROI (Окупаемость)", f"{roi:.1f}%", help="Норма > 20%")
-    col2.metric("ROE (Твой капитал)", f"{roe:.1f}%", help="Должен быть > ROA")
-    col3.metric("ROA (Все активы)", f"{roa:.1f}%", help="Эффективность имущества")
+with t1:
+    # Главный статус
+    status_score = 0
+    if roi > 20: status_score += 1
+    if sol2 > 1.5: status_score += 1
+    if qr > 1.0: status_score += 1
+
+    if status_score == 3:
+        st.success("🌟 **Статус: БИЗНЕС В ОТЛИЧНОЙ ФОРМЕ.** Все ключевые показатели в зеленой зоне.")
+    elif status_score == 2:
+        st.warning("⚠️ **Статус: ЕСТЬ ЗОНЫ ДЛЯ РОСТА.** Один из критических показателей требует внимания.")
+    else:
+        st.error("🚨 **Статус: КРИТИЧЕСКАЯ СИТУАЦИЯ.** Требуется немедленная оптимизация структуры долга или костов.")
+
+    # Метрики
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Прибыль (Прогноз)", f"{profit:,.0f} $", delta=f"{sim_rev * 100:.1f}%")
+    col2.metric("ROI", f"{roi:.1f}%", delta="Норма >20%", delta_color="off")
+    col3.metric("Solvency 2", f"{sol2:.2f}", delta="Норма >1.5", delta_color="off")
+    col4.metric("Golden Balance", f"{sol3:.2f}", delta="Норма >1.0", delta_color="off")
 
     st.markdown("---")
 
-    # Блок Устойчивости (Sol2, Sol3, QR)
-    st.subheader("🛡️ Устойчивость и Ликвидность")
-    col4, col5, col6 = st.columns(3)
-    col4.metric("Solvency 2", f"{sol2:.2f}", delta_color="normal", help="Норма > 1.5")
-    col5.metric("Solvency 3", f"{sol3:.2f}", help="Golden Balance: норма > 1.0")
-    col6.metric("Quick Ratio", f"{qr:.2f}", help="Ликвидность: норма > 1.0")
+    # График: Прогноз рентабельности
+    fig = go.Figure()
+    metrics_names = ['ROI', 'ROE', 'ROA']
+    metrics_values = [roi, roe, roa]
+    norms = [20, 15, 8]  # Условные нормы
+
+    fig.add_trace(go.Bar(x=metrics_names, y=metrics_values, marker_color=['#00d4ff', '#00ff88', '#9b59b6'],
+                         name="Текущий прогноз"))
+    fig.add_trace(
+        go.Scatter(x=metrics_names, y=norms, mode='markers', marker=dict(size=15, color='red', symbol='line-ew'),
+                   name="Минимальная норма"))
+
+    fig.update_layout(title="Рентабельность vs Рыночные нормы (%)", template="plotly_dark", height=400)
+    st.plotly_chart(fig, use_container_width=True)
+
+with t2:
+    col_l, col_r = st.columns(2)
+    with col_l:
+        st.write("### 🏛️ Структура Баланса")
+        fig_pie = go.Figure(data=[go.Pie(labels=['Fixed Assets', 'Current Assets'], values=[fa, ca], hole=.3)])
+        fig_pie.update_layout(template="plotly_dark")
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    with col_r:
+        st.write("### 🕵️ Рекомендации")
+        if qr < 1.0:
+            st.error(
+                f"**Ликвидность:** У вас всего {qr:.2f} оборотных активов на 1$ краткосрочного долга. Постарайтесь перевести часть коротких кредитов в длинные.")
+        if roe < 10:
+            st.warning(
+                "**Эффективность:** ROE слишком низкий. Ваши личные деньги работают неэффективно. Проверьте маржинальность.")
+        if sol3 > 2.0:
+            st.info(
+                "**Заметка:** У вас очень много лишнего капитала. Возможно, стоит инвестировать его в расширение, а не просто держать на балансе.")
 
     st.markdown("---")
-
-    # Визуальный SWOT
-    c_left, c_right = st.columns(2)
-    with c_left:
-        st.info("### ✅ Почему бизнес молодец:")
-        if roi > 20: st.write(f"**ROI {roi:.1f}%:** Прибыль на высоком уровне.")
-        if roe > roa: st.write("**Эффект рычага:** Ты зарабатываешь на чужих деньгах больше, чем они стоят.")
-        if sol3 > 1.0: st.write("**Golden Balance:** Твой капитал перекрывает все долги.")
-
-    with c_right:
-        st.warning("### ⚠️ Где нужно поднажать:")
-        if qr < 1.0: st.write(f"**Ликвидность:** QR {qr:.2f} — маловато оборотных средств.")
-        if sol2 < 1.5: st.write(f"**Риск:** Sol2 ниже 1.5 — активы слишком зависят от долгов.")
-
-with tab2:
-    # График баланса
-    st.subheader("📊 Баланс: Активы vs Обязательства")
-    fig_b = go.Figure(data=[
-        go.Bar(name='Активы', x=['Assets'], y=[total_assets], marker_color='#00d4ff'),
-        go.Bar(name='Долги', x=['Liabilities'], y=[total_liabilities], marker_color='#ff4b4b'),
-        go.Bar(name='Капитал', x=['Equity'], y=[equity], marker_color='#00ff88')
-    ])
-    fig_b.update_layout(barmode='group', template="plotly_dark", height=400)
-    st.plotly_chart(fig_b, use_container_width=True)
-
-    # Таблица
-    st.write("### 📑 Подробная структура")
-    st.table(pd.DataFrame({
-        "Категория": ["Fixed Assets", "Current Assets", "Long-term Debt", "Short-term Debt", "EQUITY"],
-        "Сумма ($)": [fa, ca, ltl, stl, equity]
-    }))
-
-with tab3:
+    st.write("### 📖 Пояснения к 'Золотому балансу'")
     st.markdown("""
-    ### 🎓 Мини-справочник
-    * **ROI:** Если он 25%, значит на каждый потраченный $1 ты получил $0.25 чистой прибыли.
-    * **ROE:** Твоя личная доходность как владельца. Сравнивай её со ставкой в банке.
-    * **Sol2:** Коэффициент автономии. Если он < 1.5, значит банк владеет твоим бизнесом больше, чем ты.
-    * **Golden Balance (Sol3):** Когда своих денег больше, чем долгов. Это база спокойного сна.
+
+    Золотой баланс (Solvency 3) — это когда ваш собственный капитал равен или больше всех ваших долгов. 
+    Если стрелка вашего прогресса выше **1.0**, это значит, что даже если вы закроете бизнес сегодня, вы раздадите все долги и у вас еще останутся деньги.
     """)
