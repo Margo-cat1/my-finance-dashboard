@@ -268,16 +268,7 @@ elif st.session_state["authentication_status"]:
                 st.error(f"🚨 {t['msg_cash_low']} (Current: {qr:.2f})")
             if sol2_val < 0:
                 st.error(f"💣 {t['msg_bankrupt']}")
-        with col_s:
-            st.success(f"### {t['strong']}")
-            if sol3_pct >= 50: st.write(t["msg_autonomy"])
-            if roi >= 25: st.write(f"{t['msg_roi']} ({roi:.1f}%)")
-            if qr >= 2.0: st.write(t["msg_liq"])
-        with col_r:
-            st.warning(f"### {t['risks']}")
-            if sol3_pct < 30: st.write(t["msg_dep"])
-            if qr < 2.0: st.write(t["msg_cash_low"] + f" (Current: {qr:.2f})")
-            if sol2_val < 0: st.error(t["msg_bankrupt"])
+
 
     with tab2:
         st.table(pd.DataFrame({
