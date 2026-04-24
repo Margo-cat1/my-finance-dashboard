@@ -128,37 +128,65 @@ elif st.session_state["authentication_status"]:
 
     st.markdown("""
             <style>
-            /* Фикс для появления клавиатуры на мобилках */
-            input {
-                -webkit-user-select: text !important;
-                -moz-user-select: text !important;
-                -ms-user-select: text !important;
-                user-select: text !important;
+            /* Импорт красивого шрифта */
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+            html, body, [data-testid="stAppViewContainer"] {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Мягкий градиент на фон */
             }
 
-            /* Улучшаем кликабельность полей */
-            div[data-baseweb="input"] {
-                cursor: text !important;
+            /* Эффект матового стекла для карточек (Glassmorphism) */
+            [data-testid="stMetric"] {
+                background: rgba(255, 255, 255, 0.7) !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px !important;
+                padding: 20px !important;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07) !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            /* Анимация карточек при наведении */
+            [data-testid="stMetric"]:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15) !important;
+                border-left: 5px solid #090979 !important;
+            }
+
+            /* Красивые заголовки разделов */
+            .section-header {
+                font-size: 24px;
+                font-weight: 800;
+                background: -webkit-linear-gradient(#1e2130, #090979);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 25px 0 15px 0;
+                letter-spacing: -0.5px;
+            }
+
+            /* Улучшенный Sidebar */
+            [data-testid="stSidebar"] {
+                background-color: rgba(30, 33, 48, 0.05);
+                border-right: 1px solid rgba(0,0,0,0.05);
+            }
+
+            /* Фикс клавиатуры и инпутов для мобилок */
+            input {
+                -webkit-user-select: text !important;
+                user-select: text !important;
+                border-radius: 10px !important;
+            }
+
+            /* Стильные табы */
+            .stTabs [aria-selected="true"] {
+                background: linear-gradient(90deg, #00d4ff 0%, #090979 100%) !important;
+                color: white !important;
+                border-radius: 10px !important;
             }
 
             @media (max-width: 640px) {
-                .main .block-container {
-                    padding: 10px !important;
-                }
-                [data-testid="stMetricValue"] {
-                    font-size: 1.5rem !important;
-                }
-            }
-
-            /* Стили формы логина (центрирование) */
-            [data-testid="stForm"] {
-                border: none;
-                padding: 20px;
-                border-radius: 20px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                background-color: #ffffff;
-                max-width: 400px;
-                margin: 0 auto;
+                [data-testid="stMetricValue"] { font-size: 1.8rem !important; }
             }
             </style>
             """, unsafe_allow_html=True)
@@ -198,20 +226,23 @@ elif st.session_state["authentication_status"]:
     tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
     with tab1:
-        st.markdown(f'<div class="section-header">{t["sec_eff"]}</div>', unsafe_allow_html=True)
-        c1, c2, c3 = st.columns(3)
-        c1.metric("ROI", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
-        c2.metric("ROE", f"{roe:.1f}%")
-        c3.metric("ROA", f"{roa:.1f}%")
-
-        st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
-        c4, c5, c6 = st.columns(3)
-        c4.metric("Solvency 2 (Net)", f"{sol2_val:,.0f} $")
-        c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-        c6.metric("Quick Ratio", f"{qr:.2f}")
-
+        # Блок Анализа с иконками
         st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
         col_s, col_r = st.columns(2)
+        with col_s:
+            if sol3_pct >= 50:
+                st.info(f"💎 {t['msg_autonomy']}")
+            if roi >= 25:
+                st.info(f"🚀 {t['msg_roi']} ({roi:.1f}%)")
+            if qr >= 2.0:
+                st.info(f"💧 {t['msg_liq']}")
+        with col_r:
+            if sol3_pct < 30:
+                st.warning(f"⚠️ {t['msg_dep']}")
+            if qr < 2.0:
+                st.error(f"🚨 {t['msg_cash_low']} (Current: {qr:.2f})")
+            if sol2_val < 0:
+                st.error(f"💣 {t['msg_bankrupt']}")
         with col_s:
             st.success(f"### {t['strong']}")
             if sol3_pct >= 50: st.write(t["msg_autonomy"])
