@@ -1,10 +1,11 @@
 import streamlit as st
+import pd as pd
 import pandas as pd
 
 # 1. Настройка страницы
 st.set_page_config(page_title="Financial Intelligence PRO", page_icon="📈", layout="wide")
 
-# 2. Словарь переводов (RU, EN, GE)
+# 2. Словарь переводов (Обновлен блок Guide с нормативами)
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
@@ -26,12 +27,12 @@ LANGS = {
         "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
         "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
         "guide": {
-            "roi": "**ROI:** EBITDA / Первоначальные инвестиции * 100%.",
-            "roe": "**ROE:** EBITDA / Собственный капитал * 100%.",
-            "roa": "**ROA:** EBITDA / Общие активы * 100%.",
-            "sol2": "**Solvency 2:** Активы - Долги (Чистые активы).",
-            "sol3": "**Solvency 3 (%):** (Чистые активы / Общие активы) * 100%.",
-            "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
+            "roi": "**ROI (Return on Investment):** EBITDA / Инвестиции. Норма: >20%. Показывает, как быстро окупаются вложения.",
+            "roe": "**ROE (Return on Equity):** EBITDA / Собственный капитал. Норма: >15-20%. Эффективность ваших личных денег.",
+            "roa": "**ROA (Return on Assets):** EBITDA / Общие активы. Норма: >5-10%. Насколько эффективно работает всё имущество.",
+            "sol2": "**Solvency 2 (Чистые активы):** Активы - Долги. Должно быть > 0. Если значение отрицательное — бизнес в зоне банкротства.",
+            "sol3": "**Solvency 3 (Автономия):** Чистые активы / Общие активы. Норма: >50%. Показывает вашу независимость от кредиторов.",
+            "qr": "**Quick Ratio:** Cash / Краткосрочные долги. Норма: >0.5 - 1.0. Способность погасить долги немедленно."
         }
     },
     "English": {
@@ -54,12 +55,12 @@ LANGS = {
         "msg_cash_low": "💸 **Cash Deficit:** Low cash for quick payments.",
         "msg_bankrupt": "❌ **Critical Risk:** Liabilities exceed assets!",
         "guide": {
-            "roi": "**ROI:** EBITDA / Initial Investment * 100%.",
-            "roe": "**ROE:** EBITDA / Own Capital * 100%.",
-            "roa": "**ROA:** EBITDA / Total Assets * 100%.",
-            "sol2": "**Solvency 2:** Total Assets - Total Liabilities.",
-            "sol3": "**Solvency 3 (%):** (Net Assets / Total Assets) * 100%.",
-            "qr": "**Quick Ratio:** Cash / Short-term Liabilities."
+            "roi": "**ROI:** EBITDA / Investments. Target: >20%. Shows how fast the project pays back.",
+            "roe": "**ROE:** EBITDA / Own Capital. Target: >15-20%. Efficiency of your own funds.",
+            "roa": "**ROA:** EBITDA / Total Assets. Target: >5-10%. How well all company assets perform.",
+            "sol2": "**Solvency 2 (Net Assets):** Assets - Liabilities. Must be > 0. Negative means technical bankruptcy.",
+            "sol3": "**Solvency 3 (Autonomy):** Net Assets / Total Assets. Target: >50%. Shows independence from creditors.",
+            "qr": "**Quick Ratio:** Cash / Short-term Debt. Target: >0.5 - 1.0. Ability to pay bills instantly."
         }
     },
     "ქართული": {
@@ -82,12 +83,12 @@ LANGS = {
         "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ცოტა ფული გადახდებისთვის.",
         "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემატება აქტივებს!",
         "guide": {
-            "roi": "**ROI:** EBITDA / საწყისი ინვესტიცია * 100%.",
-            "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი * 100%.",
-            "roa": "**ROA:** EBITDA / ჯამური აქტივები * 100%.",
-            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები.",
-            "sol3": "**Solvency 3 (%):** (წმინდა აქტივები / ჯამური აქტივები) * 100%.",
-            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი."
+            "roi": "**ROI:** EBITDA / ინვესტიცია. ნორმა: >20%.",
+            "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. ნორმა: >15-20%.",
+            "roa": "**ROA:** EBITDA / ჯამური აქტივები. ნორმა: >5-10%.",
+            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. უნდა იყოს > 0.",
+            "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. ნორმა: >50%.",
+            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. ნორმა: >0.5 - 1.0."
         }
     }
 }
@@ -122,7 +123,7 @@ with st.sidebar:
         ebitda_val = st.number_input(t["ebitda"], value=450000)
     sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
-# 5. РАСЧЕТЫ
+# 5. РАСЧЕТЫ (Твоя логика EBITDA / Total Assets * 100)
 total_assets = fa + ca
 total_liabilities = ltl + stl
 current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
@@ -146,9 +147,9 @@ with tab1:
 
     st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
     c4, c5, c6 = st.columns(3)
-    c4.metric("Solvency 2 (Net)", f"{sol2_val:,.0f} $")
+    c4.metric("Solvency 2 (Net Assets)", f"{sol2_val:,.0f} $")
     c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-    c6.metric("Quick Ratio", f"{qr:.2f}")
+    c6.metric("Quick Ratio (Cash/STL)", f"{qr:.2f}")
 
     # Блок Анализа
     st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
@@ -165,12 +166,14 @@ with tab1:
         if sol2_val < 0: st.error(t["msg_bankrupt"])
 
 with tab2:
+    st.markdown(f"#### {t['tab2']}")
     st.table(pd.DataFrame({
-        "Parameter": ["Assets", "Liabilities", "Equity", "Net Assets", "EBITDA"],
+        "Parameter": ["Total Assets", "Total Liabilities", "Own Capital", "Net Assets (Sol2)", "Cash", "EBITDA"],
         "Value ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
-                      f"{current_ebitda:,.0f}"]
+                      f"{cash_val:,.0f}", f"{current_ebitda:,.0f}"]
     }))
 
 with tab3:
+    st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
     for key in t["guide"]:
         st.info(t["guide"][key])
