@@ -1,6 +1,12 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
+from database import init_db, save_record, get_latest_record
+from database import save_record, init_db
+init_db()  # Создаст файл базы finance.db при запуске
+
+# Инициализируем базу при запуске
+init_db()
 # Позволяет телефону распознать сайт как приложение
 st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
 # 1. Настройка страницы
@@ -212,7 +218,26 @@ elif st.session_state["authentication_status"]:
 
         sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
         authenticator.logout('Logout', 'sidebar')
+        # --- КНОПКА СОХРАНЕНИЯ  ---
+        if st.button("🚀 Сохранить данные в базу"):
+            # Собираем данные
+            data_to_save = {
+                'cash': cash_val,  # из строки 214
+                'receivables': ca,  # твои Current Assets (ca)
+                'inventory': 0,  # если нет отдельного поля, ставим 0
+                'fixed_assets': fa,  # из строки 206
+                'short_term_debt': stl,  # из строки 210
+                'long_term_debt': ltl,  # из строки 209
+                'revenue': 0,  # если выручки нет в инпутах, ставим 0
+                'ebitda': ebitda_val  # из строки 215
+            }
 
+            # Берем имя пользователя из сессии (которое на скрине в строке 201)
+            current_user = st.session_state["username"]
+
+            # Сохраняем (функция из database.py)
+            save_record(current_user, data_to_save)
+            st.sidebar.success(f"Данные для {current_user} сохранены!")
     # Расчеты
     total_assets = fa + ca
     total_liabilities = ltl + stl
