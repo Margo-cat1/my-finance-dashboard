@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
-from database import save_record, init_db
-init_db()  # Создаст файл базы finance.db при запуске
+# Инициализируем базу только один раз
+init_db()
 
 # Инициализируем базу при запуске
 init_db()
