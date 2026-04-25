@@ -145,23 +145,21 @@ name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status:
 
-    # --- ТОЛЬКО ТУТ, КОГДА ВХОД ВЫПОЛНЕН, ЗАГРУЖАЕМ ДАННЫЕ ---
-
     lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
     t = LANGS[lang_choice]
     st.write(f'👤 *{st.session_state["name"]}*')
     last_rec = get_latest_record(st.session_state["username"])
 
     if last_rec:
-                    db_fa = float(last_rec['fixed_assets'])
-                    db_ca = float(last_rec['receivables'])
-                    db_cash = float(last_rec['cash'])
-                    db_ltl = float(last_rec['long_term_debt'])
-                    db_stl = float(last_rec['short_term_debt'])
-                    db_ebitda = float(last_rec['ebitda'])
+            db_fa = float(last_rec['fixed_assets'])
+            db_ca = float(last_rec['receivables'])
+            db_cash = float(last_rec['cash'])
+            db_ltl = float(last_rec['long_term_debt'])
+            db_stl = float(last_rec['short_term_debt'])
+            db_ebitda = float(last_rec['ebitda'])
     else:
-                    db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
-                    db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+            db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
+            db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
 
         # 3. основной интерфейс (с отступом!)
     with st.sidebar:
