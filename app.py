@@ -231,17 +231,17 @@ if authentication_status:
         lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
         t = LANGS[lang_choice]
 
-        with st.expander(t["assets"], expanded=True):
-            fa = st.number_input(t["fa"], value=float(actual_balance))
-            ca = st.number_input(t["ca"], value=float(actual_balance))
-        with st.expander(t["liabilities"], expanded=True):
-            ltl = st.number_input(t["ltl"], value=800000)
-            stl = st.number_input(t["stl"], value=400000)
-        with st.expander(t["ops"], expanded=True):
-            own_cap = st.number_input(t["own_cap"], value=1000000)
-            init_inv = st.number_input(t["init_inv"], value=1500000)
-            cash_val = st.number_input(t["cash"], value=300000)
-            ebitda_val = st.number_input(t["ebitda"], value=450000)
+    with st.expander(t["assets"], expanded=True):
+        fa = st.number_input(t["fa"], value=float(actual_balance))
+        ca = st.number_input(t["ca"], value=float(actual_balance))
+    with st.expander(t["liabilities"], expanded=True):
+        ltl = st.number_input(t["ltl"], value=800000)
+        stl = st.number_input(t["stl"], value=400000)
+    with st.expander(t["ops"], expanded=True):
+        own_cap = st.number_input(t["own_cap"], value=1000000)
+        init_inv = st.number_input(t["init_inv"], value=1500000)
+        cash_val = st.number_input(t["cash"], value=300000)
+        ebitda_val = st.number_input(t["ebitda"], value=450000)
 
         sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
         authenticator.logout('Logout', 'sidebar')
