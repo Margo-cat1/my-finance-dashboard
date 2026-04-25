@@ -53,7 +53,7 @@ def get_latest_record(username):
     conn.close()
     return df
 
-  def get_balance():
+def get_balance():
     conn = sqlite3.connect("finance.db")
     cursor = conn.cursor()
     # Считаем сумму всех операций (доходы плюс, расходы минус)
