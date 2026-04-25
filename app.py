@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
-from database import init_db, save_record, get_balance
+from database import init_db, save_record, get_latest_record
 
 init_db()
 last_rec = get_latest_record(st.session_state["username"])
