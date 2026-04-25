@@ -52,3 +52,12 @@ def get_latest_record(username):
     df = pd.read_sql(query, conn)
     conn.close()
     return df
+
+  def get_balance():
+        conn = sqlite3.connect("finance.db")
+        cursor = conn.cursor()
+        # Считаем сумму всех операций (доходы плюс, расходы минус)
+        cursor.execute("SELECT SUM(amount) FROM operations")
+        result = cursor.fetchone()[0]
+        conn.close()
+        return result if result is not None else 0

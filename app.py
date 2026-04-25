@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
-from database import init_db, save_record, get_latest_record
+from database import init_db, save_record, get_balance, get_latest_record
 # Инициализируем базу только один раз
 init_db()
-
+# Вызываем функцию из нашего файла database.py
+actual_balance = get_balance()
 # Инициализируем базу при запуске
 init_db()
 # Позволяет телефону распознать сайт как приложение
@@ -205,8 +206,8 @@ elif st.session_state["authentication_status"]:
         t = LANGS[lang_choice]
 
         with st.expander(t["assets"], expanded=True):
-            fa = st.number_input(t["fa"], value=2100000)
-            ca = st.number_input(t["ca"], value=900000)
+            fa = st.number_input(t["fa"], value=float(actual_balance))
+            ca = st.number_input(t["ca"], value=float(actual_balance))
         with st.expander(t["liabilities"], expanded=True):
             ltl = st.number_input(t["ltl"], value=800000)
             stl = st.number_input(t["stl"], value=400000)
@@ -308,3 +309,5 @@ elif st.session_state["authentication_status"]:
         st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
         for key in t["guide"]:
             st.info(t["guide"][key])
+
+
