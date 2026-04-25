@@ -3,6 +3,10 @@ import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
 
+# 1. Сначала настройки страницы (ОБЯЗАТЕЛЬНО ПЕРВАЯ КОМАНДА)
+st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
+
+# 2. Словарь переводов
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
@@ -62,60 +66,22 @@ LANGS = {
     }
 }
 
-
-# 1. Настройка страницы
-st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
-
-# Позволяет телефону распознать сайт как приложение
+# 3. Стилизация и манифест (Глобально)
 st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
-
-# --- СТИЛИЗАЦИЯ ФОРМЫ ЛОГИНА ---
 st.markdown("""
     <style>
-    /* Центрируем блок логина */
-    [data-testid="stForm"] {
-        border: none;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        background-color: #ffffff;
-        max-width: 450px;
-        margin: 50px auto;
-    }
-    /* Заголовок формы */
-    .login-header {
-        text-align: center;
-        font-family: 'Inter', sans-serif;
-        color: #1e2130;
-        margin-bottom: 30px;
-    }
-    /* Кнопка входа */
-    button[kind="primaryFormSubmit"] {
-        width: 100%;
-        background: linear-gradient(90deg, #00d4ff 0%, #090979 100%);
-        border: none;
-        color: white;
-        padding: 10px;
-        border-radius: 10px;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    html, body, [data-testid="stAppViewContainer"] { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important; }
+    [data-testid="stForm"] { border: none; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background-color: #ffffff; max-width: 450px; margin: 50px auto; }
+    .login-header { text-align: center; color: #1e2130; margin-bottom: 30px; }
+    button[kind="primaryFormSubmit"] { width: 100%; background: linear-gradient(90deg, #00d4ff 0%, #090979 100%); border: none; color: white; padding: 10px; border-radius: 10px; }
+    [data-testid="stMetric"] { background: rgba(255, 255, 255, 0.7) !important; backdrop-filter: blur(12px); border-radius: 20px !important; padding: 15px !important; }
+    .section-header { font-size: 1.5rem; font-weight: 800; color: #1e2130; margin-top: 20px; margin-bottom: 10px; }
+    footer {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Теперь в сайдбаре (где st.sidebar) подставляем эти переменные в value
-with st.sidebar:
-    with st.expander(t["assets"], expanded=True):
-        fa = st.number_input(t["fa"], value=db_fa)  # Вместо actual_balance ставим db_fa
-        ca = st.number_input(t["ca"], value=db_ca)
-
-    with st.expander(t["ops"], expanded=True):
-        cash_val = st.number_input(t["cash"], value=db_cash)
-        ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
-
-
-
-
-
-# --- БЛОК АВТОРИЗАЦИИ ---
+# 4. Авторизация
 credentials = {
     'usernames': {
         'admin': {'name': 'Admin User', 'password': '123'},
@@ -123,165 +89,70 @@ credentials = {
     }
 }
 
-authenticator = stauth.Authenticate(
-    credentials,
-    'finance_cookie',
-    'auth_key',
-    cookie_expiry_days=30
-)
+authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
 
-# Красивый заголовок над формой
+# Если не залогинены — красивый заголовок
 if not st.session_state.get("authentication_status"):
     st.markdown("<h1 class='login-header'>🔐 Financial Intelligence</h1>", unsafe_allow_html=True)
 
-# Вызываем логин
-# 1. Сначала инициализируем базу
 init_db()
-
-# 2. Показываем форму логина
 name, authentication_status, username = authenticator.login("Login", "main")
 
+# --- ГЛАВНЫЙ БЛОК ПРИЛОЖЕНИЯ ---
 if authentication_status:
-
-    lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
+    # Выбор языка (обязательно в начале авторизованной зоны)
+    lang_choice = st.sidebar.selectbox("🌐 Language", list(LANGS.keys()))
     t = LANGS[lang_choice]
-    st.write(f'👤 *{st.session_state["name"]}*')
-    last_rec = get_latest_record(st.session_state["username"])
 
+    st.sidebar.title(f"Welcome {name}")
+
+    # Загрузка данных из базы
+    last_rec = get_latest_record(username)
     if last_rec:
-            db_fa = float(last_rec['fixed_assets'])
-            db_ca = float(last_rec['receivables'])
-            db_cash = float(last_rec['cash'])
-            db_ltl = float(last_rec['long_term_debt'])
-            db_stl = float(last_rec['short_term_debt'])
-            db_ebitda = float(last_rec['ebitda'])
+        db_fa = float(last_rec['fixed_assets'])
+        db_ca = float(last_rec['receivables'])
+        db_cash = float(last_rec['cash'])
+        db_ltl = float(last_rec['long_term_debt'])
+        db_stl = float(last_rec['short_term_debt'])
+        db_ebitda = float(last_rec['ebitda'])
     else:
-            db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
-            db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+        db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
+        db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
 
-        # 3. основной интерфейс (с отступом!)
+    # САЙДБАР С ВВОДОМ ДАННЫХ
     with st.sidebar:
         with st.expander(t["assets"], expanded=True):
-            fa = st.number_input(t["fa"], value=db_fa)  # Используем db_fa
+            fa = st.number_input(t["fa"], value=db_fa)
+            ca = st.number_input(t["ca"], value=db_ca)
 
+        with st.expander(t["liabilities"], expanded=True):
+            ltl = st.number_input(t["ltl"], value=db_ltl)
+            stl = st.number_input(t["stl"], value=db_stl)
 
-
-
-
-    # 3. Дальше идет отрисовка твоего интерфейса (st.sidebar и т.д.)
-    st.sidebar.title(f"Welcome {name}")
-    # ...
-
-    # ОСНОВНОЙ КОД
-
-
-    st.markdown("""
-        <style>
-        /* 1. ОБЩИЕ НАСТРОЙКИ ШРИФТА И ФОНА */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-
-        html, body, [data-testid="stAppViewContainer"] {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
-        }
-
-        /* 2. ВОЗВРАЩАЕМ КНОПКУ МЕНЮ И НАСТРАИВАЕМ САЙДБАР */
-        header {
-            visibility: visible !important; /* Кнопка меню должна быть видна! */
-            background: transparent !important;
-        }
-
-        [data-testid="stSidebar"] {
-            background-color: white !important;
-            border-right: 1px solid rgba(0,0,0,0.05);
-        }
-
-        /* 3. ФИКС ДЛЯ МОБИЛОК (Чтобы не было каши) */
-        @media (max-width: 640px) {
-            [data-testid="stSidebar"] {
-                width: 80vw !important; /* Меню занимает 80% экрана */
-                z-index: 1000001 !important;
-            }
-
-            /* Добавляем отступ сверху в меню, чтобы элементы не вылазили под кнопку закрытия */
-            [data-testid="stSidebar"] .block-container {
-                padding-top: 3rem !important;
-            }
-
-            /* Метрики чуть мельче на мобилке, чтобы не наезжали друг на друга */
-            [data-testid="stMetricValue"] {
-                font-size: 1.4rem !important;
-            }
-        }
-
-        /* 4. КАРТОЧКИ (Glassmorphism) */
-        [data-testid="stMetric"] {
-            background: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 20px !important;
-            padding: 15px !important;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05) !important;
-        }
-
-        /* 5. ПОЛЯ ВВОДА */
-        input {
-            -webkit-user-select: text !important;
-            user-select: text !important;
-        }
-
-        /* 6. КРАСИВЫЕ ТАБЫ */
-        .stTabs [aria-selected="true"] {
-            background: linear-gradient(90deg, #00d4ff 0%, #090979 100%) !important;
-            color: white !important;
-            border-radius: 12px !important;
-        }
-
-        /* Скрываем только футер (сделано в Streamlit) */
-        footer {visibility: hidden;}
-        </style>
-        """, unsafe_allow_html=True)
-
-
-
-    with st.expander(t["assets"], expanded=True):
-        fa = st.number_input(t["fa"], value=float(actual_balance))
-        ca = st.number_input(t["ca"], value=float(actual_balance))
-    with st.expander(t["liabilities"], expanded=True):
-        ltl = st.number_input(t["ltl"], value=800000)
-        stl = st.number_input(t["stl"], value=400000)
-    with st.expander(t["ops"], expanded=True):
-        own_cap = st.number_input(t["own_cap"], value=1000000)
-        init_inv = st.number_input(t["init_inv"], value=1500000)
-        cash_val = st.number_input(t["cash"], value=300000)
-        ebitda_val = st.number_input(t["ebitda"], value=450000)
+        with st.expander(t["ops"], expanded=True):
+            own_cap = st.number_input(t["own_cap"], value=1000000.0)
+            init_inv = st.number_input(t["init_inv"], value=1500000.0)
+            cash_val = st.number_input(t["cash"], value=db_cash)
+            ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
 
         sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
-        authenticator.logout('Logout', 'sidebar')
-        # --- КНОПКА СОХРАНЕНИЯ  ---
-        if st.button("🚀 Сохранить данные в базу"):
-            # Собираем данные
+
+        if st.button("🚀 Сохранить данные"):
             data_to_save = {
-                'cash': cash_val,  # из строки 214
-                'receivables': ca,  # твои Current Assets (ca)
-                'inventory': 0,  # если нет отдельного поля, ставим 0
-                'fixed_assets': fa,  # из строки 206
-                'short_term_debt': stl,  # из строки 210
-                'long_term_debt': ltl,  # из строки 209
-                'revenue': 0,  # если выручки нет в инпутах, ставим 0
-                'ebitda': ebitda_val  # из строки 215
+                'cash': cash_val, 'receivables': ca, 'inventory': 0,
+                'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
+                'revenue': 0, 'ebitda': ebitda_val
             }
+            save_record(username, data_to_save)
+            st.success("Данные сохранены!")
 
-            # Берем имя пользователя из сессии (которое на скрине в строке 201)
-            current_user = st.session_state["username"]
+        authenticator.logout('Logout', 'sidebar')
 
-            # Сохраняем (функция из database.py)
-            save_record(current_user, data_to_save)
-            st.sidebar.success(f"Данные для {current_user} сохранены!")
-    # Расчеты
+    # РАСЧЕТЫ
     total_assets = fa + ca
     total_liabilities = ltl + stl
     current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
+
     roi = (current_ebitda / init_inv * 100) if init_inv != 0 else 0
     roe = (current_ebitda / own_cap * 100) if own_cap != 0 else 0
     roa = (current_ebitda / total_assets * 100) if total_assets != 0 else 0
@@ -289,53 +160,35 @@ if authentication_status:
     sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
     qr = (cash_val / stl) if stl != 0 else 0
 
+    # ОСНОВНОЙ ЭКРАН (ТАБЫ)
     st.title(t["title"])
     tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
     with tab1:
-        # --- СЕКЦИЯ 1: ЭФФЕКТИВНОСТЬ (ROI, ROE, ROA) ---
         st.markdown(f'<div class="section-header">{t["sec_eff"]}</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
+        c1.metric("ROI", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
+        c2.metric("ROE", f"{roe:.1f}%")
+        c3.metric("ROA", f"{roa:.1f}%")
 
-        # Расчеты (убедись, что переменные определены выше в коде)
-        # roi = (current_ebitda / init_inv * 100)
-        # roe = (current_ebitda / own_cap * 100)
-        # roa = (current_ebitda / total_assets * 100)
-
-        c1.metric("ROI (Окупаемость)", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
-        c2.metric("ROE (Капитал)", f"{roe:.1f}%")
-        c3.metric("ROA (Активы)", f"{roa:.1f}%")
-
-        # --- СЕКЦИЯ 2: УСТОЙЧИВОСТЬ ---
         st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
-        c4.metric("Solvency 2 (Net Assets)", f"{sol2_val:,.0f} $")
+        c4.metric("Net Assets", f"{sol2_val:,.0f} $")
         c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-        c6.metric("Quick Ratio (Ликвидность)", f"{qr:.2f}")
+        c6.metric("Quick Ratio", f"{qr:.2f}")
 
-        # --- СЕКЦИЯ 3: АВТОМАТИЧЕСКИЙ АНАЛИЗ (Как на твоем фото) ---
         st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
-
         col_s, col_r = st.columns(2)
-
         with col_s:
             st.success(f"### {t['strong']}")
-            if sol3_pct >= 50:
-                st.info(f"💎 {t['msg_autonomy']}")
-            if roi >= 25:
-                st.info(f"🚀 {t['msg_roi']} ({roi:.1f}%)")
-            if qr >= 2.0:
-                st.info(f"💧 {t['msg_liq']}")
-
+            if sol3_pct >= 50: st.info(f"💎 {t['msg_autonomy']}")
+            if roi >= 25: st.info(f"🚀 {t['msg_roi']} ({roi:.1f}%)")
+            if qr >= 2.0: st.info(f"💧 {t['msg_liq']}")
         with col_r:
             st.warning(f"### {t['risks']}")
-            if sol3_pct < 30:
-                st.error(f"🚩 {t['msg_dep']}")
-            if qr < 2.0:
-                st.error(f"🚨 {t['msg_cash_low']} (Current: {qr:.2f})")
-            if sol2_val < 0:
-                st.error(f"💣 {t['msg_bankrupt']}")
-
+            if sol3_pct < 30: st.error(f"🚩 {t['msg_dep']}")
+            if qr < 2.0: st.error(f"🚨 {t['msg_cash_low']} ({qr:.2f})")
+            if sol2_val < 0: st.error(f"💣 {t['msg_bankrupt']}")
 
     with tab2:
         st.table(pd.DataFrame({
@@ -349,4 +202,7 @@ if authentication_status:
         for key in t["guide"]:
             st.info(t["guide"][key])
 
-
+elif authentication_status is False:
+    st.error('Username/password is incorrect')
+elif authentication_status is None:
+    st.warning('Please enter your username and password')
