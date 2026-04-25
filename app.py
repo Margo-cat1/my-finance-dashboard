@@ -3,14 +3,13 @@ import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
 
-# 1. Сначала настройки страницы (ОБЯЗАТЕЛЬНО ПЕРВАЯ КОМАНДА)
+# 1. Настройка страницы (должна быть самой первой командой Streamlit)
 st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
 
 # 2. Словарь переводов
 LANGS = {
     "Русский": {
         "title": "📊 Финансовый Интеллект",
-        "settings": "⚙️ Ввод данных",
         "assets": "💼 Активы", "liabilities": "💸 Долги", "ops": "📈 Операционка",
         "fa": "Fixed Assets", "ca": "Current Assets",
         "ltl": "Long-term Debt", "stl": "Short-term Debt",
@@ -38,7 +37,6 @@ LANGS = {
     },
     "ქართული": {
         "title": "📊 ფინანსური ინტელექტი",
-        "settings": "⚙️ მონაცემები",
         "assets": "💼 აქტივები", "liabilities": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
         "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
         "ltl": "გრძელვადიანი ვალი", "stl": "მოკლევადიანი ვალი",
@@ -61,27 +59,22 @@ LANGS = {
             "roa": "**ROA:** EBITDA / ჯამური აქტივები. **მიზანი: > 10%**.",
             "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. **მინიმუმი: > 0**.",
             "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. **მინიმუმი: 50%**.",
-            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მინიმუმი: 2.0**."
+            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მიზანი: 2.0**."
         }
     }
 }
 
-# 3. Стилизация и манифест (Глобально)
-st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
+# 3. Кастомный CSS
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-    html, body, [data-testid="stAppViewContainer"] { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important; }
-    [data-testid="stForm"] { border: none; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background-color: #ffffff; max-width: 450px; margin: 50px auto; }
-    .login-header { text-align: center; color: #1e2130; margin-bottom: 30px; }
-    button[kind="primaryFormSubmit"] { width: 100%; background: linear-gradient(90deg, #00d4ff 0%, #090979 100%); border: none; color: white; padding: 10px; border-radius: 10px; }
-    [data-testid="stMetric"] { background: rgba(255, 255, 255, 0.7) !important; backdrop-filter: blur(12px); border-radius: 20px !important; padding: 15px !important; }
-    .section-header { font-size: 1.5rem; font-weight: 800; color: #1e2130; margin-top: 20px; margin-bottom: 10px; }
-    footer {visibility: hidden;}
+    [data-testid="stMetric"] { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .section-header { font-size: 1.5rem; font-weight: bold; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #eee; }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. Авторизация
+# 4. Инициализация базы и авторизация
+init_db()
+
 credentials = {
     'usernames': {
         'admin': {'name': 'Admin User', 'password': '123'},
@@ -91,23 +84,21 @@ credentials = {
 
 authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
 
-# Если не залогинены — красивый заголовок
-if not st.session_state.get("authentication_status"):
-    st.markdown("<h1 class='login-header'>🔐 Financial Intelligence</h1>", unsafe_allow_html=True)
+# Исправленный вызов логина (ValueError возникал из-за старого формата аргументов)
+authenticator.login(location='main')
 
-init_db()
-name, authentication_status, username = authenticator.login("Login", "main")
+# 5. Основная логика приложения (выполняется только если вход выполнен)
+if st.session_state["authentication_status"]:
 
-# --- ГЛАВНЫЙ БЛОК ПРИЛОЖЕНИЯ ---
-if authentication_status:
-    # Выбор языка (обязательно в начале авторизованной зоны)
+    # Выбор языка (теперь переменная 't' будет доступна везде ниже)
     lang_choice = st.sidebar.selectbox("🌐 Language", list(LANGS.keys()))
     t = LANGS[lang_choice]
 
-    st.sidebar.title(f"Welcome {name}")
+    st.sidebar.write(f'👤 **{st.session_state["name"]}**')
 
     # Загрузка данных из базы
-    last_rec = get_latest_record(username)
+    last_rec = get_latest_record(st.session_state["username"])
+
     if last_rec:
         db_fa = float(last_rec['fixed_assets'])
         db_ca = float(last_rec['receivables'])
@@ -116,10 +107,11 @@ if authentication_status:
         db_stl = float(last_rec['short_term_debt'])
         db_ebitda = float(last_rec['ebitda'])
     else:
+        # Дефолтные значения, если база пуста
         db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
         db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
 
-    # САЙДБАР С ВВОДОМ ДАННЫХ
+    # Отрисовка Сайдбара
     with st.sidebar:
         with st.expander(t["assets"], expanded=True):
             fa = st.number_input(t["fa"], value=db_fa)
@@ -138,13 +130,13 @@ if authentication_status:
         sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
         if st.button("🚀 Сохранить данные"):
-            data_to_save = {
+            data = {
                 'cash': cash_val, 'receivables': ca, 'inventory': 0,
                 'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
                 'revenue': 0, 'ebitda': ebitda_val
             }
-            save_record(username, data_to_save)
-            st.success("Данные сохранены!")
+            save_record(st.session_state["username"], data)
+            st.success("Данные успешно сохранены!")
 
         authenticator.logout('Logout', 'sidebar')
 
@@ -160,7 +152,7 @@ if authentication_status:
     sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
     qr = (cash_val / stl) if stl != 0 else 0
 
-    # ОСНОВНОЙ ЭКРАН (ТАБЫ)
+    # ОСНОВНОЙ ИНТЕРФЕЙС
     st.title(t["title"])
     tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 
@@ -173,9 +165,9 @@ if authentication_status:
 
         st.markdown(f'<div class="section-header">{t["sec_sol"]}</div>', unsafe_allow_html=True)
         c4, c5, c6 = st.columns(3)
-        c4.metric("Net Assets", f"{sol2_val:,.0f} $")
+        c4.metric("Net Assets (Sol 2)", f"{sol2_val:,.0f} $")
         c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-        c6.metric("Quick Ratio", f"{qr:.2f}")
+        c6.metric("Quick Ratio (Ликв.)", f"{qr:.2f}")
 
         st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
         col_s, col_r = st.columns(2)
@@ -191,18 +183,19 @@ if authentication_status:
             if sol2_val < 0: st.error(f"💣 {t['msg_bankrupt']}")
 
     with tab2:
-        st.table(pd.DataFrame({
-            "Parameter": ["Assets", "Liabilities", "Equity", "Net Assets", "EBITDA"],
-            "Value ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
-                          f"{current_ebitda:,.0f}"]
-        }))
+        df_balance = pd.DataFrame({
+            "Параметр": ["Активы", "Долги", "Капитал", "Чистые активы", "EBITDA"],
+            "Значение ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
+                             f"{current_ebitda:,.0f}"]
+        })
+        st.table(df_balance)
 
     with tab3:
         st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
         for key in t["guide"]:
             st.info(t["guide"][key])
 
-elif authentication_status is False:
+elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-elif authentication_status is None:
+elif st.session_state["authentication_status"] is None:
     st.warning('Please enter your username and password')
