@@ -3,6 +3,72 @@ import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
 
+LANGS = {
+    "Русский": {
+        "title": "📊 Финансовый Интеллект",
+        "settings": "⚙️ Ввод данных",
+        "assets": "💼 Активы", "liabilities": "💸 Долги", "ops": "📈 Операционка",
+        "fa": "Fixed Assets", "ca": "Current Assets",
+        "ltl": "Long-term Debt", "stl": "Short-term Debt",
+        "own_cap": "Собственный капитал", "init_inv": "Первоначальные инвестиции",
+        "cash": "Наличные (Cash)", "ebitda": "EBITDA",
+        "tab1": "🎯 Дашборд", "tab2": "📊 Структура", "tab3": "📚 Справочник",
+        "sec_eff": "🚀 Эффективность (EBITDA)",
+        "sec_sol": "🛡️ Устойчивость и Ликвидность",
+        "analysis_header": "🔍 Автоматический анализ",
+        "strong": "✅ Сильные стороны", "risks": "⚠️ Зоны внимания",
+        "msg_autonomy": "🌟 **Автономия:** Большая часть активов — ваши.",
+        "msg_roi": "📈 **Окупаемость:** Высокий уровень ROI",
+        "msg_liq": "💧 **Ликвидность:** Хороший запас наличности.",
+        "msg_dep": "🚩 **Зависимость:** Высокая доля долгов.",
+        "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
+        "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
+        "guide": {
+            "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**.",
+            "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**.",
+            "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**.",
+            "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**.",
+            "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**.",
+            "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**."
+        }
+    },
+    "ქართული": {
+        "title": "📊 ფინანსური ინტელექტი",
+        "settings": "⚙️ მონაცემები",
+        "assets": "💼 აქტივები", "liabilities": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
+        "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
+        "ltl": "გრძელვადიანი ვალი", "stl": "მოკლევადიანი ვალი",
+        "own_cap": "საკუთარი კაპიტალი", "init_inv": "საწყისი ინვესტიცია",
+        "cash": "Cash", "ebitda": "EBITDA",
+        "tab1": "🎯 მთავარი", "tab2": "📊 ბალანსი", "tab3": "📚 ცნობარი",
+        "sec_eff": "🚀 ეფექტურობა (EBITDA)",
+        "sec_sol": "🛡️ მდგრადობა და ლიკვიდურობა",
+        "analysis_header": "🔍 ავტომატური ანალიზი",
+        "strong": "✅ ძლიერი მხარეები", "risks": "⚠️ რისკები",
+        "msg_autonomy": "🌟 **ავტონომია:** აქტივების უმეტესი ნაწილი თქვენია.",
+        "msg_roi": "📈 **უკუგება:** ROI-ს მაღალი დონე",
+        "msg_liq": "💧 **ლიკვიდურობა:** ნაღდი ფულის კარგი მარაგი.",
+        "msg_dep": "🚩 **დამოკიდებულება:** ვალების მაღალი წილი.",
+        "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ცოტა ფული გადახდებისთვის.",
+        "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემაება აქტივებს!",
+        "guide": {
+            "roi": "**ROI:** EBITDA / ინვესტიცია. **მიზანი: > 25%**.",
+            "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. **მიზანი: > 20%**.",
+            "roa": "**ROA:** EBITDA / ჯამური აქტივები. **მიზანი: > 10%**.",
+            "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. **მინიმუმი: > 0**.",
+            "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. **მინიმუმი: 50%**.",
+            "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მინიმუმი: 2.0**."
+        }
+    }
+}
+
+
+
+
+
+
+
+
 # 3. Теперь в сайдбаре (где st.sidebar) подставляем эти переменные в value
 with st.sidebar:
     with st.expander(t["assets"], expanded=True):
@@ -77,87 +143,36 @@ init_db()
 # 2. Показываем форму логина
 name, authentication_status, username = authenticator.login("Login", "main")
 
-if authentication_status:
+    if authentication_status:
     # --- ТОЛЬКО ТУТ, КОГДА ВХОД ВЫПОЛНЕН, ЗАГРУЖАЕМ ДАННЫЕ ---
 
-    last_rec = get_latest_record(st.session_state["username"])
+        lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
+        t = LANGS[lang_choice]
+        st.write(f'👤 *{st.session_state["name"]}*')
+        last_rec = get_latest_record(st.session_state["username"])
 
-    if last_rec:
-        db_fa = float(last_rec['fixed_assets'])
-        db_ca = float(last_rec['receivables'])
-        db_cash = float(last_rec['cash'])
-        db_ltl = float(last_rec['long_term_debt'])
-        db_stl = float(last_rec['short_term_debt'])
-        db_ebitda = float(last_rec['ebitda'])
-    else:
-        db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
-        db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+        if last_rec:
+            db_fa = float(last_rec['fixed_assets'])
+            db_ca = float(last_rec['receivables'])
+            db_cash = float(last_rec['cash'])
+            db_ltl = float(last_rec['long_term_debt'])
+            db_stl = float(last_rec['short_term_debt'])
+            db_ebitda = float(last_rec['ebitda'])
+        else:
+            db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
+            db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
 
-
+        # 3. основной интерфейс (с отступом!)
+        with st.sidebar:
+            with st.expander(t["assets"], expanded=True):
+                fa = st.number_input(t["fa"], value=db_fa)  # Используем db_fa
 
     # 3. Дальше идет отрисовка твоего интерфейса (st.sidebar и т.д.)
     st.sidebar.title(f"Welcome {name}")
     # ...
 
-    # --- ТВОЙ ОСНОВНОЙ КОД (БЕЗ ИЗМЕНЕНИЙ) ---
-    LANGS = {
-        "Русский": {
-            "title": "📊 Финансовый Интеллект",
-            "settings": "⚙️ Ввод данных",
-            "assets": "💼 Активы", "liabilities": "💸 Долги", "ops": "📈 Операционка",
-            "fa": "Fixed Assets", "ca": "Current Assets",
-            "ltl": "Long-term Debt", "stl": "Short-term Debt",
-            "own_cap": "Собственный капитал", "init_inv": "Первоначальные инвестиции",
-            "cash": "Наличные (Cash)", "ebitda": "EBITDA",
-            "tab1": "🎯 Дашборд", "tab2": "📊 Структура", "tab3": "📚 Справочник",
-            "sec_eff": "🚀 Эффективность (EBITDA)",
-            "sec_sol": "🛡️ Устойчивость и Ликвидность",
-            "analysis_header": "🔍 Автоматический анализ",
-            "strong": "✅ Сильные стороны", "risks": "⚠️ Зоны внимания",
-            "msg_autonomy": "🌟 **Автономия:** Большая часть активов — ваши.",
-            "msg_roi": "📈 **Окупаемость:** Высокий уровень ROI",
-            "msg_liq": "💧 **Ликвидность:** Хороший запас наличности.",
-            "msg_dep": "🚩 **Зависимость:** Высокая доля долгов.",
-            "msg_cash_low": "💸 **Дефицит Cash:** Мало денег для платежей.",
-            "msg_bankrupt": "❌ **Критический риск:** Долги больше активов!",
-            "guide": {
-                "roi": "**ROI:** EBITDA / Инвестиции. **Цель: > 25%**.",
-                "roe": "**ROE:** EBITDA / Собственный капитал. **Цель: > 20%**.",
-                "roa": "**ROA:** EBITDA / Общие активы. **Цель: > 10%**.",
-                "sol2": "**Solvency 2:** Активы - Долги. **Минимум: > 0**.",
-                "sol3": "**Solvency 3:** Чистые активы / Общие активы. **Минимум: 50%**.",
-                "qr": "**Quick Ratio:** Cash / Краткосрочные долги. **Минимум: 2.0**."
-            }
-        },
-        "ქართული": {
-            "title": "📊 ფინანსური ინტელექტი",
-            "settings": "⚙️ მონაცემები",
-            "assets": "💼 აქტივები", "liabilities": "💸 ვალდებულებები", "ops": "📈 ოპერაციები",
-            "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
-            "ltl": "გრძელვადიანი ვალი", "stl": "მოკლევადიანი ვალი",
-            "own_cap": "საკუთარი კაპიტალი", "init_inv": "საწყისი ინვესტიცია",
-            "cash": "Cash", "ebitda": "EBITDA",
-            "tab1": "🎯 მთავარი", "tab2": "📊 ბალანსი", "tab3": "📚 ცნობარი",
-            "sec_eff": "🚀 ეფექტურობა (EBITDA)",
-            "sec_sol": "🛡️ მდგრადობა და ლიკვიდურობა",
-            "analysis_header": "🔍 ავტომატური ანალიზი",
-            "strong": "✅ ძლიერი მხარეები", "risks": "⚠️ რისკები",
-            "msg_autonomy": "🌟 **ავტონომია:** აქტივების უმეტესი ნაწილი თქვენია.",
-            "msg_roi": "📈 **უკუგება:** ROI-ს მაღალი დონე",
-            "msg_liq": "💧 **ლიკვიდურობა:** ნაღდი ფულის კარგი მარაგი.",
-            "msg_dep": "🚩 **დამოკიდებულება:** ვალების მაღალი წილი.",
-            "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ცოტა ფული გადახდებისთვის.",
-            "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემაება აქტივებს!",
-            "guide": {
-                "roi": "**ROI:** EBITDA / ინვესტიცია. **მიზანი: > 25%**.",
-                "roe": "**ROE:** EBITDA / საკუთარი კაპიტალი. **მიზანი: > 20%**.",
-                "roa": "**ROA:** EBITDA / ჯამური აქტივები. **მიზანი: > 10%**.",
-                "sol2": "**Solvency 2:** აქტივები - ვალდებულებები. **მინიმუმი: > 0**.",
-                "sol3": "**Solvency 3:** წმინდა აქტივები / ჯამური აქტივები. **მინიმუმი: 50%**.",
-                "qr": "**Quick Ratio:** Cash / მოკლევადიანი ვალი. **მინიმუმი: 2.0**."
-            }
-        }
-    }
+    # ОСНОВНОЙ КОД
+
 
     st.markdown("""
         <style>
@@ -226,10 +241,16 @@ if authentication_status:
         </style>
         """, unsafe_allow_html=True)
 
-    with st.sidebar:
-        st.write(f'👤 *{st.session_state["name"]}*')
-        lang_choice = st.selectbox("🌐 Language", list(LANGS.keys()))
-        t = LANGS[lang_choice]
+
+
+
+
+
+
+
+
+
+
 
     with st.expander(t["assets"], expanded=True):
         fa = st.number_input(t["fa"], value=float(actual_balance))
