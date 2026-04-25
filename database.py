@@ -53,11 +53,16 @@ def get_latest_record(username):
     conn.close()
     return df
 
-def get_balance():
+
+import sqlite3
+
+def get_latest_record(username):
     conn = sqlite3.connect("finance.db")
+    # Это позволяет обращаться к данным по именам колонок, как в словаре
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    # Считаем сумму всех операций (доходы плюс, расходы минус)
-    cursor.execute("SELECT SUM(amount) FROM finance_records")
-    result = cursor.fetchone()[0]
+    # Берем самую последнюю запись конкретного пользователя
+    cursor.execute("SELECT * FROM finance_records WHERE username = ? ORDER BY id DESC LIMIT 1", (username,))
+    row = cursor.fetchone()
     conn.close()
-    return result if result is not None else 0
+    return row

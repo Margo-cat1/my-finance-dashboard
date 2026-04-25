@@ -4,7 +4,30 @@ import streamlit_authenticator as stauth
 from database import init_db, save_record, get_balance
 
 init_db()
-actual_balance = get_balance()
+last_rec = get_latest_record(st.session_state["username"])
+
+if last_rec:
+    db_fa = float(last_rec['fixed_assets'])
+    db_ca = float(last_rec['receivables'])
+    db_cash = float(last_rec['cash'])
+    db_ltl = float(last_rec['long_term_debt'])
+    db_stl = float(last_rec['short_term_debt'])
+    db_ebitda = float(last_rec['ebitda'])
+else:
+    db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
+    db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+
+# 3. Теперь в сайдбаре (где st.sidebar) подставляем эти переменные в value
+with st.sidebar:
+    with st.expander(t["assets"], expanded=True):
+        fa = st.number_input(t["fa"], value=db_fa)  # Вместо actual_balance ставим db_fa
+        ca = st.number_input(t["ca"], value=db_ca)
+
+    with st.expander(t["ops"], expanded=True):
+        cash_val = st.number_input(t["cash"], value=db_cash)
+        ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
+
+
 # Позволяет телефону распознать сайт как приложение
 st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
 # 1. Настройка страницы
