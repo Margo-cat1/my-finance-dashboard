@@ -164,9 +164,9 @@ if authentication_status:
                 db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
 
         # 3. основной интерфейс (с отступом!)
-        with st.sidebar:
-            with st.expander(t["assets"], expanded=True):
-                fa = st.number_input(t["fa"], value=db_fa)  # Используем db_fa
+    with st.sidebar:
+        with st.expander(t["assets"], expanded=True):
+            fa = st.number_input(t["fa"], value=db_fa)  # Используем db_fa
 
 
 
