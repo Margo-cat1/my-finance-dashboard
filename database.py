@@ -54,10 +54,10 @@ def get_latest_record(username):
     return df
 
   def get_balance():
-        conn = sqlite3.connect("finance.db")
-        cursor = conn.cursor()
-        # Считаем сумму всех операций (доходы плюс, расходы минус)
-        cursor.execute("SELECT SUM(amount) FROM operations")
-        result = cursor.fetchone()[0]
-        conn.close()
-        return result if result is not None else 0
+    conn = sqlite3.connect("finance.db")
+    cursor = conn.cursor()
+    # Считаем сумму всех операций (доходы плюс, расходы минус)
+    cursor.execute("SELECT SUM(amount) FROM operations")
+    result = cursor.fetchone()[0]
+    conn.close()
+    return result if result is not None else 0
