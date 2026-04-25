@@ -2,9 +2,8 @@ import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_balance
-# Инициализируем базу только один раз
+
 init_db()
-# Вызываем функцию из нашего файла database.py
 actual_balance = get_balance()
 # Позволяет телефону распознать сайт как приложение
 st.markdown(f'<link rel="manifest" href="manifest.json">', unsafe_allow_html=True)
