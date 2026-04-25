@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
 
-# 1. Настройка страницы (должна быть самой первой командой Streamlit)
+# 1. Настройка страницы (строго первой командой)
 st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
 
 # 2. Словарь переводов
@@ -64,7 +64,7 @@ LANGS = {
     }
 }
 
-# 3. Кастомный CSS
+# 3. Кастомный стиль
 st.markdown("""
     <style>
     [data-testid="stMetric"] { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
@@ -83,14 +83,12 @@ credentials = {
 }
 
 authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
-
-# Исправленный вызов логина (ValueError возникал из-за старого формата аргументов)
 authenticator.login(location='main')
 
-# 5. Основная логика приложения (выполняется только если вход выполнен)
+# 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
 
-    # Выбор языка (теперь переменная 't' будет доступна везде ниже)
+    # Выбор языка
     lang_choice = st.sidebar.selectbox("🌐 Language", list(LANGS.keys()))
     t = LANGS[lang_choice]
 
@@ -106,12 +104,15 @@ if st.session_state["authentication_status"]:
         db_ltl = float(last_rec['long_term_debt'])
         db_stl = float(last_rec['short_term_debt'])
         db_ebitda = float(last_rec['ebitda'])
+        # Используем .get() или проверку ключей для новых полей
+        db_own_cap = float(last_rec['own_capital']) if 'own_capital' in last_rec.keys() else 1000000.0
+        db_init_inv = float(last_rec['initial_inv']) if 'initial_inv' in last_rec.keys() else 1500000.0
     else:
-        # Дефолтные значения, если база пуста
         db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
         db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+        db_own_cap, db_init_inv = 1000000.0, 1500000.0
 
-    # Отрисовка Сайдбара
+    # САЙДБАР (Ввод данных)
     with st.sidebar:
         with st.expander(t["assets"], expanded=True):
             fa = st.number_input(t["fa"], value=db_fa)
@@ -122,32 +123,32 @@ if st.session_state["authentication_status"]:
             stl = st.number_input(t["stl"], value=db_stl)
 
         with st.expander(t["ops"], expanded=True):
-            own_cap = st.number_input(t["own_cap"], value=1000000.0)
-            init_inv = st.number_input(t["init_inv"], value=1500000.0)
+            own_cap = st.number_input(t["own_cap"], value=db_own_cap)  # Теперь динамично
+            init_inv = st.number_input(t["init_inv"], value=db_init_inv)  # Теперь динамично
             cash_val = st.number_input(t["cash"], value=db_cash)
             ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
-
-        sim_ebitda = st.slider("EBITDA Change %", -50, 50, 0)
 
         if st.button("🚀 Сохранить данные"):
             data = {
                 'cash': cash_val, 'receivables': ca, 'inventory': 0,
                 'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
-                'revenue': 0, 'ebitda': ebitda_val
+                'revenue': 0, 'ebitda': ebitda_val,
+                'own_capital': own_cap,
+                'initial_inv': init_inv
             }
             save_record(st.session_state["username"], data)
             st.success("Данные успешно сохранены!")
+            st.rerun()  # Мгновенно обновляем интерфейс
 
         authenticator.logout('Logout', 'sidebar')
 
     # РАСЧЕТЫ
     total_assets = fa + ca
     total_liabilities = ltl + stl
-    current_ebitda = ebitda_val * (1 + sim_ebitda / 100)
 
-    roi = (current_ebitda / init_inv * 100) if init_inv != 0 else 0
-    roe = (current_ebitda / own_cap * 100) if own_cap != 0 else 0
-    roa = (current_ebitda / total_assets * 100) if total_assets != 0 else 0
+    roi = (ebitda_val / init_inv * 100) if init_inv != 0 else 0
+    roe = (ebitda_val / own_cap * 100) if own_cap != 0 else 0
+    roa = (ebitda_val / total_assets * 100) if total_assets != 0 else 0
     sol2_val = total_assets - total_liabilities
     sol3_pct = (sol2_val / total_assets * 100) if total_assets != 0 else 0
     qr = (cash_val / stl) if stl != 0 else 0
@@ -159,7 +160,7 @@ if st.session_state["authentication_status"]:
     with tab1:
         st.markdown(f'<div class="section-header">{t["sec_eff"]}</div>', unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        c1.metric("ROI", f"{roi:.1f}%", delta=f"{sim_ebitda}%")
+        c1.metric("ROI", f"{roi:.1f}%")
         c2.metric("ROE", f"{roe:.1f}%")
         c3.metric("ROA", f"{roa:.1f}%")
 
@@ -186,7 +187,7 @@ if st.session_state["authentication_status"]:
         df_balance = pd.DataFrame({
             "Параметр": ["Активы", "Долги", "Капитал", "Чистые активы", "EBITDA"],
             "Значение ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
-                             f"{current_ebitda:,.0f}"]
+                             f"{ebitda_val:,.0f}"]
         })
         st.table(df_balance)
 
