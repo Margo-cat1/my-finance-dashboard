@@ -3,20 +3,6 @@ import pandas as pd
 import streamlit_authenticator as stauth
 from database import init_db, save_record, get_latest_record
 
-init_db()
-last_rec = get_latest_record(st.session_state["username"])
-
-if last_rec:
-    db_fa = float(last_rec['fixed_assets'])
-    db_ca = float(last_rec['receivables'])
-    db_cash = float(last_rec['cash'])
-    db_ltl = float(last_rec['long_term_debt'])
-    db_stl = float(last_rec['short_term_debt'])
-    db_ebitda = float(last_rec['ebitda'])
-else:
-    db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
-    db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
-
 # 3. Теперь в сайдбаре (где st.sidebar) подставляем эти переменные в value
 with st.sidebar:
     with st.expander(t["assets"], expanded=True):
@@ -85,13 +71,33 @@ if not st.session_state.get("authentication_status"):
     st.markdown("<h1 class='login-header'>🔐 Financial Intelligence</h1>", unsafe_allow_html=True)
 
 # Вызываем логин
-authenticator.login()
+# 1. Сначала инициализируем базу
+init_db()
 
-if st.session_state["authentication_status"] is False:
-    st.error('Username/password is incorrect')
-elif st.session_state["authentication_status"] is None:
-    st.info('Please enter your credentials to access the dashboard')
-elif st.session_state["authentication_status"]:
+# 2. Показываем форму логина
+name, authentication_status, username = authenticator.login("Login", "main")
+
+if authentication_status:
+    # --- ТОЛЬКО ТУТ, КОГДА ВХОД ВЫПОЛНЕН, ЗАГРУЖАЕМ ДАННЫЕ ---
+
+    last_rec = get_latest_record(st.session_state["username"])
+
+    if last_rec:
+        db_fa = float(last_rec['fixed_assets'])
+        db_ca = float(last_rec['receivables'])
+        db_cash = float(last_rec['cash'])
+        db_ltl = float(last_rec['long_term_debt'])
+        db_stl = float(last_rec['short_term_debt'])
+        db_ebitda = float(last_rec['ebitda'])
+    else:
+        db_fa, db_ca, db_cash = 2100000.0, 900000.0, 300000.0
+        db_ltl, db_stl, db_ebitda = 800000.0, 400000.0, 450000.0
+
+
+
+    # 3. Дальше идет отрисовка твоего интерфейса (st.sidebar и т.д.)
+    st.sidebar.title(f"Welcome {name}")
+    # ...
 
     # --- ТВОЙ ОСНОВНОЙ КОД (БЕЗ ИЗМЕНЕНИЙ) ---
     LANGS = {
