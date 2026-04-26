@@ -154,20 +154,20 @@ if st.session_state["authentication_status"]:
             ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
 
             # --- ВАЛИДАЦИЯ И СОХРАНЕНИЕ ---
-            if st.button("🚀 Сохранить данные"):
+        if st.button("🚀 Сохранить данные"):
                 # Проверяем, что пользователь ввел хоть какие-то цифры
-                if cash_val == 0 and own_cap == 0 and init_inv == 0:
-                    st.error("⚠️ Данные не заполнены. Введите значения перед сохранением!")
-                elif cash_val < 0:
-                    st.warning("🧐 Наличные (Cash) не могут быть отрицательными.")
-                else:
-                    # Подготовка данных
-                    data = {
-                        'cash': cash_val, 'receivables': ca, 'inventory': 0,
-                        'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
-                        'revenue': 0, 'ebitda': ebitda_val,
-                        'own_capital': own_cap,
-                        'initial_inv': init_inv
+            if cash_val == 0 and own_cap == 0 and init_inv == 0:
+                st.error("⚠️ Данные не заполнены. Введите значения перед сохранением!")
+            elif cash_val < 0:
+                st.warning("🧐 Наличные (Cash) не могут быть отрицательными.")
+            else:
+                # Подготовка данных
+                data = {
+                    'cash': cash_val, 'receivables': ca, 'inventory': 0,
+                    'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
+                    'revenue': 0, 'ebitda': ebitda_val,
+                    'own_capital': own_cap,
+                    'initial_inv': init_inv
                     }
 
                     with st.spinner('Связываемся с базой данных...'):
@@ -176,7 +176,8 @@ if st.session_state["authentication_status"]:
                     # Эффекты успеха
                     st.toast("✅ Данные успешно сохранены!", icon="🚀")
                     st.balloons()  # Праздничные шарики
-
+                    import time
+                    time.sleep(1)
                     # Перезагрузка страницы, чтобы обновились графики
                     st.rerun()
 
