@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
-from database import init_db, save_record, get_latest_record
+from database import init_db, save_record, get_latest_record, get_all_records
 
 # 1. Настройка страницы (строго первой командой)
 st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
