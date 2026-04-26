@@ -139,6 +139,11 @@ if st.session_state["authentication_status"]:
 
     # САЙДБАР (Ввод данных)
     with st.sidebar:
+        # --- 1. НАСТРОЙКА ВАЛЮТЫ (Вставлять тут!) ---
+        currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
+        selected_curr = st.selectbox("Валюта:", options=list(currency_dict.keys()))
+        curr_symbol = currency_dict[selected_curr]
+        st.markdown("---")
         with st.expander(t["assets"], expanded=True):
             fa = st.number_input(t["fa"], value=int(db_fa), step=1, format="%d")
             ca = st.number_input(t["ca"], value=int(db_ca), step=1, format="%d")
@@ -258,11 +263,12 @@ if st.session_state["authentication_status"]:
         # 1. Основные показатели в стильных карточках
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
-            col1.metric("Собственный капитал", f"{own_cap:,.0f} $")
-            col2.metric("Наличные (Cash)", f"{cash_val:,.0f} $")
+            # Форматируем: разделяем тысячи пробелом и ставим выбранный символ
+            col1.metric("Собственный капитал", f"{own_cap:,.0f} {curr_symbol}".replace(",", " "))
+            col2.metric("Наличные (Cash)", f"{cash_val:,.0f} {curr_symbol}".replace(",", " "))
             col3.metric(
                 "Чистые активы",
-                f"{sol2_val:,.0f} $",
+                f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
                 delta="Норма" if sol2_val >= 0 else "Риск",
                 delta_color="normal" if sol2_val >= 0 else "inverse"
             )
