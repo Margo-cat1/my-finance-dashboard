@@ -113,7 +113,9 @@ if not st.session_state["authentication_status"]:
 if st.session_state["authentication_status"]:
     lang_options = {
             "RU": {
-                "flag": "🇷🇺", "name": "Русский", "title": "📈 Финансовый Дашборд",
+                "flag": "🇷🇺",
+                "name": "Русский",
+                "title": "📈 Финансовый Дашборд",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
                 "card_cap": "Собственный капитал", "card_cash": "Наличные", "card_net": "Чистые активы",
                 "save": "🚀 Обновить показатели", "analysis_header": "Результаты анализа",
@@ -136,7 +138,9 @@ if st.session_state["authentication_status"]:
                 }
             },
             "EN": {
-                "flag": "🇺🇸", "name": "English", "title": "📈 Financial Dashboard",
+                "flag": "🇺🇸",
+                "name": "English",
+                "title": "📈 Financial Dashboard",
                 "tab1": "📥 Input", "tab2": "📊 Analysis", "tab3": "📜 History",
                 "card_cap": "Equity", "card_cash": "Cash", "card_net": "Net Assets",
                 "save": "🚀 Update Stats", "analysis_header": "Analysis Results",
@@ -157,7 +161,9 @@ if st.session_state["authentication_status"]:
                 }
             },
             "GE": {
-                "flag": "🇬🇪", "name": "ქართული", "title": "📈 ფინანსური პანელი",
+                "flag": "🇬🇪",
+                "name": "ქართული",
+                "title": "📈 ფინანსური პანელი",
                 "tab1": "📥 შეტანა", "tab2": "📊 ანალიზი", "tab3": "📜 ისტორია",
                 "card_cap": "საკუთარი კაპიტალი", "card_cash": "ნაღდი ფული", "card_net": "წმინდა აქტივები",
                 "save": "🚀 განახლება", "analysis_header": "ანალიზის შედეგები",
