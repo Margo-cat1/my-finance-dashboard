@@ -332,13 +332,20 @@ if st.session_state["authentication_status"]:
         # 1. Основные показатели в стильных карточках
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
-            # Форматируем: разделяем тысячи пробелом и ставим выбранный символ
-            col1.metric(label=t["card_cap"], f"{own_cap:,.0f} {curr_symbol}".replace(",", " "))
-            col2.metric(label=t["card_cash"], f"{cash_val:,.0f} {curr_symbol}".replace(",", " "))
+
+            # Везде добавляем value= перед строкой с цифрами
+            col1.metric(
+                label=t["card_cap"],
+                value=f"{own_cap:,.0f} {curr_symbol}".replace(",", " ")
+            )
+            col2.metric(
+                label=t["card_cash"],
+                value=f"{cash_val:,.0f} {curr_symbol}".replace(",", " ")
+            )
             col3.metric(
                 label=t["card_net"],
-                f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
-                delta="Норма" if sol2_val >= 0 else "Риск",
+                value=f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
+                delta=t["strong"] if sol2_val >= 0 else t["risks"],
                 delta_color="normal" if sol2_val >= 0 else "inverse"
             )
 
