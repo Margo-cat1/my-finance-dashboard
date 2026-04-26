@@ -75,15 +75,41 @@ st.markdown("""
 # 4. Инициализация базы и авторизация
 init_db()
 
-credentials = {
-    'usernames': {
-        'admin': {'name': 'Admin User', 'password': '123'},
-        'margo': {'name': 'Margo', 'password': '456'}
-    }
-}
+import yaml
+from yaml.loader import SafeLoader
 
-authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
-authenticator.login()
+# 4. Инициализация базы и авторизация
+init_db()
+
+# Загружаем конфиг из файла
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
+
+if st.session_state["authentication_status"] is None or st.session_state["authentication_status"] is False:
+    tab_login, tab_reg = st.tabs(["🔑 Вход", "👤 Регистрация"])
+
+    with tab_login:
+        authenticator.login()
+
+    with tab_reg:
+        try:
+            # Регистрация нового пользователя
+            if authenticator.register_user(pre_authorization=False):
+                # ВАЖНО: записываем обновленные данные обратно в файл config.yaml
+                with open('config.yaml', 'w') as file:
+                    yaml.dump(config, file, default_flow_style=False)
+                st.success('Пользователь зарегистрирован! Теперь войдите во вкладке "Вход"')
+        except Exception as e:
+            st.error(f"Ошибка: {e}")
+
+
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:

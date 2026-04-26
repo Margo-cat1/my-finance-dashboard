@@ -1,0 +1,17 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@gmail.com
+      name: Admin User
+      password: '123'
+    margo:
+      email: margo@gmail.com
+      name: Margo
+      password: '456'
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: finance_cookie
+preauthorized:
+  emails:
+    - test@gmail.com
