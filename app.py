@@ -119,16 +119,16 @@ if st.session_state["authentication_status"]:
             "Русский": {
                 "flag": "🇷🇺", "title": "📈 Финансовый Дашборд", "save": "🚀 Обновить показатели",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
+                "card_cap": "Собственный капитал", "card_cash": "Наличные", "card_net": "Чистые активы",
                 "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Результаты анализа",
-                "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
-                "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги",
-                "stl": "Краткоср. долги", "own_cap": "Капитал", "init_inv": "Инвест.",
-                "cash": "Наличные", "ebitda": "EBITDA",
                 "strong": "Сильные стороны", "risks": "Риски",
                 "msg_roi": "Высокая рентабельность", "msg_autonomy": "Хорошая автономия",
                 "msg_liq": "Ликвидность в норме",
                 "msg_dep": "Зависимость от долгов", "msg_cash_low": "Мало наличности",
                 "msg_bankrupt": "Риск банкротства!",
+                "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
+                "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги", "stl": "Краткоср. долги",
+                "own_cap": "Капитал", "init_inv": "Инвест.", "cash": "Наличные", "ebitda": "EBITDA",
                 "guide": {
                     "ROA": "Рентабельность активов: как эффективно работают ресурсы.",
                     "ROE": "Рентабельность капитала: отдача на ваши вложения.",
@@ -138,32 +138,33 @@ if st.session_state["authentication_status"]:
             "English": {
                 "flag": "🇺🇸", "title": "📈 Financial Dashboard", "save": "🚀 Update Stats",
                 "tab1": "📥 Input", "tab2": "📊 Analysis", "tab3": "📜 History",
+                "card_cap": "Equity", "card_cash": "Cash", "card_net": "Net Assets",
                 "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis Results",
-                "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Ops",
-                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt",
-                "stl": "S-term Debt", "own_cap": "Capital", "init_inv": "Invest.",
-                "cash": "Cash", "ebitda": "EBITDA",
                 "strong": "Strengths", "risks": "Risks",
                 "msg_roi": "High ROI", "msg_autonomy": "Good Autonomy", "msg_liq": "Solid Liquidity",
                 "msg_dep": "Debt Dependent", "msg_cash_low": "Low Cash", "msg_bankrupt": "Bankruptcy Risk!",
+                "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Ops",
+                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt", "stl": "S-term Debt",
+                "own_cap": "Capital", "init_inv": "Invest.", "cash": "Cash", "ebitda": "EBITDA",
                 "guide": {
                     "ROA": "Return on Assets: how effectively resources work.",
                     "ROE": "Return on Equity: return on your investments.",
                     "Solvency": "Solvency: whether assets cover all debts."
                 }
             },
-            "GEL": {
+            "ქართული": {
                 "flag": "🇬🇪", "title": "📈 ფინანსური პანელი", "save": "🚀 მონაცემების განახლება",
                 "tab1": "📥 შეტანა", "tab2": "📊 ანალიზი", "tab3": "📜 ისტორია",
+                "card_cap": "საკუთარი კაპიტალი", "card_cash": "ნაღდი ფული", "card_net": "წმინდა აქტივები",
                 "sec_eff": "ეფექტურობა", "sec_sol": "მდგრადობა", "analysis_header": "ანალიზის შედეგები",
-                "assets": "🏠 აქტივები", "liabilities": "📉 ვალდებულებები", "ops": "⚙️ ოპერაციები",
-                "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები", "ltl": "გრძელვადიანი ვალი",
-                "stl": "მოკლევადიანი ვალი", "own_cap": "კაპიტალი", "init_inv": "ინვესტიცია",
-                "cash": "ნაღდი ფული", "ebitda": "EBITDA",
                 "strong": "ძლიერი მხარეები", "risks": "რისკები",
                 "msg_roi": "მაღალი რენტაბელობა", "msg_autonomy": "კარგი ავტონომია", "msg_liq": "ლიკვიდობა ნორმაშია",
                 "msg_dep": "დამოკიდებულება ვალებზე", "msg_cash_low": "ცოტა ნაღდი ფული",
                 "msg_bankrupt": "გაკოტრების რისკი!",
+                "assets": "🏠 აქტივები", "liabilities": "📉 ვალდებულებები", "ops": "⚙️ ოპერაციები",
+                "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები", "ltl": "გრძელვადიანი ვალი",
+                "stl": "მოკლევადიანი ვალი",
+                "own_cap": "კაპიტალი", "init_inv": "ინვესტიცია", "cash": "ნაღდი ფული", "ebitda": "EBITDA",
                 "guide": {
                     "ROA": "აქტივების რენტაბელობა: რამდენად ეფექტურად მუშაობს რესურსები.",
                     "ROE": "კაპიტალის რენტაბელობა: უკუგება თქვენს ინვესტიციებზე.",
@@ -172,12 +173,13 @@ if st.session_state["authentication_status"]:
             }
         }
 
-        selected_l = st.selectbox("", options=list(lang_options.keys()),
-                                  format_func=lambda x: f"{lang_options[x]['flag']} {x}",
-                                  label_visibility="collapsed")
-
-    # ВАЖНО: переменная t должна быть на этом уровне отступа
-    t = lang_options[selected_l]
+        selected_l_key = st.selectbox(
+            "",
+            options=list(lang_options.keys()),
+            format_func=lambda x: f"{lang_options[x]['flag']} {lang_options[x]['name']}",
+            label_visibility="collapsed"
+        )
+        t = lang_options[selected_l_key]
 
     with h_col3:
         currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
@@ -327,10 +329,10 @@ if st.session_state["authentication_status"]:
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
             # Форматируем: разделяем тысячи пробелом и ставим выбранный символ
-            col1.metric("Собственный капитал", f"{own_cap:,.0f} {curr_symbol}".replace(",", " "))
-            col2.metric("Наличные (Cash)", f"{cash_val:,.0f} {curr_symbol}".replace(",", " "))
+            col1.metric(label=t["card_cap"], f"{own_cap:,.0f} {curr_symbol}".replace(",", " "))
+            col2.metric(label=t["card_cash"], f"{cash_val:,.0f} {curr_symbol}".replace(",", " "))
             col3.metric(
-                "Чистые активы",
+                label=t["card_net"],
                 f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
                 delta="Норма" if sol2_val >= 0 else "Риск",
                 delta_color="normal" if sol2_val >= 0 else "inverse"
