@@ -1,14 +1,23 @@
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: finance_cookie
 credentials:
   usernames:
     admin:
       email: admin@gmail.com
       name: Admin User
-      password: '123'
+      password: $2b$12$/XL6MeyW55iChtHw7trBZ.cZ7uvwCzgTvFgkVcxtHe.1h6JkkUJpe
     margo:
       email: margo@gmail.com
       name: Margo
-      password: '456'
-cookie:
-  expiry_days: 30
-  key: some_signature_key
-  name: finance_cookie
+      password: $2b$12$wAqIdcAt3MtCQJWez9c5XeqJ.2WxsIiZnpTIKxIp6PSgM1vmQMoHO
+    margo-test:
+      email: margarita.petrosova1@gmail.com
+      failed_login_attempts: 0
+      first_name: Margotest
+      last_name: Margottestt
+      logged_in: true
+      password: $2b$12$AWfJxecw4ycvHKhTX9JufePsvooW7.EzQ7WPuKTkARBCzqVbHyECe
+      password_hint: odindeviat
+      roles: null

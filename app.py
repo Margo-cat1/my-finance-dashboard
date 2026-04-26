@@ -213,13 +213,51 @@ if st.session_state["authentication_status"]:
             if sol2_val < 0: st.error(f"💣 {t['msg_bankrupt']}")
 
     with tab2:
-        df_balance = pd.DataFrame({
-            "Параметр": ["Активы", "Долги", "Капитал", "Чистые активы", "EBITDA"],
-            "Значение ($)": [f"{total_assets:,.0f}", f"{total_liabilities:,.0f}", f"{own_cap:,.0f}", f"{sol2_val:,.0f}",
-                             f"{ebitda_val:,.0f}"]
-        })
-        st.table(df_balance)
+        st.subheader("📊 Финансовый анализ и история")
 
+        # 1. Метрики (красивые карточки)
+        col1, col2, col3 = st.columns(3)
+
+        # Чистые активы: подсвечиваются в зависимости от значения
+        # delta_color="normal" делает зеленое при плюсе, "inverse" — красное при минусе
+        col1.metric(
+            label="Чистые активы",
+            value=f"{sol2_val:,.0f} $",
+            delta="Положительный баланс" if sol2_val >= 0 else "Отрицательный баланс",
+            delta_color="normal" if sol2_val >= 0 else "inverse"
+        )
+        col2.metric("Общие активы", f"{total_assets:,.0f} $")
+        col3.metric("EBITDA", f"{ebitda_val:,.0f} $")
+
+        st.markdown("---")
+
+        # 2. История из базы данных
+        st.write("### 📜 История сохранений")
+
+        # Получаем данные из функции, которую мы добавим в database.py
+        history_df = get_all_records(st.session_state["username"])
+
+        if not history_df.empty:
+            # Показываем таблицу с историей
+            st.dataframe(history_df, use_container_width=True)
+
+            # 3. Графики
+            col_left, col_right = st.columns(2)
+
+            with col_left:
+                st.write("#### Структура (текущая)")
+                chart_data = pd.DataFrame({
+                    'Категория': ['Cash', 'Receivables', 'Fixed Assets'],
+                    'Сумма': [cash_val, ca, fa]
+                })
+                st.bar_chart(chart_data.set_index('Категория'))
+
+            with col_right:
+                st.write("#### Динамика капитала")
+                # Линейный график по датам из истории
+                st.line_chart(history_df.set_index('date')['own_capital'])
+        else:
+            st.info("История пока пуста. Нажмите 'Сохранить данные' в сайдбаре.")
     with tab3:
         st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
         for key in t["guide"]:
