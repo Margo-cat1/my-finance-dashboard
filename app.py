@@ -140,12 +140,12 @@ if st.session_state["authentication_status"]:
     # САЙДБАР (Ввод данных)
     with st.sidebar:
         with st.expander(t["assets"], expanded=True):
-            fa = st.number_input(t["fa"], value=db_fa)
-            ca = st.number_input(t["ca"], value=db_ca)
+            fa = st.number_input(t["fa"], value=int(db_fa), step=1, format="%d")
+            ca = st.number_input(t["ca"], value=int(db_ca), step=1, format="%d")
 
         with st.expander(t["liabilities"], expanded=True):
-            ltl = st.number_input(t["ltl"], value=db_ltl)
-            stl = st.number_input(t["stl"], value=db_stl)
+            ltl = st.number_input(t["ltl"], value=int(db_ltl), step=1, format="%d")
+            stl = st.number_input(t["stl"], value=int(db_stl), step=1, format="%d")
 
         with st.expander(t["ops"], expanded=True):
             own_cap = st.number_input(t["own_cap"], value=int(db_own_cap), step=1, format="%d")   # Теперь динамично
