@@ -4,6 +4,7 @@ import streamlit_authenticator as stauth
 import plotly.express as px
 from database import init_db, save_record, get_latest_record, get_all_records
 
+
 # 1. Настройка страницы (строго первой командой)
 st.set_page_config(page_title="FinMarge PRO", page_icon="📈", layout="wide")
 
@@ -152,22 +153,54 @@ if st.session_state["authentication_status"]:
             cash_val = st.number_input(t["cash"], value=db_cash)
             ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
 
-        if st.button("🚀 Сохранить данные"):
-            data = {
-                'cash': cash_val, 'receivables': ca, 'inventory': 0,
-                'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
-                'revenue': 0, 'ebitda': ebitda_val,
-                'own_capital': own_cap,
-                'initial_inv': init_inv
-            }
-            save_record(st.session_state["username"], data)
-            # Запоминаем, что нужно показать успех
-            st.session_state["saved"] = True
-            st.rerun()
-    # Сразу после блока с сайдбаром (без отступа!) добавь:
-        if st.session_state.get("saved"):
-            st.toast("✅ Данные успешно обновлены в базе!")
-            st.session_state["saved"] = False  # Сбрасываем, чтобы не мигало вечно
+            # 1. Валидация и сохранение с крутым UX
+            if st.button("🚀 Сохранить данные"):
+                # Защита от "дурака": проверяем, что введено хоть что-то
+                if cash_val == 0 and own_cap == 0 and init_inv == 0:
+                    st.error("⚠️ Данные не заполнены. Нечего сохранять!")
+                elif cash_val < 0:
+                    st.warning("🧐 Наличные не могут быть отрицательными.")
+                else:
+                    data = {
+                        'cash': cash_val, 'receivables': ca, 'inventory': 0,
+                        'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
+                        'revenue': 0, 'ebitda': ebitda_val,
+                        'own_capital': own_cap,
+                        'initial_inv': init_inv
+                    }
+
+                    # Показываем статус сохранения
+                    with st.spinner('Связываемся с базой данных...'):
+                        save_record(st.session_state["username"], data)
+
+                    # Эффекты успеха
+                    st.balloons()
+                    st.toast("✅ Данные успешно обновлены в базе!", icon="🚀")
+
+                    # Перезагружаем для обновления графиков
+                    st.rerun()
+
+        # --- 3. ЭКСПОРТ В EXCEL (Сразу под кнопкой сохранения) ---
+        st.markdown("---")
+
+        # Получаем всю историю для текущего пользователя
+        history_df = get_all_records(st.session_state["username"])
+
+        if not history_df.empty:
+            import io
+
+            buffer = io.BytesIO()
+            # Создаем Excel файл "на лету"
+            with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                history_df.to_excel(writer, index=False, sheet_name='Finance_Report')
+
+            st.download_button(
+                label="📥 Скачать отчет в Excel",
+                data=buffer,
+                file_name=f"report_{st.session_state['username']}.xlsx",
+                mime="application/vnd.ms-excel",
+                help="Нажмите, чтобы выгрузить всю историю сохранений в таблицу"
+            )
 
 
         authenticator.logout('Logout', 'sidebar')
