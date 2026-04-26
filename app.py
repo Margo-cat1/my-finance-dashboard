@@ -112,30 +112,45 @@ if not st.session_state["authentication_status"]:
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
     # --- ШАПКА ПРИЛОЖЕНИЯ (Правый верхний угол) ---
-    # Создаем 3 колонки: широкая пустая и две узкие под выбор
     h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
     with h_col2:
-        # 1. Выбор Языка
+        # Словарь со ВСЕМИ ключами перевода
         lang_options = {
-            "Русский": {"flag": "🇷🇺", "assets": "Активы", "liabilities": "Долги", "ops": "Операционка"},
-            "English": {"flag": "🇺🇸", "assets": "Assets", "liabilities": "Liabilities", "ops": "Operations"},
-            "GEL": {"flag": "🇬🇪", "assets": "აქტივები", "liabilities": "ვალდებულებები", "ops": "ოპერაციები"}
+            "Русский": {
+                "flag": "🇷🇺", "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
+                "fa": "Внеоборотные активы", "ca": "Оборотные активы",
+                "ltl": "Долгосрочные долги", "stl": "Краткосрочные долги",
+                "own_cap": "Собственный капитал", "init_inv": "Инвестиции", "cash": "Наличные", "ebitda": "EBITDA"
+            },
+            "English": {
+                "flag": "🇺🇸", "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Operations",
+                "fa": "Fixed Assets", "ca": "Current Assets",
+                "ltl": "Long-term Debt", "stl": "Short-term Debt",
+                "own_cap": "Owner Capital", "init_inv": "Initial Inv", "cash": "Cash", "ebitda": "EBITDA"
+            },
+            "GEL": {
+                "flag": "🇬🇪", "assets": "🏠 აქტივები", "liabilities": "📉 ვალდებულებები", "ops": "⚙️ ოპერაციები",
+                "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები",
+                "ltl": "გრძელვადიანი ვალი", "stl": "მოკლევადიანი ვალი",
+                "own_cap": "საკუთარი კაპიტალი", "init_inv": "ინვესტიცია", "cash": "ნაღდი ფული", "ebitda": "EBITDA"
+            }
         }
+
         selected_l = st.selectbox(
             "", options=list(lang_options.keys()),
             format_func=lambda x: f"{lang_options[x]['flag']} {x}",
             label_visibility="collapsed"
         )
-        t = lang_options[selected_l]  # Теперь перевод доступен везде
+        t = lang_options[selected_l]
 
     with h_col3:
-        # 2. Выбор Валюты
+        # Валюта (тут всё было верно)
         currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
         selected_curr = st.selectbox("", options=list(currency_dict.keys()), label_visibility="collapsed")
         curr_symbol = currency_dict[selected_curr]
 
-    st.markdown("---")  # Отделяем шапку от контента
+    st.markdown("---")
 
     # Приветствие в сайдбаре оставляем
     st.sidebar.write(f'👤 **{st.session_state["name"]}**')
