@@ -218,55 +218,60 @@ if st.session_state["authentication_status"]:
     with tab2:
         st.subheader("🏦 Финансовый Дашборд")
 
-        # Красивые карточки в один ряд с фоном
-        main_metrics = st.container(border=True)
-        with main_metrics:
+        # --- ШАГ 1: ПОЛУЧАЕМ ДАННЫЕ (Этого не хватало на скрине!) ---
+        history_df = get_all_records(st.session_state["username"])
+
+        # 1. Основные показатели в стильных карточках
+        with st.container(border=True):
             col1, col2, col3 = st.columns(3)
-            col1.metric("Capitalization", f"{own_cap:,.0f} $", "Equity", delta_color="normal")
-            col2.metric("Liquid Cash", f"{cash_val:,.0f} $", "Cash on hand")
-            col3.metric("Net Assets", f"{sol2_val:,.0f} $", delta=f"{sol2_val:,.0f}",
-                        delta_color="normal" if sol2_val >= 0 else "inverse")
-
-        st.markdown("###")  # Небольшой отступ
-
-        # Ряд с графиками в контейнерах
-        chart_col1, chart_col2 = st.columns(2)
-
-        with chart_col1:
-            with st.container(border=True):
-                st.write("#### 🍩 Состав активов")
-                # Делаем круговую диаграмму (Donut chart) - это выглядит профессиональнее
-                fig_pie = px.pie(
-                    values=[cash_val, ca, fa],
-                    names=['Наличные', 'Дебиторка', 'Внеоборотные'],
-                    hole=0.5,
-                    color_discrete_sequence=px.colors.qualitative.Pastel
-                )
-                fig_pie.update_layout(margin=dict(l=20, r=20, t=20, b=20), height=300)
-                st.plotly_chart(fig_pie, use_container_width=True)
-
-        with chart_col2:
-            with st.container(border=True):
-                st.write("#### 📈 Тренд капитала")
-                # Улучшенный линейный график с точками
-                if not history_df.empty:
-                    fig_line = px.line(
-                        history_df, x='date', y='own_capital',
-                        markers=True,
-                        color_discrete_sequence=['#00CC96']
-                    )
-                    fig_line.update_layout(margin=dict(l=20, r=20, t=20, b=20), height=300,
-                                           xaxis_title=None, yaxis_title=None)
-                    st.plotly_chart(fig_line, use_container_width=True)
+            col1.metric("Собственный капитал", f"{own_cap:,.0f} $")
+            col2.metric("Наличные (Cash)", f"{cash_val:,.0f} $")
+            col3.metric(
+                "Чистые активы",
+                f"{sol2_val:,.0f} $",
+                delta="Норма" if sol2_val >= 0 else "Риск",
+                delta_color="normal" if sol2_val >= 0 else "inverse"
+            )
 
         st.markdown("###")
 
-        # История в раскрывающемся списке (Expander), чтобы не занимала всё место
-        with st.expander("📂 Посмотреть полную историю транзакций", expanded=False):
-            st.dataframe(
-                history_df.style.background_gradient(subset=['own_capital'], cmap='Greens'),
-                use_container_width=True
-            )
+        # 2. Визуализация (только если есть история)
+        if not history_df.empty:
+            chart_col1, chart_col2 = st.columns(2)
+
+            with chart_col1:
+                with st.container(border=True):
+                    st.write("#### 🍩 Состав активов")
+                    import plotly.express as px
+
+                    fig_pie = px.pie(
+                        values=[cash_val, ca, fa],
+                        names=['Наличные', 'Дебиторка', 'Внеоборотные'],
+                        hole=0.5,
+                        color_discrete_sequence=px.colors.qualitative.Safe
+                    )
+                    fig_pie.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=250, showlegend=False)
+                    st.plotly_chart(fig_pie, use_container_width=True)
+
+            with chart_col2:
+                with st.container(border=True):
+                    st.write("#### 📈 Тренд капитала")
+                    fig_line = px.line(history_df, x='date', y='own_capital')
+                    fig_line.update_traces(line_color='#00CC96', line_shape="spline")
+                    fig_line.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=250, xaxis_title=None,
+                                           yaxis_title=None)
+                    st.plotly_chart(fig_line, use_container_width=True)
+
+            st.markdown("###")
+
+            # 3. Детальная история
+            with st.expander("📂 Посмотреть детальную таблицу истории", expanded=False):
+                st.dataframe(
+                    history_df.style.background_gradient(subset=['own_capital'], cmap='Greens'),
+                    use_container_width=True
+                )
+        else:
+            st.info("История пока пуста. Нажмите 'Сохранить данные' в сайдбаре.")
     with tab3:
         st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
         for key in t["guide"]:
