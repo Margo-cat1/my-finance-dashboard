@@ -126,6 +126,9 @@ if st.session_state["authentication_status"]:
                 "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
                 "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги", "stl": "Краткоср. долги",
                 "own_cap": "Капитал", "init_inv": "Инвест.", "cash": "Наличные", "ebitda": "EBITDA",
+                "chart_pie": "🍩 Состав активов",
+                "chart_line": "📈 Тренд капитала",
+                "history_table": "📂 Детальная таблица истории",
                 "guide": {
                     "ROA": "Рентабельность активов: как эффективно работают ресурсы.",
                     "ROE": "Рентабельность капитала: отдача на ваши вложения.",
@@ -144,6 +147,9 @@ if st.session_state["authentication_status"]:
                 "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Ops",
                 "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt", "stl": "S-term Debt",
                 "own_cap": "Capital", "init_inv": "Invest.", "cash": "Cash", "ebitda": "EBITDA",
+                "chart_pie": "🍩 Asset Composition",
+                "chart_line": "📈 Capital Trend",
+                "history_table": "📂 Detailed History Table",
                 "guide": {
                     "ROA": "Return on Assets: how effectively resources work.",
                     "ROE": "Return on Equity: return on your investments.",
@@ -164,6 +170,9 @@ if st.session_state["authentication_status"]:
                 "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები", "ltl": "გრძელვადიანი ვალი",
                 "stl": "მოკლევადიანი ვალი",
                 "own_cap": "კაპიტალი", "init_inv": "ინვესტიცია", "cash": "ნაღდი ფული", "ebitda": "EBITDA",
+                "chart_pie": "🍩 აქტივების შემადგენლობა",
+                "chart_line": "📈 კაპიტალის ტრენდი",
+                "history_table": "📂 ისტორიის ცხრილი",
                 "guide": {
                     "ROA": "აქტივების რენტაბელობა: რამდენად ეფექტურად მუშაობს რესურსები.",
                     "ROE": "კაპიტალის რენტაბელობა: უკუგება თქვენს ინვესტიციებზე.",
@@ -324,7 +333,7 @@ if st.session_state["authentication_status"]:
         # --- ШАГ 1: ПОЛУЧАЕМ ДАННЫЕ (Этого не хватало на скрине!) ---
         history_df = get_all_records(st.session_state["username"])
 
-        # 1. Основные показатели в стильных карточках
+
         # 1. Основные показатели в стильных карточках
         # 1. Основные показатели (Карточки)
         with st.container(border=True):
