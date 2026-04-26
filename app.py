@@ -116,11 +116,12 @@ if st.session_state["authentication_status"]:
 
     with h_col2:
         lang_options = {
-            "Русский": {
-                "flag": "🇷🇺", "title": "📈 Финансовый Дашборд", "save": "🚀 Обновить показатели",
+            "RU": {
+                "flag": "🇷🇺", "name": "Русский", "title": "📈 Финансовый Дашборд",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
                 "card_cap": "Собственный капитал", "card_cash": "Наличные", "card_net": "Чистые активы",
-                "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Результаты анализа",
+                "save": "🚀 Обновить показатели", "analysis_header": "Результаты анализа",
+                "sec_eff": "Эффективность", "sec_sol": "Устойчивость",
                 "strong": "Сильные стороны", "risks": "Риски",
                 "msg_roi": "Высокая рентабельность", "msg_autonomy": "Хорошая автономия",
                 "msg_liq": "Ликвидность в норме",
@@ -135,11 +136,12 @@ if st.session_state["authentication_status"]:
                     "Solvency": "Платежеспособность: хватит ли активов покрыть долги."
                 }
             },
-            "English": {
-                "flag": "🇺🇸", "title": "📈 Financial Dashboard", "save": "🚀 Update Stats",
+            "EN": {
+                "flag": "🇺🇸", "name": "English", "title": "📈 Financial Dashboard",
                 "tab1": "📥 Input", "tab2": "📊 Analysis", "tab3": "📜 History",
                 "card_cap": "Equity", "card_cash": "Cash", "card_net": "Net Assets",
-                "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis Results",
+                "save": "🚀 Update Stats", "analysis_header": "Analysis Results",
+                "sec_eff": "Efficiency", "sec_sol": "Solvency",
                 "strong": "Strengths", "risks": "Risks",
                 "msg_roi": "High ROI", "msg_autonomy": "Good Autonomy", "msg_liq": "Solid Liquidity",
                 "msg_dep": "Debt Dependent", "msg_cash_low": "Low Cash", "msg_bankrupt": "Bankruptcy Risk!",
@@ -152,11 +154,12 @@ if st.session_state["authentication_status"]:
                     "Solvency": "Solvency: whether assets cover all debts."
                 }
             },
-            "ქართული": {
-                "flag": "🇬🇪", "title": "📈 ფინანსური პანელი", "save": "🚀 მონაცემების განახლება",
+            "GE": {
+                "flag": "🇬🇪", "name": "ქართული", "title": "📈 ფინანსური პანელი",
                 "tab1": "📥 შეტანა", "tab2": "📊 ანალიზი", "tab3": "📜 ისტორია",
                 "card_cap": "საკუთარი კაპიტალი", "card_cash": "ნაღდი ფული", "card_net": "წმინდა აქტივები",
-                "sec_eff": "ეფექტურობა", "sec_sol": "მდგრადობა", "analysis_header": "ანალიზის შედეგები",
+                "save": "🚀 განახლება", "analysis_header": "ანალიზის შედეგები",
+                "sec_eff": "ეფექტურობა", "sec_sol": "მდგრადობა",
                 "strong": "ძლიერი მხარეები", "risks": "რისკები",
                 "msg_roi": "მაღალი რენტაბელობა", "msg_autonomy": "კარგი ავტონომია", "msg_liq": "ლიკვიდობა ნორმაშია",
                 "msg_dep": "დამოკიდებულება ვალებზე", "msg_cash_low": "ცოტა ნაღდი ფული",
@@ -173,6 +176,7 @@ if st.session_state["authentication_status"]:
             }
         }
 
+        # Выбор языка с отображением флагов
         selected_l_key = st.selectbox(
             "",
             options=list(lang_options.keys()),
