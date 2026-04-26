@@ -112,41 +112,37 @@ if not st.session_state["authentication_status"]:
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
     # --- ШАПКА ПРИЛОЖЕНИЯ (Правый верхний угол) ---
+    # --- 1. СОЗДАЕМ ШАПКУ (ПРАВЫЙ УГОЛ) ---
     h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
     with h_col2:
-        # Добавляем ключ "title" для каждого языка!
+        # В этом словаре ДОЛЖНЫ быть все ключи, на которые ругается система
         lang_options = {
             "Русский": {
                 "flag": "🇷🇺", "title": "📈 Финансовый Дашборд",
+                "tab1": "Ввод данных", "tab2": "Аналитика", "tab3": "История",
+                "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Анализ",
                 "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
                 "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги",
                 "stl": "Краткоср. долги", "own_cap": "Капитал", "init_inv": "Инвест.",
-                "cash": "Наличные", "ebitda": "EBITDA", "save": "Обновить"
+                "cash": "Наличные", "ebitda": "EBITDA", "save": "Обновить показатели"
             },
             "English": {
                 "flag": "🇺🇸", "title": "📈 Financial Dashboard",
+                "tab1": "Data Input", "tab2": "Analytics", "tab3": "History",
+                "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis",
                 "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Operations",
                 "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt",
-                "stl": "S-term Debt", "own_cap": "Capital", "init_inv": "Invest.",
-                "cash": "Cash", "ebitda": "EBITDA", "save": "Update"
-            },
-            "GEL": {
-                "flag": "🇬🇪", "title": "📈 ფინანსური პანელი",
-                "assets": "🏠 აქტივები", "liabilities": "📉 ვალდებულებები", "ops": "⚙️ ოპერაციები",
-                "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები", "ltl": "გრძელვ. ვალი",
-                "stl": "მოკლევ. ვალი", "own_cap": "კაპიტალი", "init_inv": "ინვესტიცია",
-                "cash": "ნაღდი ფული", "ebitda": "EBITDA", "save": "განახლება"
+                "stl": "S-term Debt", "own_cap": "Capital", "init_inv": "Initial Inv",
+                "cash": "Cash", "ebitda": "EBITDA", "save": "Update Stats"
             }
         }
 
-        selected_l = st.selectbox(
-            "", options=list(lang_options.keys()),
-            format_func=lambda x: f"{lang_options[x]['flag']} {x}",
-            label_visibility="collapsed"
-        )
+        selected_l = st.selectbox("", options=list(lang_options.keys()),
+                                  format_func=lambda x: f"{lang_options[x]['flag']} {x}",
+                                  label_visibility="collapsed")
 
-    # ВАЖНО: Эту строку (t = ...) ставим БЕЗ ОТСТУПА относительно with h_col2
+    # ВАЖНО: t стоит БЕЗ ОТСТУПА, чтобы его видели все вкладки (tab1, tab2...)
     t = lang_options[selected_l]
 
     with h_col3:
