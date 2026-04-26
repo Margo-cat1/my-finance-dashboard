@@ -45,8 +45,8 @@ def get_latest_record(username):
 def get_all_records(username):
     conn = create_connection()
     import pandas as pd
-    # Берем данные для графиков и истории
-    query = "SELECT date, cash, receivables, fixed_assets, own_capital FROM finance_records WHERE username = ? ORDER BY id DESC"
+    # Мы берем дату и капитал для графика, а остальное для таблицы
+    query = "SELECT date, cash, receivables, fixed_assets, own_capital FROM finance_records WHERE username = ? ORDER BY date ASC"
     df = pd.read_sql_query(query, conn, params=(username,))
     conn.close()
     return df
