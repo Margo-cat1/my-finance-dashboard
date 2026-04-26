@@ -83,7 +83,7 @@ credentials = {
 }
 
 authenticator = stauth.Authenticate(credentials, 'finance_cookie', 'auth_key', cookie_expiry_days=30)
-authenticator.login(location='main')
+authenticator.login()
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
