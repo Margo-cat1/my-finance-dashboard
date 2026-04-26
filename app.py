@@ -183,9 +183,13 @@ if st.session_state["authentication_status"]:
     h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
     with h_col2:
-        selected_l = st.selectbox("", options=list(lang_options.keys()),
-                                  format_func=lambda x: f"{lang_options[x]['flag']} {x}",
-                                  key="lang_sel")
+        selected_l = st.selectbox(
+            "",
+            options=list(lang_options.keys()),
+            # Теперь мы берем именно значок флага из словаря, а не ключ "GE"
+            format_func=lambda x: f"{lang_options[x]['flag']} {lang_options[x]['name']}",
+            key="lang_sel"
+        )
         t = lang_options[selected_l]  # Теперь t — это наш переводчик
 
     with h_col3:
