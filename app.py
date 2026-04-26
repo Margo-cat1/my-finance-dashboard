@@ -193,7 +193,7 @@ if st.session_state["authentication_status"]:
             "",
             options=list(lang_options.keys()),
             # Теперь мы берем именно значок флага из словаря, а не ключ "GE"
-            format_func=lambda x: f"{lang_options[x]['flag']} {lang_options[x]['name']}",
+            format_func=lambda x: lang_options[x]['name'],
             key="lang_sel"
         )
         t = lang_options[selected_l]  # Теперь t — это наш переводчик
@@ -243,7 +243,7 @@ if st.session_state["authentication_status"]:
 
             # --- ВАЛИДАЦИЯ И ПРОФЕССИОНАЛЬНОЕ СОХРАНЕНИЕ ---
             st.markdown("---")
-            if st.button("🚀 Обновить показатели", use_container_width=True):  # Кнопка на всю ширину
+            if st.button("🚀 Обновить показатели", width="stretch"):
                 if cash_val == 0 and own_cap == 0:
                     st.error("⚠️ Система: Данные для анализа отсутствуют.")
                 else:
