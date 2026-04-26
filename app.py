@@ -321,7 +321,7 @@ if st.session_state["authentication_status"]:
         c4, c5, c6 = st.columns(3)
         c4.metric("Net Assets (Sol 2)", f"{sol2_val:,.0f} $")
         c5.metric("Solvency 3 (%)", f"{sol3_pct:.1f}%")
-        c6.metric("Quick Ratio (Ликв.)", f"{qr:.2f}")
+        c6.metric("Quick Ratio ", f"{qr:.2f}")
 
         st.markdown(f'<div class="section-header">{t["analysis_header"]}</div>', unsafe_allow_html=True)
         col_s, col_r = st.columns(2)
