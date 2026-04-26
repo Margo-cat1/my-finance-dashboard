@@ -282,17 +282,15 @@ if st.session_state["authentication_status"]:
 
         if not history_df.empty:
             import io
-
             buffer = io.BytesIO()
             # Создаем Excel файл "на лету"
             with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
                 history_df.to_excel(writer, index=False, sheet_name='Finance_Report')
-
-        st.download_button(
-            label=t["download"],
-            data=buffer.getvalue(),
-            file_name=f"report_{st.session_state['username']}.xlsx",
-            mime="application/vnd.ms-excel"
+            st.download_button(
+                label=t["download"],
+                data=buffer.getvalue(),
+                file_name=f"report_{st.session_state['username']}.xlsx",
+                mime="application/vnd.ms-excel"
             )
 
 
