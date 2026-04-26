@@ -111,11 +111,7 @@ if not st.session_state["authentication_status"]:
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
-    # --- 1. ШАПКА (Язык и Валюта) ---
-    h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
-
-    with h_col2:
-        lang_options = {
+    all_translations = {
             "RU": {
                 "flag": "🇷🇺", "name": "Русский", "title": "📈 Финансовый Дашборд",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
@@ -175,19 +171,20 @@ if st.session_state["authentication_status"]:
                 }
             }
         }
+    # --- 1. ШАПКА (Язык и Валюта) ---
+    h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
-        # Выбор языка с отображением флагов
-        selected_l_key = st.selectbox(
-            "",
-            options=list(lang_options.keys()),
-            format_func=lambda x: f"{lang_options[x]['flag']} {lang_options[x]['name']}",
-            label_visibility="collapsed"
-        )
-        t = lang_options[selected_l_key]
+    with h_col2:
+        # Выбор языка
+        selected_l_key = st.selectbox("", options=list(all_translations.keys()),
+                                      format_func=lambda x: f"{all_translations[x]['flag']} {all_translations[x]['name']}",
+                                      key="lang_sel")
+        t = all_translations[selected_l_key] # В переменную 't' попадает выбранный язык
 
     with h_col3:
+        # Выбор валюты (отдельно, как ты и хотела)
         currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
-        selected_curr = st.selectbox("", options=list(currency_dict.keys()), label_visibility="collapsed")
+        selected_curr = st.selectbox("", options=list(currency_dict.keys()), key="curr_sel")
         curr_symbol = currency_dict[selected_curr]
 
     st.markdown("---")
