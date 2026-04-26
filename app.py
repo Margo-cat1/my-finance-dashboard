@@ -101,7 +101,7 @@ if st.session_state["authentication_status"] is None or st.session_state["authen
     with tab_reg:
         try:
             # Регистрация нового пользователя
-            if authenticator.register_user(pre_authorization=False):
+            if authenticator.register_user(pre_authorized=False):
                 # ВАЖНО: записываем обновленные данные обратно в файл config.yaml
                 with open('config.yaml', 'w') as file:
                     yaml.dump(config, file, default_flow_style=False)
