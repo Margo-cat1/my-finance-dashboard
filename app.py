@@ -250,7 +250,7 @@ if st.session_state["authentication_status"]:
                         hole=0.5,
                         color_discrete_sequence=px.colors.qualitative.Safe
                     )
-                    fig_pie.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=250, showlegend=False)
+                    fig_pie.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=300, showlegend=False)
                     st.plotly_chart(fig_pie, use_container_width=True)
 
             with chart_col2:
