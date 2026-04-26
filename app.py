@@ -153,14 +153,15 @@ if st.session_state["authentication_status"]:
             cash_val = st.number_input(t["cash"], value=db_cash)
             ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
 
-            # 1. Валидация и сохранение с крутым UX
+            # --- ВАЛИДАЦИЯ И СОХРАНЕНИЕ ---
             if st.button("🚀 Сохранить данные"):
-                # Защита от "дурака": проверяем, что введено хоть что-то
+                # Проверяем, что пользователь ввел хоть какие-то цифры
                 if cash_val == 0 and own_cap == 0 and init_inv == 0:
-                    st.error("⚠️ Данные не заполнены. Нечего сохранять!")
+                    st.error("⚠️ Данные не заполнены. Введите значения перед сохранением!")
                 elif cash_val < 0:
-                    st.warning("🧐 Наличные не могут быть отрицательными.")
+                    st.warning("🧐 Наличные (Cash) не могут быть отрицательными.")
                 else:
+                    # Подготовка данных
                     data = {
                         'cash': cash_val, 'receivables': ca, 'inventory': 0,
                         'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
@@ -169,21 +170,18 @@ if st.session_state["authentication_status"]:
                         'initial_inv': init_inv
                     }
 
-                    # Показываем статус сохранения
                     with st.spinner('Связываемся с базой данных...'):
                         save_record(st.session_state["username"], data)
 
                     # Эффекты успеха
-                    st.balloons()
-                    st.toast("✅ Данные успешно обновлены в базе!", icon="🚀")
+                    st.toast("✅ Данные успешно сохранены!", icon="🚀")
+                    st.balloons()  # Праздничные шарики
 
-                    # Перезагружаем для обновления графиков
+                    # Перезагрузка страницы, чтобы обновились графики
                     st.rerun()
 
-        # --- 3. ЭКСПОРТ В EXCEL (Сразу под кнопкой сохранения) ---
+            # --- ЭКСПОРТ В EXCEL (сразу под кнопкой) ---
         st.markdown("---")
-
-        # Получаем всю историю для текущего пользователя
         history_df = get_all_records(st.session_state["username"])
 
         if not history_df.empty:
@@ -195,11 +193,10 @@ if st.session_state["authentication_status"]:
                 history_df.to_excel(writer, index=False, sheet_name='Finance_Report')
 
             st.download_button(
-                label="📥 Скачать отчет в Excel",
+                label="📥 Скачать историю в Excel",
                 data=buffer,
                 file_name=f"report_{st.session_state['username']}.xlsx",
-                mime="application/vnd.ms-excel",
-                help="Нажмите, чтобы выгрузить всю историю сохранений в таблицу"
+                mime="application/vnd.ms-excel"
             )
 
 
