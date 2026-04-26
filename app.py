@@ -193,6 +193,7 @@ if st.session_state["authentication_status"]:
             "",
             options=list(lang_options.keys()),
             # Теперь мы берем именно значок флага из словаря, а не ключ "GE"
+            index=2,  # <--- делает грузинский язык стартовым
             format_func=lambda x: lang_options[x]['name'],
             key="lang_sel"
         )
