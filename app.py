@@ -92,23 +92,20 @@ authenticator = stauth.Authenticate(
     config['cookie']['expiry_days']
 )
 
-if st.session_state["authentication_status"] is None or st.session_state["authentication_status"] is False:
+if not st.session_state["authentication_status"]:
     tab_login, tab_reg = st.tabs(["🔑 Вход", "👤 Регистрация"])
-
     with tab_login:
         authenticator.login()
-
     with tab_reg:
         try:
             # Регистрация нового пользователя
-            if authenticator.register_user(pre_authorized=False):
+            if authenticator.register_user():
                 # ВАЖНО: записываем обновленные данные обратно в файл config.yaml
                 with open('config.yaml', 'w') as file:
                     yaml.dump(config, file, default_flow_style=False)
                 st.success('Пользователь зарегистрирован! Теперь войдите во вкладке "Вход"')
         except Exception as e:
             st.error(f"Ошибка: {e}")
-
 
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
