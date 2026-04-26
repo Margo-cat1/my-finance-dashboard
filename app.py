@@ -128,7 +128,12 @@ if st.session_state["authentication_status"]:
                 "msg_roi": "Высокая рентабельность", "msg_autonomy": "Хорошая автономия",
                 "msg_liq": "Ликвидность в норме",
                 "msg_dep": "Зависимость от долгов", "msg_cash_low": "Мало наличности",
-                "msg_bankrupt": "Риск банкротства!"
+                "msg_bankrupt": "Риск банкротства!",
+                "guide": {
+                    "ROA": "Рентабельность активов: как эффективно работают ресурсы.",
+                    "ROE": "Рентабельность капитала: отдача на ваши вложения.",
+                    "Solvency": "Платежеспособность: хватит ли активов покрыть долги."
+                }
             },
             "English": {
                 "flag": "🇺🇸", "title": "📈 Financial Dashboard", "save": "🚀 Update Stats",
@@ -140,7 +145,30 @@ if st.session_state["authentication_status"]:
                 "cash": "Cash", "ebitda": "EBITDA",
                 "strong": "Strengths", "risks": "Risks",
                 "msg_roi": "High ROI", "msg_autonomy": "Good Autonomy", "msg_liq": "Solid Liquidity",
-                "msg_dep": "Debt Dependent", "msg_cash_low": "Low Cash", "msg_bankrupt": "Bankruptcy Risk!"
+                "msg_dep": "Debt Dependent", "msg_cash_low": "Low Cash", "msg_bankrupt": "Bankruptcy Risk!",
+                "guide": {
+                    "ROA": "Return on Assets: how effectively resources work.",
+                    "ROE": "Return on Equity: return on your investments.",
+                    "Solvency": "Solvency: whether assets cover all debts."
+                }
+            },
+            "GEL": {
+                "flag": "🇬🇪", "title": "📈 ფინანსური პანელი", "save": "🚀 მონაცემების განახლება",
+                "tab1": "📥 შეტანა", "tab2": "📊 ანალიზი", "tab3": "📜 ისტორია",
+                "sec_eff": "ეფექტურობა", "sec_sol": "მდგრადობა", "analysis_header": "ანალიზის შედეგები",
+                "assets": "🏠 აქტივები", "liabilities": "📉 ვალდებულებები", "ops": "⚙️ ოპერაციები",
+                "fa": "ძირითადი აქტივები", "ca": "მიმდინარე აქტივები", "ltl": "გრძელვადიანი ვალი",
+                "stl": "მოკლევადიანი ვალი", "own_cap": "კაპიტალი", "init_inv": "ინვესტიცია",
+                "cash": "ნაღდი ფული", "ebitda": "EBITDA",
+                "strong": "ძლიერი მხარეები", "risks": "რისკები",
+                "msg_roi": "მაღალი რენტაბელობა", "msg_autonomy": "კარგი ავტონომია", "msg_liq": "ლიკვიდობა ნორმაშია",
+                "msg_dep": "დამოკიდებულება ვალებზე", "msg_cash_low": "ცოტა ნაღდი ფული",
+                "msg_bankrupt": "გაკოტრების რისკი!",
+                "guide": {
+                    "ROA": "აქტივების რენტაბელობა: რამდენად ეფექტურად მუშაობს რესურსები.",
+                    "ROE": "კაპიტალის რენტაბელობა: უკუგება თქვენს ინვესტიციებზე.",
+                    "Solvency": "გადახდისუნარიანობა: საკმარისია თუ არა აქტივები ვალების დასაფარად."
+                }
             }
         }
 
@@ -148,7 +176,7 @@ if st.session_state["authentication_status"]:
                                   format_func=lambda x: f"{lang_options[x]['flag']} {x}",
                                   label_visibility="collapsed")
 
-    # ВАЖНО: переменная t должна быть на этом же уровне отступа, что и h_col2
+    # ВАЖНО: переменная t должна быть на этом уровне отступа
     t = lang_options[selected_l]
 
     with h_col3:
