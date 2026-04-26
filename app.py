@@ -111,38 +111,35 @@ if not st.session_state["authentication_status"]:
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
-    # --- ШАПКА ПРИЛОЖЕНИЯ (Правый верхний угол) ---
-    # --- 1. СОЗДАЕМ ШАПКУ (ПРАВЫЙ УГОЛ) ---
+    # --- 1. ШАПКА (Язык и Валюта) ---
     h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
     with h_col2:
-        # В этом словаре ДОЛЖНЫ быть все ключи, на которые ругается система
         lang_options = {
             "Русский": {
-                "flag": "🇷🇺", "title": "📈 Финансовый Дашборд",
-                "tab1": "Ввод данных", "tab2": "Аналитика", "tab3": "История",
-                "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Анализ",
+                "flag": "🇷🇺", "title": "📊 Финансовый Дашборд", "save": "Обновить показатели",
+                "tab1": "🚀 Ввод", "tab2": "📉 Анализ", "tab3": "📜 История",
+                "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Результаты анализа",
                 "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
                 "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги",
                 "stl": "Краткоср. долги", "own_cap": "Капитал", "init_inv": "Инвест.",
-                "cash": "Наличные", "ebitda": "EBITDA", "save": "Обновить показатели"
+                "cash": "Наличные", "ebitda": "EBITDA", "strong": "Сильная позиция", "weak": "Нужны улучшения"
             },
             "English": {
-                "flag": "🇺🇸", "title": "📈 Financial Dashboard",
-                "tab1": "Data Input", "tab2": "Analytics", "tab3": "History",
-                "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis",
-                "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Operations",
-                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt",
-                "stl": "S-term Debt", "own_cap": "Capital", "init_inv": "Initial Inv",
-                "cash": "Cash", "ebitda": "EBITDA", "save": "Update Stats"
+                "flag": "🇺🇸", "title": "📊 Financial Dashboard", "save": "Update Stats",
+                "tab1": "🚀 Input", "tab2": "📉 Analysis", "tab3": "📜 History",
+                "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis Results",
+                "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Ops",
+                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "Long-term Debt",
+                "stl": "Short-term Debt", "own_cap": "Capital", "init_inv": "Invest.",
+                "cash": "Cash", "ebitda": "EBITDA", "strong": "Strong Position", "weak": "Needs Work"
             }
         }
-
         selected_l = st.selectbox("", options=list(lang_options.keys()),
                                   format_func=lambda x: f"{lang_options[x]['flag']} {x}",
                                   label_visibility="collapsed")
 
-    # ВАЖНО: t стоит БЕЗ ОТСТУПА, чтобы его видели все вкладки (tab1, tab2...)
+    # ВАЖНО: Эту строку (t = ...) ставим БЕЗ отступа, вровень с h_col1
     t = lang_options[selected_l]
 
     with h_col3:
@@ -151,10 +148,6 @@ if st.session_state["authentication_status"]:
         curr_symbol = currency_dict[selected_curr]
 
     st.markdown("---")
-
-
-
-
 
     # Загрузка данных из базы
     last_rec = get_latest_record(st.session_state["username"])
