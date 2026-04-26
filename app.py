@@ -319,20 +319,26 @@ if st.session_state["authentication_status"]:
     import plotly.express as px  # Добавь этот импорт в самый верх файла!
 
     with tab2:
-        st.subheader("🏦 Финансовый Дашборд")
+        st.subheader(t["title"])
 
         # --- ШАГ 1: ПОЛУЧАЕМ ДАННЫЕ (Этого не хватало на скрине!) ---
         history_df = get_all_records(st.session_state["username"])
 
         # 1. Основные показатели в стильных карточках
         # 1. Основные показатели в стильных карточках
+        # 1. Основные показатели (Карточки)
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
 
-            col1.metric(label=t["card_cap"], value=f"{own_cap:,.0f} {curr_symbol}")
-            col2.metric(label=t["card_cash"], value=f"{cash_val:,.0f} {curr_symbol}")
-            col3.metric(label=t["card_net"], value=f"{sol2_val:,.0f} {curr_symbol}")
-
+            # Добавляем value= перед f-строкой, чтобы убрать SyntaxError!
+            col1.metric(label=t["card_cap"], value=f"{own_cap:,.0f} {curr_symbol}".replace(",", " "))
+            col2.metric(label=t["card_cash"], value=f"{cash_val:,.0f} {curr_symbol}".replace(",", " "))
+            col3.metric(
+                label=t["card_net"],
+                value=f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
+                delta=t["risks"] if sol2_val < 0 else t["strong"],
+                delta_color="inverse" if sol2_val < 0 else "normal"
+            )
         st.markdown("###")
 
         # 2. Визуализация (только если есть история)
@@ -341,7 +347,7 @@ if st.session_state["authentication_status"]:
 
             with chart_col1:
                 with st.container(border=True):
-                    st.write("#### 🍩 Состав активов")
+                    st.subheader(t["chart_pie"])
                     import plotly.express as px
 
                     fig_pie = px.pie(
@@ -360,7 +366,7 @@ if st.session_state["authentication_status"]:
 
             with chart_col2:
                 with st.container(border=True):
-                    st.write("#### 📈 Тренд капитала")
+                    st.subheader(t["chart_line"])
                     fig_line = px.line(
                         history_df, x='date', y='own_capital',
                         markers=True, line_shape="spline"
@@ -378,7 +384,7 @@ if st.session_state["authentication_status"]:
             st.markdown("###")
 
             # 3. Детальная история
-            with st.expander("📂 Посмотреть детальную таблицу истории", expanded=False):
+            with st.expander(t["history_table"], expanded=False):
                 st.dataframe(
                     history_df.style.background_gradient(subset=['own_capital'], cmap='Greens'),
                     use_container_width=True
