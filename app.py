@@ -170,16 +170,16 @@ if st.session_state["authentication_status"]:
                     'initial_inv': init_inv
                     }
 
-                    with st.spinner('Связываемся с базой данных...'):
-                        save_record(st.session_state["username"], data)
+                with st.spinner('Связываемся с базой данных...'):
+                    save_record(st.session_state["username"], data)
 
-                    # Эффекты успеха
-                    st.toast("✅ Данные успешно сохранены!", icon="🚀")
-                    st.balloons()  # Праздничные шарики
-                    import time
-                    time.sleep(1)
-                    # Перезагрузка страницы, чтобы обновились графики
-                    st.rerun()
+                # Эффекты успеха
+                st.toast("✅ Данные успешно сохранены!", icon="🚀")
+                st.balloons()  # Праздничные шарики
+                import time
+                time.sleep(1)
+                # Перезагрузка страницы, чтобы обновились графики
+                st.rerun()
 
             # --- ЭКСПОРТ В EXCEL (сразу под кнопкой) ---
         st.markdown("---")
