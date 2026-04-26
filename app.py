@@ -148,10 +148,10 @@ if st.session_state["authentication_status"]:
             stl = st.number_input(t["stl"], value=db_stl)
 
         with st.expander(t["ops"], expanded=True):
-            own_cap = st.number_input(t["own_cap"], value=db_own_cap)  # Теперь динамично
-            init_inv = st.number_input(t["init_inv"], value=db_init_inv)  # Теперь динамично
-            cash_val = st.number_input(t["cash"], value=db_cash)
-            ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
+            own_cap = st.number_input(t["own_cap"], value=int(db_own_cap), step=1, format="%d")   # Теперь динамично
+            init_inv = st.number_input(t["init_inv"], value=int(db_init_inv), step=1, format="%d")    # Теперь динамично
+            cash_val = st.number_input(t["cash"], value=int(db_cash), step=1, format="%d")
+            ebitda_val = st.number_input(t["ebitda"], value=int(db_ebitda), step=1, format="%d")
 
             # --- ВАЛИДАЦИЯ И ПРОФЕССИОНАЛЬНОЕ СОХРАНЕНИЕ ---
             st.markdown("---")
