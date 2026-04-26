@@ -131,6 +131,7 @@ if st.session_state["authentication_status"]:
                 "chart_pie": "🍩 Состав активов",
                 "chart_line": "📈 Тренд капитала",
                 "history_table": "📂 Детальная таблица истории",
+                "download": "📥 Скачать отчет",
                 "guide": {
                     "ROA": "Рентабельность активов: как эффективно работают ресурсы.",
                     "ROE": "Рентабельность капитала: отдача на ваши вложения.",
@@ -154,6 +155,7 @@ if st.session_state["authentication_status"]:
                 "chart_pie": "🍩 Asset Composition",
                 "chart_line": "📈 Capital Trend",
                 "history_table": "📂 Detailed History Table",
+                "download": "📥 Download Report",
                 "guide": {
                     "ROA": "Return on Assets: how effectively resources work.",
                     "ROE": "Return on Equity: return on your investments.",
@@ -179,6 +181,7 @@ if st.session_state["authentication_status"]:
                 "chart_pie": "🍩 აქტივების შემადგენლობა",
                 "chart_line": "📈 კაპიტალის ტრენდი",
                 "history_table": "📂 ისტორიის ცხრილი",
+                "download": "📥 ჩამოტვირთვა",
                 "guide": {
                     "ROA": "აქტივების რენტაბელობა: რამდენად ეფექტურად მუშაობს რესურსები.",
                     "ROE": "კაპიტალის რენტაბელობა: უკუგება თქვენს ინვესტიციებზე.",
@@ -244,7 +247,7 @@ if st.session_state["authentication_status"]:
 
             # --- ВАЛИДАЦИЯ И ПРОФЕССИОНАЛЬНОЕ СОХРАНЕНИЕ ---
             st.markdown("---")
-            if st.button("🚀 Обновить показатели", width="stretch"):
+            if st.button(label=t["save"], width="stretch"):
                 if cash_val == 0 and own_cap == 0:
                     st.error("⚠️ Система: Данные для анализа отсутствуют.")
                 else:
@@ -286,8 +289,8 @@ if st.session_state["authentication_status"]:
                 history_df.to_excel(writer, index=False, sheet_name='Finance_Report')
 
             st.download_button(
-                label="📥 Скачать историю в Excel",
-                data=buffer,
+                label=t["download"],
+                data=file,
                 file_name=f"report_{st.session_state['username']}.xlsx",
                 mime="application/vnd.ms-excel"
             )
