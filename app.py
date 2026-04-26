@@ -117,29 +117,38 @@ if st.session_state["authentication_status"]:
     with h_col2:
         lang_options = {
             "Русский": {
-                "flag": "🇷🇺", "title": "📊 Финансовый Дашборд", "save": "Обновить показатели",
-                "tab1": "🚀 Ввод", "tab2": "📉 Анализ", "tab3": "📜 История",
+                "flag": "🇷🇺", "title": "📈 Финансовый Дашборд", "save": "🚀 Обновить показатели",
+                "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
                 "sec_eff": "Эффективность", "sec_sol": "Устойчивость", "analysis_header": "Результаты анализа",
                 "assets": "🏠 Активы", "liabilities": "📉 Долги", "ops": "⚙️ Операционка",
                 "fa": "Внеоборотные", "ca": "Оборотные", "ltl": "Долгоср. долги",
                 "stl": "Краткоср. долги", "own_cap": "Капитал", "init_inv": "Инвест.",
-                "cash": "Наличные", "ebitda": "EBITDA", "strong": "Сильная позиция", "weak": "Нужны улучшения"
+                "cash": "Наличные", "ebitda": "EBITDA",
+                "strong": "Сильные стороны", "risks": "Риски",
+                "msg_roi": "Высокая рентабельность", "msg_autonomy": "Хорошая автономия",
+                "msg_liq": "Ликвидность в норме",
+                "msg_dep": "Зависимость от долгов", "msg_cash_low": "Мало наличности",
+                "msg_bankrupt": "Риск банкротства!"
             },
             "English": {
-                "flag": "🇺🇸", "title": "📊 Financial Dashboard", "save": "Update Stats",
-                "tab1": "🚀 Input", "tab2": "📉 Analysis", "tab3": "📜 History",
+                "flag": "🇺🇸", "title": "📈 Financial Dashboard", "save": "🚀 Update Stats",
+                "tab1": "📥 Input", "tab2": "📊 Analysis", "tab3": "📜 History",
                 "sec_eff": "Efficiency", "sec_sol": "Solvency", "analysis_header": "Analysis Results",
                 "assets": "🏠 Assets", "liabilities": "📉 Liabilities", "ops": "⚙️ Ops",
-                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "Long-term Debt",
-                "stl": "Short-term Debt", "own_cap": "Capital", "init_inv": "Invest.",
-                "cash": "Cash", "ebitda": "EBITDA", "strong": "Strong Position", "weak": "Needs Work"
+                "fa": "Fixed Assets", "ca": "Current Assets", "ltl": "L-term Debt",
+                "stl": "S-term Debt", "own_cap": "Capital", "init_inv": "Invest.",
+                "cash": "Cash", "ebitda": "EBITDA",
+                "strong": "Strengths", "risks": "Risks",
+                "msg_roi": "High ROI", "msg_autonomy": "Good Autonomy", "msg_liq": "Solid Liquidity",
+                "msg_dep": "Debt Dependent", "msg_cash_low": "Low Cash", "msg_bankrupt": "Bankruptcy Risk!"
             }
         }
+
         selected_l = st.selectbox("", options=list(lang_options.keys()),
                                   format_func=lambda x: f"{lang_options[x]['flag']} {x}",
                                   label_visibility="collapsed")
 
-    # ВАЖНО: Эту строку (t = ...) ставим БЕЗ отступа, вровень с h_col1
+    # ВАЖНО: переменная t должна быть на этом же уровне отступа, что и h_col2
     t = lang_options[selected_l]
 
     with h_col3:
