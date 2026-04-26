@@ -137,7 +137,8 @@ if st.session_state["authentication_status"]:
                 'initial_inv': init_inv
             }
             save_record(st.session_state["username"], data)
-            st.success("Данные успешно сохранены!")
+            st.sidebar.success("✅ Данные успешно сохранены!")
+            st.toast("Данные обновлены!")
             st.rerun()  # Мгновенно обновляем интерфейс
 
         authenticator.logout('Logout', 'sidebar')
