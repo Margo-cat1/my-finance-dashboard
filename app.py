@@ -141,9 +141,9 @@ if st.session_state["authentication_status"]:
             st.session_state["saved"] = True
             st.rerun()
     # Сразу после блока с сайдбаром (без отступа!) добавь:
-    if st.session_state.get("saved"):
-        st.toast("✅ Данные успешно обновлены в базе!")
-        st.session_state["saved"] = False  # Сбрасываем, чтобы не мигало вечно
+        if st.session_state.get("saved"):
+            st.toast("✅ Данные успешно обновлены в базе!")
+            st.session_state["saved"] = False  # Сбрасываем, чтобы не мигало вечно
 
 
         authenticator.logout('Logout', 'sidebar')
