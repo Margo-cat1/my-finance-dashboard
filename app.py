@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
+import plotly.express as px
 from database import init_db, save_record, get_latest_record, get_all_records
 
 # 1. Настройка страницы (строго первой командой)
@@ -212,52 +213,60 @@ if st.session_state["authentication_status"]:
             if qr < 2.0: st.error(f"🚨 {t['msg_cash_low']} ({qr:.2f})")
             if sol2_val < 0: st.error(f"💣 {t['msg_bankrupt']}")
 
+    import plotly.express as px  # Добавь этот импорт в самый верх файла!
+
     with tab2:
-        st.subheader("📊 Финансовый анализ и история")
+        st.subheader("🏦 Финансовый Дашборд")
 
-        # 1. Метрики (красивые карточки)
-        col1, col2, col3 = st.columns(3)
+        # Красивые карточки в один ряд с фоном
+        main_metrics = st.container(border=True)
+        with main_metrics:
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Capitalization", f"{own_cap:,.0f} $", "Equity", delta_color="normal")
+            col2.metric("Liquid Cash", f"{cash_val:,.0f} $", "Cash on hand")
+            col3.metric("Net Assets", f"{sol2_val:,.0f} $", delta=f"{sol2_val:,.0f}",
+                        delta_color="normal" if sol2_val >= 0 else "inverse")
 
-        # Чистые активы: подсвечиваются в зависимости от значения
-        # delta_color="normal" делает зеленое при плюсе, "inverse" — красное при минусе
-        col1.metric(
-            label="Чистые активы",
-            value=f"{sol2_val:,.0f} $",
-            delta="Положительный баланс" if sol2_val >= 0 else "Отрицательный баланс",
-            delta_color="normal" if sol2_val >= 0 else "inverse"
-        )
-        col2.metric("Общие активы", f"{total_assets:,.0f} $")
-        col3.metric("EBITDA", f"{ebitda_val:,.0f} $")
+        st.markdown("###")  # Небольшой отступ
 
-        st.markdown("---")
+        # Ряд с графиками в контейнерах
+        chart_col1, chart_col2 = st.columns(2)
 
-        # 2. История из базы данных
-        st.write("### 📜 История сохранений")
+        with chart_col1:
+            with st.container(border=True):
+                st.write("#### 🍩 Состав активов")
+                # Делаем круговую диаграмму (Donut chart) - это выглядит профессиональнее
+                fig_pie = px.pie(
+                    values=[cash_val, ca, fa],
+                    names=['Наличные', 'Дебиторка', 'Внеоборотные'],
+                    hole=0.5,
+                    color_discrete_sequence=px.colors.qualitative.Pastel
+                )
+                fig_pie.update_layout(margin=dict(l=20, r=20, t=20, b=20), height=300)
+                st.plotly_chart(fig_pie, use_container_width=True)
 
-        # Получаем данные из функции, которую мы добавим в database.py
-        history_df = get_all_records(st.session_state["username"])
+        with chart_col2:
+            with st.container(border=True):
+                st.write("#### 📈 Тренд капитала")
+                # Улучшенный линейный график с точками
+                if not history_df.empty:
+                    fig_line = px.line(
+                        history_df, x='date', y='own_capital',
+                        markers=True,
+                        color_discrete_sequence=['#00CC96']
+                    )
+                    fig_line.update_layout(margin=dict(l=20, r=20, t=20, b=20), height=300,
+                                           xaxis_title=None, yaxis_title=None)
+                    st.plotly_chart(fig_line, use_container_width=True)
 
-        if not history_df.empty:
-            # Показываем таблицу с историей
-            st.dataframe(history_df, use_container_width=True)
+        st.markdown("###")
 
-            # 3. Графики
-            col_left, col_right = st.columns(2)
-
-            with col_left:
-                st.write("#### Структура (текущая)")
-                chart_data = pd.DataFrame({
-                    'Категория': ['Cash', 'Receivables', 'Fixed Assets'],
-                    'Сумма': [cash_val, ca, fa]
-                })
-                st.bar_chart(chart_data.set_index('Категория'))
-
-            with col_right:
-                st.write("#### Динамика капитала")
-                # Линейный график по датам из истории
-                st.line_chart(history_df.set_index('date')['own_capital'])
-        else:
-            st.info("История пока пуста. Нажмите 'Сохранить данные' в сайдбаре.")
+        # История в раскрывающемся списке (Expander), чтобы не занимала всё место
+        with st.expander("📂 Посмотреть полную историю транзакций", expanded=False):
+            st.dataframe(
+                history_df.style.background_gradient(subset=['own_capital'], cmap='Greens'),
+                use_container_width=True
+            )
     with tab3:
         st.markdown(f'<div class="section-header">📚 {t["tab3"]}</div>', unsafe_allow_html=True)
         for key in t["guide"]:
