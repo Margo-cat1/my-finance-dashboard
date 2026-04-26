@@ -153,33 +153,36 @@ if st.session_state["authentication_status"]:
             cash_val = st.number_input(t["cash"], value=db_cash)
             ebitda_val = st.number_input(t["ebitda"], value=db_ebitda)
 
-            # --- ВАЛИДАЦИЯ И СОХРАНЕНИЕ ---
-        if st.button("🚀 Сохранить данные"):
-                # Проверяем, что пользователь ввел хоть какие-то цифры
-            if cash_val == 0 and own_cap == 0 and init_inv == 0:
-                st.error("⚠️ Данные не заполнены. Введите значения перед сохранением!")
-            elif cash_val < 0:
-                st.warning("🧐 Наличные (Cash) не могут быть отрицательными.")
-            else:
-                # Подготовка данных
-                data = {
-                    'cash': cash_val, 'receivables': ca, 'inventory': 0,
-                    'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
-                    'revenue': 0, 'ebitda': ebitda_val,
-                    'own_capital': own_cap,
-                    'initial_inv': init_inv
+            # --- ВАЛИДАЦИЯ И ПРОФЕССИОНАЛЬНОЕ СОХРАНЕНИЕ ---
+            st.markdown("---")
+            if st.button("🚀 Обновить показатели", use_container_width=True):  # Кнопка на всю ширину
+                if cash_val == 0 and own_cap == 0:
+                    st.error("⚠️ Система: Данные для анализа отсутствуют.")
+                else:
+                    # Прогресс-бар вместо шариков
+                    progress_bar = st.sidebar.progress(0)
+                    for percent_complete in range(100):
+                        import time
+
+                        time.sleep(0.005)  # Имитация обработки
+                        progress_bar.progress(percent_complete + 1)
+
+                    data = {
+                        'cash': cash_val, 'receivables': ca, 'inventory': 0,
+                        'fixed_assets': fa, 'short_term_debt': stl, 'long_term_debt': ltl,
+                        'revenue': 0, 'ebitda': ebitda_val,
+                        'own_capital': own_cap,
+                        'initial_inv': init_inv
                     }
 
-                with st.spinner('Связываемся с базой данных...'):
                     save_record(st.session_state["username"], data)
 
-                # Эффекты успеха
-                st.toast("✅ Данные успешно сохранены!", icon="🚀")
-                st.balloons()  # Праздничные шарики
-                import time
-                time.sleep(1)
-                # Перезагрузка страницы, чтобы обновились графики
-                st.rerun()
+                    # Стильное уведомление в углу экрана (вместо шариков)
+                    st.toast('База данных успешно обновлена', icon='📈')
+
+                    # Очищаем прогресс-бар и обновляем
+                    progress_bar.empty()
+                    st.rerun()
 
             # --- ЭКСПОРТ В EXCEL (сразу под кнопкой) ---
         st.markdown("---")
@@ -281,16 +284,29 @@ if st.session_state["authentication_status"]:
                         hole=0.5,
                         color_discrete_sequence=px.colors.qualitative.Safe
                     )
-                    fig_pie.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=300, showlegend=False)
+                    # Лечим обрывы: увеличиваем margin (отступы)
+                    fig_pie.update_layout(
+                        margin=dict(l=30, r=30, t=30, b=30),
+                        height=350,
+                        showlegend=False
+                    )
                     st.plotly_chart(fig_pie, use_container_width=True)
 
             with chart_col2:
                 with st.container(border=True):
                     st.write("#### 📈 Тренд капитала")
-                    fig_line = px.line(history_df, x='date', y='own_capital')
-                    fig_line.update_traces(line_color='#00CC96', line_shape="spline")
-                    fig_line.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=250, xaxis_title=None,
-                                           yaxis_title=None)
+                    fig_line = px.line(
+                        history_df, x='date', y='own_capital',
+                        markers=True, line_shape="spline"
+                    )
+                    fig_line.update_traces(line_color='#00CC96')
+                    # Лечим обрывы: l=50 дает место для цифр на оси Y
+                    fig_line.update_layout(
+                        margin=dict(l=50, r=30, t=30, b=30),
+                        height=350,
+                        xaxis_title=None,
+                        yaxis_title=None
+                    )
                     st.plotly_chart(fig_line, use_container_width=True)
 
             st.markdown("###")
