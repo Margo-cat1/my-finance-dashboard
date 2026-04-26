@@ -111,7 +111,7 @@ if not st.session_state["authentication_status"]:
 
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
-    all_translations = {
+    lang_options = {
             "RU": {
                 "flag": "🇷🇺", "name": "Русский", "title": "📈 Финансовый Дашборд",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
@@ -171,18 +171,16 @@ if st.session_state["authentication_status"]:
                 }
             }
         }
-    # --- 1. ШАПКА (Язык и Валюта) ---
     h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
     with h_col2:
-        # Выбор языка
-        selected_l_key = st.selectbox("", options=list(all_translations.keys()),
-                                      format_func=lambda x: f"{all_translations[x]['flag']} {all_translations[x]['name']}",
-                                      key="lang_sel")
-        t = all_translations[selected_l_key] # В переменную 't' попадает выбранный язык
+        selected_l = st.selectbox("", options=list(lang_options.keys()),
+                                  format_func=lambda x: f"{lang_options[x]['flag']} {x}",
+                                  key="lang_sel")
+        t = lang_options[selected_l]  # Теперь t — это наш переводчик
 
     with h_col3:
-        # Выбор валюты (отдельно, как ты и хотела)
+        # Валюта теперь НЕ зависит от языка
         currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
         selected_curr = st.selectbox("", options=list(currency_dict.keys()), key="curr_sel")
         curr_symbol = currency_dict[selected_curr]
@@ -327,23 +325,13 @@ if st.session_state["authentication_status"]:
         history_df = get_all_records(st.session_state["username"])
 
         # 1. Основные показатели в стильных карточках
+        # 1. Основные показатели в стильных карточках
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
 
-            col1.metric(
-                label=t["card_cap"],
-                value=f"{own_cap:,.0f} {curr_symbol}".replace(",", " ")
-            )
-            col2.metric(
-                label=t["card_cash"],
-                value=f"{cash_val:,.0f} {curr_symbol}".replace(",", " ")
-            )
-            col3.metric(
-                label=t["card_net"],
-                value=f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
-                delta=t["risks"] if sol2_val < 0 else t["strong"],
-                delta_color="inverse" if sol2_val < 0 else "normal"
-            )
+            col1.metric(label=t["card_cap"], value=f"{own_cap:,.0f} {curr_symbol}")
+            col2.metric(label=t["card_cash"], value=f"{cash_val:,.0f} {curr_symbol}")
+            col3.metric(label=t["card_net"], value=f"{sol2_val:,.0f} {curr_symbol}")
 
         st.markdown("###")
 
