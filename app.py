@@ -333,7 +333,6 @@ if st.session_state["authentication_status"]:
         with st.container(border=True):
             col1, col2, col3 = st.columns(3)
 
-            # Везде добавляем value= перед строкой с цифрами
             col1.metric(
                 label=t["card_cap"],
                 value=f"{own_cap:,.0f} {curr_symbol}".replace(",", " ")
@@ -345,8 +344,8 @@ if st.session_state["authentication_status"]:
             col3.metric(
                 label=t["card_net"],
                 value=f"{sol2_val:,.0f} {curr_symbol}".replace(",", " "),
-                delta=t["strong"] if sol2_val >= 0 else t["risks"],
-                delta_color="normal" if sol2_val >= 0 else "inverse"
+                delta=t["risks"] if sol2_val < 0 else t["strong"],
+                delta_color="inverse" if sol2_val < 0 else "normal"
             )
 
         st.markdown("###")
