@@ -109,15 +109,37 @@ if not st.session_state["authentication_status"]:
         except Exception as e:
             st.error(f"Ошибка: {e}")
 
-
 # 5. ОСНОВНАЯ ЧАСТЬ (выполняется только после входа)
 if st.session_state["authentication_status"]:
+    # --- ШАПКА ПРИЛОЖЕНИЯ (Правый верхний угол) ---
+    # Создаем 3 колонки: широкая пустая и две узкие под выбор
+    h_col1, h_col2, h_col3 = st.columns([4, 1, 1])
 
-    # Выбор языка
-    lang_choice = st.sidebar.selectbox("🌐 Language", list(LANGS.keys()))
-    t = LANGS[lang_choice]
+    with h_col2:
+        # 1. Выбор Языка
+        lang_options = {
+            "Русский": {"flag": "🇷🇺", "assets": "Активы", "liabilities": "Долги", "ops": "Операционка"},
+            "English": {"flag": "🇺🇸", "assets": "Assets", "liabilities": "Liabilities", "ops": "Operations"},
+            "GEL": {"flag": "🇬🇪", "assets": "აქტივები", "liabilities": "ვალდებულებები", "ops": "ოპერაციები"}
+        }
+        selected_l = st.selectbox(
+            "", options=list(lang_options.keys()),
+            format_func=lambda x: f"{lang_options[x]['flag']} {x}",
+            label_visibility="collapsed"
+        )
+        t = lang_options[selected_l]  # Теперь перевод доступен везде
 
+    with h_col3:
+        # 2. Выбор Валюты
+        currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
+        selected_curr = st.selectbox("", options=list(currency_dict.keys()), label_visibility="collapsed")
+        curr_symbol = currency_dict[selected_curr]
+
+    st.markdown("---")  # Отделяем шапку от контента
+
+    # Приветствие в сайдбаре оставляем
     st.sidebar.write(f'👤 **{st.session_state["name"]}**')
+
 
     # Загрузка данных из базы
     last_rec = get_latest_record(st.session_state["username"])
@@ -139,11 +161,7 @@ if st.session_state["authentication_status"]:
 
     # САЙДБАР (Ввод данных)
     with st.sidebar:
-        # --- 1. НАСТРОЙКА ВАЛЮТЫ (Вставлять тут!) ---
-        currency_dict = {"USD": "$", "EUR": "€", "GEL": "₾"}
-        selected_curr = st.selectbox("Валюта:", options=list(currency_dict.keys()))
-        curr_symbol = currency_dict[selected_curr]
-        st.markdown("---")
+
         with st.expander(t["assets"], expanded=True):
             fa = st.number_input(t["fa"], value=int(db_fa), step=1, format="%d")
             ca = st.number_input(t["ca"], value=int(db_ca), step=1, format="%d")
