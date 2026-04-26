@@ -113,7 +113,7 @@ if not st.session_state["authentication_status"]:
 if st.session_state["authentication_status"]:
     lang_options = {
             "RU": {
-                "flag": "🇷🇺",
+
                 "name": "Русский",
                 "title": "📈 Финансовый Дашборд",
                 "tab1": "📥 Ввод", "tab2": "📊 Анализ", "tab3": "📜 История",
@@ -138,7 +138,7 @@ if st.session_state["authentication_status"]:
                 }
             },
             "EN": {
-                "flag": "🇺🇸",
+
                 "name": "English",
                 "title": "📈 Financial Dashboard",
                 "tab1": "📥 Input", "tab2": "📊 Analysis", "tab3": "📜 History",
@@ -161,7 +161,7 @@ if st.session_state["authentication_status"]:
                 }
             },
             "GE": {
-                "flag": "🇬🇪",
+
                 "name": "ქართული",
                 "title": "📈 ფინანსური პანელი",
                 "tab1": "📥 შეტანა", "tab2": "📊 ანალიზი", "tab3": "📜 ისტორია",
