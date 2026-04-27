@@ -154,7 +154,7 @@ if not st.session_state.get("authentication_status"):
             # Сначала отрисовываем форму
             try:
                 # Результат работы функции помещаем в переменную
-                reg_status = auth.register_user(location='main', pre_authorization=False)
+                reg_status = auth.register_user(location='main', pre_authorizazed=False)
 
                 # Показываем успех ТОЛЬКО если статус True
                 if reg_status:
