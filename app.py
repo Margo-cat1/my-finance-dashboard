@@ -148,24 +148,21 @@ if not st.session_state.get("authentication_status"):
         auth_tab1, auth_tab2 = st.tabs(["🔐 Вход в систему", "👤 Регистрация"])
 
         with auth_tab1:
-            # Вызов логина без стандартного заголовка (мы его уже написали выше)
             auth.login(location='main')
 
-            if st.session_state["authentication_status"] is False:
-                st.error("Неверное имя пользователя или пароль")
-            elif st.session_state["authentication_status"] is None:
-                st.warning("Пожалуйста, введите данные")
-
         with auth_tab2:
-            st.markdown("### Создать аккаунт")
+            # Сначала отрисовываем форму
             try:
-                # Включаем регистрацию
-                if auth.register_user(location='main'):
+                # Результат работы функции помещаем в переменную
+                reg_status = auth.register_user(location='main', pre_authorization=False)
+
+                # Показываем успех ТОЛЬКО если статус True
+                if reg_status:
                     with open('config.yaml', 'w') as f:
                         yaml.dump(config, f, default_flow_style=False)
-                    st.success('Аккаунт создан! Теперь перейдите во вкладку Вход.')
+                    st.success('Аккаунт успешно создан! Теперь перейдите во вкладку Вход.')
             except Exception as e:
-                st.error(f"Ошибка при регистрации: {e}")
+                st.error(f"Ошибка: {e}")
 
 # --- 4. MAIN APP ---
 if st.session_state.get("authentication_status"):
