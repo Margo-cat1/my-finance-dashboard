@@ -242,22 +242,26 @@ if st.session_state.get("authentication_status"):
             st.write("📥 **Выгрузить отчет:**")
             col_ex, col_csv = st.columns(2)
 
-            # --- ФОРМАТ 1: EXCEL ---
+            # --- ПОДГОТОВКА EXCEL ---
+            # Используем io.BytesIO(), чтобы файл создавался в памяти, а не на диске
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
                 history_df.to_excel(writer, index=False, sheet_name='Financial_Report')
 
+            # Вытаскиваем данные из буфера ПЕРЕД тем как кнопка их запросит
+            excel_data = buffer.getvalue()
+
             with col_ex:
                 st.download_button(
                     label="💾 Скачать в Excel (.xlsx)",
-                    data=buffer.getvalue(),
+                    data=excel_data,
                     file_name=f"fin_report_{user}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True
                 )
 
-            # --- ФОРМАТ 2: CSV (Текстовый формат) ---
-            csv_data = history_df.to_csv(index=False).encode('utf-8-sig')  # utf-8-sig чтобы Excel видел кириллицу
+            # --- ПОДГОТОВКА CSV ---
+            csv_data = history_df.to_csv(index=False).encode('utf-8-sig')
             with col_csv:
                 st.download_button(
                     label="📄 Скачать в CSV (.csv)",
@@ -267,7 +271,8 @@ if st.session_state.get("authentication_status"):
                     use_container_width=True
                 )
         else:
-            st.info("История пуста. Сохраните данные в боковом меню, чтобы появился отчет.")
+            # Если данных нет, мы хотя бы объясняем пользователю, почему кнопок нет
+            st.info("Чтобы скачать отчет, сначала добавьте данные через боковое меню и нажмите 'Обновить показатели'.")
 
     with tab4:
         st.write(f"### {t['tab4']}")
