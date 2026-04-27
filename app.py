@@ -30,7 +30,7 @@ UI_TEXTS = {
         "msg_bankrupt": "❌ **Критический риск:** Отрицательный капитал! Долги превышают стоимость активов.",
         "chart_pie": "🍩 Состав активов", "chart_line": "📈 Тренд капитала",
         "hints": {
-            "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный рубль.",
+            "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный доллар.",
             "roe": "ROE = EBITDA / Капитал. Эффективность работы ваших собственных средств.",
             "roa": "ROA = EBITDA / Активы. Насколько эффективно работают все ресурсы бизнеса.",
             "net_assets": "Чистые активы = Активы - Долги. Реальная стоимость вашего бизнеса сегодня.",
@@ -135,17 +135,37 @@ init_db()
 with open('config.yaml') as f:
     config = yaml.load(f, Loader=SafeLoader)
 
-auth = stauth.Authenticate(config['credentials'], config['cookie']['name'], config['cookie']['key'],
+auth = stauth.Authenticate(config['credentials'],
+                           config['cookie']['name'],
+                           config['cookie']['key'],
                            config['cookie']['expiry_days'])
 
 if not st.session_state.get("authentication_status"):
-    t1, t2 = st.tabs(["🔑 Вход", "👤 Регистрация"])
-    with t1:
-        auth.login()
-    with t2:
-        if auth.register_user():
-            with open('config.yaml', 'w') as f: yaml.dump(config, f)
-            st.success('Успешно! Войдите во вкладке Вход.')
+    _, center_col, _ = st.columns([1, 2, 1])
+    with center_col:
+        st.markdown("<h1 style='text-align: center;'>🏦 FinMarge PRO</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: gray;'>Ваш персональный финансовый аналитик</p>", unsafe_allow_html=True)
+        auth_tab1, auth_tab2 = st.tabs(["🔐 Вход в систему", "👤 Регистрация"])
+
+        with auth_tab1:
+            # Вызов логина без стандартного заголовка (мы его уже написали выше)
+            auth.login(location='main')
+
+            if st.session_state["authentication_status"] is False:
+                st.error("Неверное имя пользователя или пароль")
+            elif st.session_state["authentication_status"] is None:
+                st.warning("Пожалуйста, введите данные")
+
+        with auth_tab2:
+            st.markdown("### Создать аккаунт")
+            try:
+                # Включаем регистрацию
+                if auth.register_user(location='main'):
+                    with open('config.yaml', 'w') as f:
+                        yaml.dump(config, f, default_flow_style=False)
+                    st.success('Аккаунт создан! Теперь перейдите во вкладку Вход.')
+            except Exception as e:
+                st.error(f"Ошибка при регистрации: {e}")
 
 # --- 4. MAIN APP ---
 if st.session_state.get("authentication_status"):
