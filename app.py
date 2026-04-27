@@ -144,25 +144,28 @@ if not st.session_state.get("authentication_status"):
     _, center_col, _ = st.columns([1, 2, 1])
     with center_col:
         st.markdown("<h1 style='text-align: center;'>🏦 FinMarge PRO</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: gray;'>Ваш персональный финансовый аналитик</p>", unsafe_allow_html=True)
-        auth_tab1, auth_tab2 = st.tabs(["🔐 Вход в систему", "👤 Регистрация"])
+        st.markdown("<p style='text-align: center; color: gray;'>Ваш персональный финансовый аналитик</p>",
+                    unsafe_allow_html=True)
 
+
+        auth_tab1, auth_tab2 = st.tabs(["🔐 Вход в систему", "👤 Регистрация"])
         with auth_tab1:
             auth.login(location='main')
+            if st.session_state["authentication_status"] is False:
+                st.error("Неверное имя пользователя или пароль")
+            elif st.session_state["authentication_status"] is None:
+                st.warning("Пожалуйста, введите данные")
 
         with auth_tab2:
-            # Сначала отрисовываем форму
+            st.markdown("### Создать аккаунт")
             try:
-                # Результат работы функции помещаем в переменную
-                reg_status = auth.register_user(location='main', pre_authorizazed=False)
-
-                # Показываем успех ТОЛЬКО если статус True
-                if reg_status:
+                # Включаем регистрацию
+                if auth.register_user(location='main'):
                     with open('config.yaml', 'w') as f:
                         yaml.dump(config, f, default_flow_style=False)
-                    st.success('Аккаунт успешно создан! Теперь перейдите во вкладку Вход.')
+                    st.success('Аккаунт создан! Теперь перейдите во вкладку Вход.')
             except Exception as e:
-                st.error(f"Ошибка: {e}")
+                st.error(f"Ошибка при регистрации: {e}")
 
 # --- 4. MAIN APP ---
 if st.session_state.get("authentication_status"):
