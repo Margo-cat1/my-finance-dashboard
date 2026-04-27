@@ -234,22 +234,40 @@ if st.session_state.get("authentication_status"):
     with tab3:
         st.write(f"### {t['tab3']}")
         history_df = get_all_records(user)
+
         if not history_df.empty:
             st.dataframe(history_df, use_container_width=True)
 
-            # EXCEL EXPORT FIX
+            st.markdown("---")
+            st.write("📥 **Выгрузить отчет:**")
+            col_ex, col_csv = st.columns(2)
+
+            # --- ФОРМАТ 1: EXCEL ---
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                history_df.to_excel(writer, index=False, sheet_name='Finance_Report')
+                history_df.to_excel(writer, index=False, sheet_name='Financial_Report')
 
-            st.download_button(
-                label=t["download"],
-                data=buffer.getvalue(),
-                file_name=f"report_{user}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+            with col_ex:
+                st.download_button(
+                    label="💾 Скачать в Excel (.xlsx)",
+                    data=buffer.getvalue(),
+                    file_name=f"fin_report_{user}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True
+                )
+
+            # --- ФОРМАТ 2: CSV (Текстовый формат) ---
+            csv_data = history_df.to_csv(index=False).encode('utf-8-sig')  # utf-8-sig чтобы Excel видел кириллицу
+            with col_csv:
+                st.download_button(
+                    label="📄 Скачать в CSV (.csv)",
+                    data=csv_data,
+                    file_name=f"fin_report_{user}.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
         else:
-            st.info("No data found.")
+            st.info("История пуста. Сохраните данные в боковом меню, чтобы появился отчет.")
 
     with tab4:
         st.write(f"### {t['tab4']}")
