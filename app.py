@@ -36,6 +36,14 @@ UI_TEXTS = {
             "sol2": "**Solvency 2:** Активы - Долги. Минимум: > 0.",
             "sol3": "**Solvency 3:** Чистые активы / Общие активы. Минимум: 50%.",
             "qr": "**Quick Ratio:** Cash / Краткосрочные долги. Минимум: 2.0."
+        },
+        "hints": {
+            "roi": "ROI (Return on Investment) = EBITDA / Начальные инвестиции. Показывает общую доходность вложенного капитала.",
+            "roe": "ROE (Return on Equity) = EBITDA / Собственный капитал. Показывает эффективность использования твоих личных средств.",
+            "roa": "ROA (Return on Assets) = EBITDA / Всего активов. Показывает, насколько эффективно работают все ресурсы компании.",
+            "net_assets": "Чистые активы = Все активы - Все долги. Твой реальный капитал на текущий момент.",
+            "solv": "Коэффициент автономии = Чистые активы / Общие активы. Норма > 50%. Показывает независимость от кредитов.",
+            "qr": "Quick Ratio = Наличные / Краткосрочные долги. Показывает способность мгновенно закрыть срочные долги."
         }
     },
     "EN": {
@@ -198,15 +206,16 @@ if st.session_state.get("authentication_status"):
     with tab1:
         st.write(f"### {t['sec_eff']}")
         c_a, c_b, c_c = st.columns(3)
-        c_a.metric("ROI", f"{m['roi']:.1f}%")
-        c_b.metric("ROE", f"{m['roe']:.1f}%")
-        c_c.metric("ROA", f"{m['roa']:.1f}%")
+        # Добавляем параметр help=...
+        c_a.metric("ROI", f"{m['roi']:.1f}%", help=t['hints']['roi'])
+        c_b.metric("ROE", f"{m['roe']:.1f}%", help=t['hints']['roe'])
+        c_c.metric("ROA", f"{m['roa']:.1f}%", help=t['hints']['roa'])
 
         st.write(f"### {t['sec_sol']}")
         c_d, c_e, c_f = st.columns(3)
-        c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}")
-        c_e.metric("Solvency Ratio", f"{m['sol3']:.1f}%")
-        c_f.metric("Quick Ratio", f"{m['qr']:.2f}")
+        c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}", help=t['hints']['net_assets'])
+        c_e.metric("Solvency Ratio", f"{m['sol3']:.1f}%", help=t['hints']['solv'])
+        c_f.metric("Quick Ratio", f"{m['qr']:.2f}", help=t['hints']['qr'])
 
         st.write(f"### {t['analysis_header']}")
         s_list, r_list = get_analysis(m, t)
