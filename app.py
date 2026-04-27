@@ -239,17 +239,49 @@ if st.session_state.get("authentication_status"):
     # Main Tabs
     tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
 
+    # --- РАСЧЕТ ДЕЛЬТЫ (Сравнение с прошлым разом) ---
+    all_history = get_all_records(user)
+    last_m = None
+
+    # Если в истории больше одной записи, берем вторую сверху для сравнения
+    if len(all_history) > 1:
+        prev = all_history.iloc[1]
+        prev_total_a = prev['fixed_assets'] + prev['receivables']
+        prev_own = prev['own_capital']
+        prev_init = prev['initial_inv']
+        last_m = {
+            'roi': (prev['ebitda'] / prev_init * 100) if prev_init > 0 else 0,
+            'roe': (prev['ebitda'] / prev_own * 100) if prev_own > 0 else 0,
+            'roa': (prev['ebitda'] / prev_total_a * 100) if prev_total_a > 0 else 0,
+            'net': prev_total_a - (prev['long_term_debt'] + prev['short_term_debt'])
+        }
+
+
+    # Вспомогательная функция для красивого вывода разницы
+    def get_delta(current, key):
+        if last_m and key in last_m:
+            diff = current - last_m[key]
+            # Для процентов добавляем знак %, для чистых активов — просто число
+            return f"{diff:+.1f}%" if key != 'net' else f"{diff:+,.0f}"
+        return None
+
+
+    # --- ОТРИСОВКА ВКЛАДКИ 1 ---
     with tab1:
         st.write(f"### {t['sec_eff']}")
         c_a, c_b, c_c = st.columns(3)
-        # Добавляем параметр help=...
-        c_a.metric("ROI", f"{m['roi']:.1f}%", help=t['hints']['roi'])
-        c_b.metric("ROE", f"{m['roe']:.1f}%", help=t['hints']['roe'])
-        c_c.metric("ROA", f"{m['roa']:.1f}%", help=t['hints']['roa'])
+
+        #  зел/красн подсветкa
+        c_a.metric("ROI", f"{m['roi']:.1f}%", delta=get_delta(m['roi'], 'roi'), help=t['hints']['roi'])
+        c_b.metric("ROE", f"{m['roe']:.1f}%", delta=get_delta(m['roe'], 'roe'), help=t['hints']['roe'])
+        c_c.metric("ROA", f"{m['roa']:.1f}%", delta=get_delta(m['roa'], 'roa'), help=t['hints']['roa'])
 
         st.write(f"### {t['sec_sol']}")
         c_d, c_e, c_f = st.columns(3)
-        c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}", help=t['hints']['net_assets'])
+
+        net_val = m['sol2']
+        c_d.metric(t["card_net"], f"{net_val:,.0f} {curr_symbol}", delta=get_delta(net_val, 'net'),
+                   help=t['hints']['net_assets'])
         c_e.metric("Solvency Ratio", f"{m['sol3']:.1f}%", help=t['hints']['solv'])
         c_f.metric("Quick Ratio", f"{m['qr']:.2f}", help=t['hints']['qr'])
 
