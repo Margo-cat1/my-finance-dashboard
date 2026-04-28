@@ -36,6 +36,7 @@ UI_TEXTS = {
         "months_label": "Месяцы",
         "capital_label": "Капитал",
         "payback_line": "Точка окупаемости",
+        "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный доллар.",
             "roe": "ROE = EBITDA / Капитал. Эффективность работы ваших собственных средств.",
@@ -77,6 +78,7 @@ UI_TEXTS = {
         "months_label": "Months",
         "capital_label": "Equity",
         "payback_line": "Break-even Point",
+        "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Initial Investment. Total return on capital invested.",
             "roe": "ROE = EBITDA / Equity. Efficiency of your personal capital management.",
@@ -118,6 +120,7 @@ UI_TEXTS = {
         "months_label": "თვეები",
         "capital_label": "კაპიტალი",
         "payback_line": "ანაზღაურების წერტილი",
+        "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / ინვესტიცია. გვიჩვენებს ყოველი ჩადებული ლარის უკუგებას.",
             "roe": "ROE = EBITDA / კაპიტალი. საკუთარი სახსრების მართვის ეფექტურობა.",
@@ -261,19 +264,49 @@ if st.session_state.get("authentication_status"):
     tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
 
     with tab1:
+        # --- СЕКЦИЯ: ЭФФЕКТИВНОСТЬ ---
         st.write(f"### {t['sec_eff']}")
         c_a, c_b, c_c = st.columns(3)
-        # Добавляем параметр help=...
-        c_a.metric("ROI", f"{m['roi']:.1f}%", help=t['hints']['roi'])
+
+        # ROI с индикатором (сравниваем с 25%)
+        roi_target = t["targets"]["roi"]
+        roi_delta = m['roi'] - roi_target
+        c_a.metric(
+            label="ROI",
+            value=f"{m['roi']:.1f}%",
+            delta=f"{roi_delta:+.1f}% vs target",
+            delta_color="normal" if m['roi'] >= roi_target else "inverse",
+            help=t['hints']['roi']
+        )
+
         c_b.metric("ROE", f"{m['roe']:.1f}%", help=t['hints']['roe'])
         c_c.metric("ROA", f"{m['roa']:.1f}%", help=t['hints']['roa'])
 
+        # --- СЕКЦИЯ: УСТОЙЧИВОСТЬ ---
         st.write(f"### {t['sec_sol']}")
         c_d, c_e, c_f = st.columns(3)
-        c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}", help=t['hints']['net_assets'])
-        c_e.metric("Solvency Ratio", f"{m['sol3']:.1f}%", help=t['hints']['solv'])
-        c_f.metric("Quick Ratio", f"{m['qr']:.2f}", help=t['hints']['qr'])
 
+        c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}", help=t['hints']['net_assets'])
+
+        # Solvency Ratio с индикатором (сравниваем с 50%)
+        sol_target = t["targets"]["sol"]
+        sol_delta = m['sol3'] - sol_target
+        c_e.metric(
+            label="Solvency Ratio",
+            value=f"{m['sol3']:.1f}%",
+            delta=f"{sol_delta:+.1f}% vs target",
+            delta_color="normal" if m['sol3'] >= sol_target else "inverse",
+            help=t['hints']['solv']
+        )
+
+        #  Quick Ratio)
+        qr_target = t["targets"]["qr"]
+        qr_delta = m['qr'] - qr_target
+        c_f.metric("Quick Ratio", f"{m['qr']:.2f}",
+                   delta=f"{qr_delta:+.2f} vs target",
+                   delta_color="normal" if m['qr'] >= qr_target else "inverse")
+
+        # --- АВТОМАТИЧЕСКИЙ АНАЛИЗ (Твой старый блок) ---
         st.write(f"### {t['analysis_header']}")
         s_list, r_list = get_analysis(m, t)
         col_s, col_r = st.columns(2)
