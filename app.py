@@ -29,6 +29,13 @@ UI_TEXTS = {
         "msg_cash_low": "💸 **Дефицит Cash:** Наличных денег недостаточно для покрытия текущих обязательств.",
         "msg_bankrupt": "❌ **Критический риск:** Отрицательный капитал! Долги превышают стоимость активов.",
         "chart_pie": "🍩 Состав активов", "chart_line": "📈 Тренд капитала",
+        "forecast_title": "🔮 Прогноз окупаемости",
+        "payback_msg": "Инвестиции окупятся через **{:.1f}** лет.",
+        "never_payback": "⚠️ При текущем доходе окупаемость невозможна.",
+        "projected_chart": "📈 Прогноз роста капитала (12 мес.)",
+        "months_label": "Месяцы",
+        "capital_label": "Капитал",
+        "payback_line": "Точка окупаемости",
         "hints": {
             "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный доллар.",
             "roe": "ROE = EBITDA / Капитал. Эффективность работы ваших собственных средств.",
@@ -63,6 +70,13 @@ UI_TEXTS = {
         "msg_cash_low": "💸 **Cash Deficit:** Not enough cash to cover immediate liabilities.",
         "msg_bankrupt": "❌ **Critical Risk:** Negative equity! Debt exceeds total asset value.",
         "chart_pie": "🍩 Asset Structure", "chart_line": "📈 Equity Trend",
+        "forecast_title": "🔮 Payback Forecast",
+        "payback_msg": "Investment will break even in **{:.1f}** years.",
+        "never_payback": "⚠️ Payback impossible at current EBITDA.",
+        "projected_chart": "📈 Equity Growth Forecast (12 mo.)",
+        "months_label": "Months",
+        "capital_label": "Equity",
+        "payback_line": "Break-even Point",
         "hints": {
             "roi": "ROI = EBITDA / Initial Investment. Total return on capital invested.",
             "roe": "ROE = EBITDA / Equity. Efficiency of your personal capital management.",
@@ -97,6 +111,13 @@ UI_TEXTS = {
         "msg_cash_low": "💸 **Cash-ის დეფიციტი:** ნაღდი ფული არ არის საკმარისი ვალდებულებებისთვის.",
         "msg_bankrupt": "❌ **კრიტიკული რისკი:** ვალები აღემატება აქტივების ღირებულებას!",
         "chart_pie": "🍩 აქტივების შემადგენლობა", "chart_line": "📈 კაპიტალის ტრენდი",
+        "forecast_title": "🔮 ანაზღაურების პროგნოზი",
+        "payback_msg": "ინვესტიცია ამოღებული იქნება **{:.1f}** წელიწადში.",
+        "never_payback": "⚠️ ამ მოგებით ინვესტიციის ამოღება შეუძლებელია.",
+        "projected_chart": "📈 კაპიტალის ზრდის პროგნოზი (12 თვე)",
+        "months_label": "თვეები",
+        "capital_label": "კაპიტალი",
+        "payback_line": "ანაზღაურების წერტილი",
         "hints": {
             "roi": "ROI = EBITDA / ინვესტიცია. გვიჩვენებს ყოველი ჩადებული ლარის უკუგებას.",
             "roe": "ROE = EBITDA / კაპიტალი. საკუთარი სახსრების მართვის ეფექტურობა.",
@@ -275,6 +296,36 @@ if st.session_state.get("authentication_status"):
             if not hist_data.empty:
                 st.write(f"**{t['chart_line']}**")
                 st.plotly_chart(px.line(hist_data, x='date', y='own_capital', markers=True), use_container_width=True)
+
+        # --- Секция прогноза (добавляем ПОСЛЕ твоих графиков) ---
+        st.markdown("---")
+        st.write(f"### {t['forecast_title']}")
+
+        if ebitda_v > 0:
+            payback_years = init_inv / ebitda_v
+            st.success(t["payback_msg"].format(payback_years))
+
+            # Строим прогноз на 12 месяцев
+            future_months = list(range(13))
+            # Твой текущий капитал + (прибыль/12 * месяц)
+            equity_projection = [own_cap + (ebitda_v / 12 * m) for m in future_months]
+
+            df_forecast = pd.DataFrame({
+                "Month": future_months,
+                "Equity": equity_projection
+            })
+
+            # Новый график прогноза
+            fig_f = px.line(df_forecast, x="Month", y="Equity",
+                            title=t["projected_chart"], markers=True)
+
+            # Зеленая пунктирная линия — когда мы выходим "в ноль"
+            fig_f.add_hline(y=init_inv, line_dash="dot", line_color="green",
+                            annotation_text=t["payback_line"])
+
+            st.plotly_chart(fig_f, use_container_width=True)
+        else:
+            st.error(t["never_payback"])
 
     with tab3:
         st.write(f"### {t['tab3']}")
