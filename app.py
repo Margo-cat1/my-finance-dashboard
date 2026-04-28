@@ -406,17 +406,24 @@ if st.session_state.get("authentication_status"):
             for r in r_list: st.error(r)
 
     with tab_bep:
-        st.write(f"### ⚖️ Расчет точки безубыточности ({curr_symbol})")
+        st.write(f"### 🎯 План: Точка безубыточности ({curr_symbol})")
 
-        # Блок ввода данных прямо во вкладке
-        with st.expander("📝 Настроить операционные показатели", expanded=True):
-            c_in1, c_in2, c_in3 = st.columns(3)
-            with c_nav1:
-                rev_v = st.number_input("Текущая выручка в месяц", value=10000)
-            with c_nav2:
-                fc_v = st.number_input("Постоянные расходы (Аренда, ЗП)", value=3000)
-            with c_nav3:
-                vc_v = st.number_input("Переменные расходы (Закупка)", value=4000)
+        # Используем новые уникальные имена для колонок, чтобы ничего не "терялось"
+        st.info("Введите ваши ежемесячные показатели, чтобы рассчитать порог выживаемости бизнеса.")
+
+        with st.container():
+            # Создаем 3 равные колонки для ввода
+            plan_col1, plan_col2, plan_col3 = st.columns(3)
+
+            with plan_col1:
+                rev_v = st.number_input("Текущая выручка", value=10000, key="plan_rev")
+            with plan_col2:
+                fc_v = st.number_input("Постоянные расходы", value=3000, key="plan_fc",
+                                       help="Аренда, зарплаты, налоги — то, что платим всегда")
+            with plan_col3:
+                vc_v = st.number_input("Переменные расходы", value=4000, key="plan_vc",
+                                       help="Закупка товара, процент с продаж, упаковка")
+
 
         # Математика
         margin_v = rev_v - vc_v
