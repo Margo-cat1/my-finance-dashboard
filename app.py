@@ -342,7 +342,7 @@ if st.session_state.get("authentication_status"):
     }
 
     # Main Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
+    tab1, tab_bep, tab2, tab3, tab4 = st.tabs([t["tab1"], "🎯 План", t["tab2"], t["tab3"], t["tab4"]])
 
 
 
@@ -404,6 +404,53 @@ if st.session_state.get("authentication_status"):
         with col_r:
             st.warning(f"**{t['risks']}**")
             for r in r_list: st.error(r)
+
+    with tab_bep:
+        st.write(f"### ⚖️ Расчет точки безубыточности ({curr_symbol})")
+
+        # Блок ввода данных прямо во вкладке
+        with st.expander("📝 Настроить операционные показатели", expanded=True):
+            c_in1, c_in2, c_in3 = st.columns(3)
+            with c_nav1:
+                rev_v = st.number_input("Текущая выручка в месяц", value=10000)
+            with c_nav2:
+                fc_v = st.number_input("Постоянные расходы (Аренда, ЗП)", value=3000)
+            with c_nav3:
+                vc_v = st.number_input("Переменные расходы (Закупка)", value=4000)
+
+        # Математика
+        margin_v = rev_v - vc_v
+        margin_pct = (margin_v / rev_v) if rev_v > 0 else 0
+        bep_money_v = fc_v / margin_pct if margin_pct > 0 else 0
+
+        st.markdown("---")
+
+        # Визуализация результатов
+        col_res1, col_res2 = st.columns([1, 2])
+
+        with col_res1:
+            st.metric("Точка безубыточности", f"{bep_money_v:,.0f} {curr_symbol}",
+                      help="Сколько нужно продать, чтобы выйти в ноль")
+
+            diff = rev_v - bep_money_v
+            st.metric("Текущий результат", f"{rev_v:,.0f} {curr_symbol}",
+                      delta=f"{diff:,.0f}", delta_color="normal" if diff >= 0 else "inverse")
+
+        with col_res2:
+            progress = min(rev_v / bep_money_v, 1.2) if bep_money_v > 0 else 0
+            st.write(f"**Прогресс самоокупаемости: {progress * 100:.1f}%**")
+            st.progress(progress if progress <= 1.0 else 1.0)
+
+            if diff < 0:
+                st.error(
+                    f"🔴 Вы работаете в убыток. Нужно еще **{abs(diff):,.0f} {curr_symbol}** выручки для выхода в ноль.")
+            else:
+                st.success(
+                    f"🟢 Поздравляем! Вы прошли точку безубыточности. Чистая операционная прибыль: **{diff:,.0f} {curr_symbol}**")
+
+        # Маленький совет для владельца
+        st.info(
+            f"💡 **Маржинальность вашего бизнеса:** {margin_pct * 100:.1f}%. Это значит, что каждый заработанный 1 {curr_symbol} приносит вам {(margin_pct):.2f} {curr_symbol} на покрытие фиксированных расходов и формирование прибыли.")
 
     with tab2:
         st.write(f"### {t['tab2']}")
