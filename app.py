@@ -445,7 +445,7 @@ if st.session_state.get("authentication_status"):
             for r in r_list: st.error(r)
 
     with tab_bep:
-        st.write(f"### {t['bep_title']} ({curr_symbol})")
+        st.write(f"### {t['tab_plan']}: {t['bep_title']} ({curr_symbol})")
         st.info(t['bep_info'])
 
         with st.container():
@@ -482,8 +482,11 @@ if st.session_state.get("authentication_status"):
                 st.success(t['profit_msg'].format(diff=f"{diff:,.0f} {curr_symbol}"))
 
         # Маленький совет для владельца
-        st.info(t['margin_info'].format(margin=f"{margin_pct * 100:.1f}", curr=curr_symbol, val=f"{margin_pct:.2f}"))
-
+        st.info(t['margin_info'].format(
+            margin=f"{margin_pct * 100:.1f}",
+            curr=curr_symbol,
+            val=f"{margin_pct:.2f}"
+        ))
     with tab2:
         st.write(f"### {t['tab2']}")
         col_p, col_l = st.columns(2)
