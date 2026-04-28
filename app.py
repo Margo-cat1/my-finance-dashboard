@@ -222,50 +222,57 @@ if st.session_state.get("authentication_status"):
             </style>
         """, unsafe_allow_html=True)
 
-    # --- ВЕРХНЯЯ ПАНЕЛЬ ---
-    # --- ХАК ДЛЯ ЦВЕТНОГО ФОНА ВЕРХНЕЙ ПАНЕЛИ ---
+    # --- ГЛОБАЛЬНЫЙ ДИЗАЙН СТРАНИЦЫ ---
     st.markdown("""
             <style>
-                /* Убираем стандартные отступы */
+                /* 1. Закрашиваем фон всей страницы */
+                .stApp {
+                    background-color: #f4f7f9;
+                }
+
+                /* 2. Поднимаем контент и убираем лишние отступы сверху */
                 .block-container {
-                    padding-top: 0rem !important;
+                    padding-top: 2rem !important;
+                    padding-left: 3rem !important;
+                    padding-right: 3rem !important;
                 }
 
-                /* Создаем визуальную "плашку" через псевдоэлемент на всю ширину */
-                .stApp::before {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 85px; /* Высота нашей панели */
-                    background-color: #f0f2f6; /* Тот самый серый фон */
-                    border-bottom: 1px solid #e6e9ef;
-                    z-index: 0;
+                /* 3. Делаем верхнюю панель навигации прозрачной и аккуратной */
+                .nav-container {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 2rem;
                 }
 
-                /* Поднимаем элементы навигации над фоном */
-                [data-testid="stHorizontalBlock"] {
-                    position: relative;
-                    z-index: 1;
-                    padding-top: 15px;
-                }
-
-                /* Скрываем подписи у выпадающих списков */
+                /* Скрываем подписи селекторов */
                 div[data-testid="stSelectbox"] label {
                     display: none;
+                }
+
+                /* Делаем вкладки (Tabs) более выразительными на сером фоне */
+                .stTabs [data-baseweb="tab-list"] {
+                    gap: 10px;
+                    background-color: transparent;
+                }
+
+                .stTabs [data-baseweb="tab"] {
+                    background-color: white;
+                    border-radius: 8px 8px 0px 0px;
+                    padding: 10px 20px;
+                    border: 1px solid #e6e9ef;
                 }
             </style>
         """, unsafe_allow_html=True)
 
-    # --- САМА ПАНЕЛЬ ---
-    # Просто создаем колонки, CSS выше сам подложит под них фон
-    nav_container = st.container()
-    with nav_container:
+    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
+    # Теперь она просто «летит» над фоном без рамок
+    with st.container():
         c_nav1, c_nav2, c_nav3 = st.columns([4, 1.2, 1])
 
         with c_nav1:
-            st.markdown("<h2 style='margin:0; color:#1f77b4;'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
+            st.markdown("<h1 style='margin:0; color:#1f77b4; font-size:32px;'>🏦 FinMarge PRO</h1>",
+                        unsafe_allow_html=True)
 
         with c_nav2:
             lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2,
@@ -276,8 +283,7 @@ if st.session_state.get("authentication_status"):
             target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
             curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
 
-    # Добавляем небольшой отступ после панели, чтобы табы не прилипали
-    st.write("")
+    st.markdown("---")  # Тонкая линия под навигацией
 
 
 
