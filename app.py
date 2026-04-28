@@ -263,10 +263,9 @@ if st.session_state.get("authentication_status"):
     # Main Tabs
     tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
 
-    st.write(
-        f"DEBUG: ROI={m['roi']} (type: {type(m['roi'])}), Target={t['targets']['roi']} (type: {type(t['targets']['roi'])})")
 
-    with tab1:
+
+    st.write(f"DEBUG: ROI={m['roi']} (type: {type(m['roi'])}), Target={t['targets']['roi']} (type: {type(t['targets']['roi'])})") with tab1:
         # --- СЕКЦИЯ: ЭФФЕКТИВНОСТЬ ---
         st.write(f"### {t['sec_eff']}")
         c_a, c_b, c_c = st.columns(3)
