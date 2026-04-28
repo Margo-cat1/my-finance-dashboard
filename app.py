@@ -317,7 +317,8 @@ if st.session_state.get("authentication_status"):
 
         with c_nav3:
             target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
-            curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
+            curr_symbols = {"USD": "$", "EUR": "€", "GEL": "₾"}
+            curr_symbol = curr_symbols.get(target_currency, "₾")
 
     st.markdown("---")  # Тонкая линия под навигацией
 
@@ -479,9 +480,11 @@ if st.session_state.get("authentication_status"):
                 st.success(t['profit_msg'].format(diff=f"{diff:,.0f} {curr_symbol}"))
 
         # Маленький совет для владельца
+        current_s = curr_symbols.get(target_currency, "₾")
+
         st.info(t['margin_info'].format(
             margin=f"{margin_pct * 100:.1f}",
-            curr=curr_symbol,
+            curr=current_s,
             val=f"{margin_pct:.2f}"
         ))
     with tab2:
