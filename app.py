@@ -381,7 +381,7 @@ if st.session_state.get("authentication_status"):
     }
 
     # Main Tabs
-    tab1, tab_bep, tab2, tab3, tab4 = st.tabs([t["tab1"], "🎯 План", t["tab2"], t["tab3"], t["tab4"]])
+    tab1, tab_bep, tab2, tab3, tab4 = st.tabs([t["tab1"], t['tab_plan'], t["tab2"], t["tab3"], t["tab4"]])
 
 
 
