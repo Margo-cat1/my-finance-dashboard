@@ -223,18 +223,49 @@ if st.session_state.get("authentication_status"):
         """, unsafe_allow_html=True)
 
     # --- ВЕРХНЯЯ ПАНЕЛЬ ---
-    # Мы создаем одну общую плашку через Markdown,
-    # а затем используем колонки прямо под ней
-    st.markdown('<div class="nav-wrapper">', unsafe_allow_html=True)
+    # --- ХАК ДЛЯ ЦВЕТНОГО ФОНА ВЕРХНЕЙ ПАНЕЛИ ---
+    st.markdown("""
+            <style>
+                /* Убираем стандартные отступы */
+                .block-container {
+                    padding-top: 0rem !important;
+                }
 
-    # Важно: колонки должны быть ВНУТРИ контейнера, чтобы попасть на фон
+                /* Создаем визуальную "плашку" через псевдоэлемент на всю ширину */
+                .stApp::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 85px; /* Высота нашей панели */
+                    background-color: #f0f2f6; /* Тот самый серый фон */
+                    border-bottom: 1px solid #e6e9ef;
+                    z-index: 0;
+                }
+
+                /* Поднимаем элементы навигации над фоном */
+                [data-testid="stHorizontalBlock"] {
+                    position: relative;
+                    z-index: 1;
+                    padding-top: 15px;
+                }
+
+                /* Скрываем подписи у выпадающих списков */
+                div[data-testid="stSelectbox"] label {
+                    display: none;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+    # --- САМА ПАНЕЛЬ ---
+    # Просто создаем колонки, CSS выше сам подложит под них фон
     nav_container = st.container()
     with nav_container:
         c_nav1, c_nav2, c_nav3 = st.columns([4, 1.2, 1])
 
         with c_nav1:
-            st.markdown("<h2 style='margin:0; color:#1f77b4; font-size:24px;'>🏦 FinMarge PRO</h2>",
-                        unsafe_allow_html=True)
+            st.markdown("<h2 style='margin:0; color:#1f77b4;'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
 
         with c_nav2:
             lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2,
@@ -245,7 +276,8 @@ if st.session_state.get("authentication_status"):
             target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
             curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Добавляем небольшой отступ после панели, чтобы табы не прилипали
+    st.write("")
 
 
 
