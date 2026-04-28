@@ -265,19 +265,21 @@ if st.session_state.get("authentication_status"):
 
 
 
-    st.write(f"DEBUG: ROI={m['roi']} (type: {type(m['roi'])}), Target={t['targets']['roi']} (type: {type(t['targets']['roi'])})") with tab1:
+    with tab1:
         # --- СЕКЦИЯ: ЭФФЕКТИВНОСТЬ ---
         st.write(f"### {t['sec_eff']}")
         c_a, c_b, c_c = st.columns(3)
 
-        # ROI с индикатором (сравниваем с 25%)
+        # ROI
         roi_target = t["targets"]["roi"]
         roi_delta = m['roi'] - roi_target
+        # Если ROI выше цели -> красим дельту в зеленый (normal)
+        # Если ROI ниже цели -> красим дельту в красный (normal + отрицательное число даст красный)
         c_a.metric(
             label="ROI",
             value=f"{m['roi']:.1f}%",
             delta=f"{roi_delta:+.1f}% vs target",
-            delta_color="normal" if m['roi'] >= roi_target else "inverse",
+            delta_color="normal",
             help=t['hints']['roi']
         )
 
@@ -287,26 +289,29 @@ if st.session_state.get("authentication_status"):
         # --- СЕКЦИЯ: УСТОЙЧИВОСТЬ ---
         st.write(f"### {t['sec_sol']}")
         c_d, c_e, c_f = st.columns(3)
-
         c_d.metric(t["card_net"], f"{m['sol2']:,.0f} {curr_symbol}", help=t['hints']['net_assets'])
 
-        # Solvency Ratio с индикатором (сравниваем с 50%)
+        # Solvency Ratio
         sol_target = t["targets"]["sol"]
         sol_delta = m['sol3'] - sol_target
         c_e.metric(
             label="Solvency Ratio",
             value=f"{m['sol3']:.1f}%",
             delta=f"{sol_delta:+.1f}% vs target",
-            delta_color="normal" if m['sol3'] >= sol_target else "inverse",
+            delta_color="normal",
             help=t['hints']['solv']
         )
 
-        #  Quick Ratio)
+        # Quick Ratio
         qr_target = t["targets"]["qr"]
         qr_delta = m['qr'] - qr_target
-        c_f.metric("Quick Ratio", f"{m['qr']:.2f}",
-                   delta=f"{qr_delta:+.2f} vs target",
-                   delta_color="normal" if m['qr'] >= qr_target else "inverse")
+        c_f.metric(
+            label="Quick Ratio",
+            value=f"{m['qr']:.2f}",
+            delta=f"{qr_delta:+.2f} vs target",
+            delta_color="normal",
+            help=t['hints']['qr']
+        )
 
         # --- АВТОМАТИЧЕСКИЙ АНАЛИЗ (Твой старый блок) ---
         st.write(f"### {t['analysis_header']}")
