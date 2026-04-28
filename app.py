@@ -48,7 +48,6 @@ UI_TEXTS = {
         'loss_msg': '🔴 Вы работаете в убыток. Нужно еще {diff} выручки для выхода в ноль.',
         'profit_msg': '🟢 Поздравляем! Вы прошли точку безубыточности. Операционная прибыль: {diff}',
         'margin_info': '💡 Маржинальность вашего бизнеса: {margin}%. Это значит, что каждый заработанный 1 {curr} приносит вам {val} {curr} на покрытие расходов.',
-        'margin_msg': '💡 Маржинальность вашего бизнеса: {margin}%. Это значит, что каждый заработанный 1 {curr} приносит вам {val} {curr} на покрытие расходов.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный доллар.",
@@ -103,7 +102,6 @@ UI_TEXTS = {
         'loss_msg': '🔴 You are operating at a loss. You need {diff} more in revenue to break even.',
         'profit_msg': '🟢 Congratulations! You have passed the break-even point. Operating profit: {diff}',
         'margin_info': '💡 Your business margin: {margin}%. This means every 1 {curr} earned brings {val} {curr} to cover fixed costs and profit.',
-        'margin_msg': '💡 Your business margin is {margin}%. This means every 1 {curr} earned brings {val} {curr} to cover fixed costs and profit.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Initial Investment. Total return on capital invested.",
@@ -158,7 +156,6 @@ UI_TEXTS = {
         'loss_msg': '🔴 თქვენ ზარალზე მუშაობთ. კიდევ {diff} შემოსავალი გჭირდებათ ნულზე გასასვლელად.',
         'profit_msg': '🟢 გილოცავთ! თქვენ გადალახეთ წამგებიანობის წერტილი. საოპერაციო მოგება: {diff}',
         'margin_info': '💡 თქვენი ბიზნესის მარჟაა {margin}%. ეს ნიშნავს, რომ ყოველი გამომუშავებული 1 {curr} მოაქვს {val} {curr} ფიქსირებული ხარჯების დასაფარად და მოგების მისაღებად.',
-        'margin_msg': '💡 თქვენი ბიზნესის მარჟაა {margin}%. ეს ნიშნავს, რომ ყოველი გამომუშავებული 1 {curr} მოაქვს {val} {curr} ფიქსირებული ხარჯების დასაფარად და მოგების მისაღებად.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / ინვესტიცია. გვიჩვენებს ყოველი ჩადებული ლარის უკუგებას.",
