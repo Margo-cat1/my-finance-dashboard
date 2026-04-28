@@ -196,6 +196,24 @@ if not st.session_state.get("authentication_status"):
 if st.session_state.get("authentication_status"):
     user = st.session_state["username"]
 
+    # --- СТИЛИЗАЦИЯ ДЛЯ ПОДНЯТИЯ ПАНЕЛИ ---
+    st.markdown("""
+            <style>
+                /* Убираем отступы сверху у основного блока */
+                .stAppHeader {
+                    display: none;
+                }
+                .block-container {
+                    padding-top: 1rem !important;
+                    padding-bottom: 0rem !important;
+                }
+                /* Сближаем элементы в колонках навбара */
+                [data-testid="stVerticalBlock"] > div:first-child {
+                    margin-top: -15px;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
     # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
     with st.container():
         nav_col1, nav_col2, nav_col3 = st.columns([3, 1.2, 1])
