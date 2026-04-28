@@ -198,50 +198,61 @@ if st.session_state.get("authentication_status"):
 
     # --- УЛУЧШЕННЫЙ CSS ДЛЯ NAVBAR ---
     st.markdown("""
-        <style>
-            /* Убираем лишние отступы сверху */
-            .block-container {
-                padding-top: 1rem !important;
-            }
+            <style>
+                /* Убираем лишние отступы сверху страницы */
+                .block-container {
+                    padding-top: 1rem !important;
+                }
 
-            /* Создаем стиль для нашей плашки (Navbar) */
-            .nav-box {
-                background-color: #f0f2f6; /* Светло-серый фон */
-                padding: 10px 20px;
-                border-radius: 10px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-            }
+                /* Стиль для плашки Navbar */
+                .nav-box {
+                    background-color: #f8f9fb; /* Чуть светлее и чище */
+                    padding: 12px 24px;
+                    border-radius: 12px;
+                    margin-bottom: 25px;
+                    border: 1px solid #e6e9ef; /* Тонкая рамка для четкости */
+                }
 
-            /* Убираем стандартные отступы у заголовка */
-            h2.nav-title {
-                margin: 0;
-                padding: 0;
-                color: #1f77b4; /* Синий акцент для названия */
-            }
-        </style>
-    """, unsafe_allow_html=True)
+                /* Центрируем содержимое колонок по вертикали */
+                [data-testid="column"] {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
 
-    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) С ФОНОМ ---
-    # Обернем всё в один контейнер
+                /* Убираем отступы у заголовка внутри колонки */
+                .nav-title {
+                    margin: 0 !important;
+                    line-height: 1.6;
+                    white-space: nowrap;
+                }
+
+                /* Скрываем стандартные лейблы селекторов, чтобы они не занимали место */
+                div[data-testid="stSelectbox"] label {
+                    display: none;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
     with st.container():
-        # Используем HTML для фона, а внутри — колонки Streamlit
-        # (Streamlit не позволяет красить контейнеры напрямую, поэтому хитрим)
+        # Используем HTML для фона
         st.markdown('<div class="nav-box">', unsafe_allow_html=True)
 
-        nav_col1, nav_col2, nav_col3 = st.columns([3, 1.2, 1])
+        # Создаем колонки. Коэффициенты [4, 1, 1] дадут больше места заголовку
+        c_nav1, c_nav2, c_nav3 = st.columns([4, 1.2, 1])
 
-        with nav_col1:
-            st.markdown("<h2 class='nav-title'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
+        with c_nav1:
+            # Заголовок без лишних тегов, чтобы CSS сработал правильно
+            st.markdown(f"<h2 class='nav-title'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
 
-        with nav_col2:
-            lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2,
+        with c_nav2:
+            lang = st.selectbox("L", options=list(UI_TEXTS.keys()), index=2,
                                 format_func=lambda x: UI_TEXTS[x]['name'], key="nav_lang")
             t = UI_TEXTS[lang]
 
-        with nav_col3:
-            target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
+        with c_nav3:
+            target_currency = st.selectbox("C", options=["GEL", "USD", "EUR"], key="nav_curr")
             curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
 
         st.markdown('</div>', unsafe_allow_html=True)
