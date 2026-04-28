@@ -196,53 +196,56 @@ if not st.session_state.get("authentication_status"):
 if st.session_state.get("authentication_status"):
     user = st.session_state["username"]
 
-    # --- СТИЛИЗАЦИЯ ДЛЯ ПОДНЯТИЯ ПАНЕЛИ ---
+    # --- УЛУЧШЕННЫЙ CSS ДЛЯ NAVBAR ---
     st.markdown("""
-            <style>
-                /* Убираем отступы сверху у основного блока */
-                .stAppHeader {
-                    display: none;
-                }
-                .block-container {
-                    padding-top: 1rem !important;
-                    padding-bottom: 0rem !important;
-                }
-                /* Сближаем элементы в колонках навбара */
-                [data-testid="stVerticalBlock"] > div:first-child {
-                    margin-top: -15px;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+        <style>
+            /* Убираем лишние отступы сверху */
+            .block-container {
+                padding-top: 1rem !important;
+            }
 
-    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
+            /* Создаем стиль для нашей плашки (Navbar) */
+            .nav-box {
+                background-color: #f0f2f6; /* Светло-серый фон */
+                padding: 10px 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            /* Убираем стандартные отступы у заголовка */
+            h2.nav-title {
+                margin: 0;
+                padding: 0;
+                color: #1f77b4; /* Синий акцент для названия */
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) С ФОНОМ ---
+    # Обернем всё в один контейнер
     with st.container():
+        # Используем HTML для фона, а внутри — колонки Streamlit
+        # (Streamlit не позволяет красить контейнеры напрямую, поэтому хитрим)
+        st.markdown('<div class="nav-box">', unsafe_allow_html=True)
+
         nav_col1, nav_col2, nav_col3 = st.columns([3, 1.2, 1])
+
         with nav_col1:
-            st.markdown(f"## 🏦 FinMarge PRO")
+            st.markdown("<h2 class='nav-title'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
 
         with nav_col2:
-            lang = st.selectbox(
-                "Language",  # Можно оставить пустым "", если хочешь совсем чисто
-                options=list(UI_TEXTS.keys()),
-                index=2,
-                format_func=lambda x: UI_TEXTS[x]['name'],
-                key="nav_lang"
-            )
+            lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2,
+                                format_func=lambda x: UI_TEXTS[x]['name'], key="nav_lang")
             t = UI_TEXTS[lang]
 
         with nav_col3:
-            target_currency = st.selectbox(
-                "Currency",
-                options=["GEL", "USD", "EUR"],
-                key="nav_curr"
-            )
+            target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
             curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
 
-    # Тонкий разделитель для красоты
-    st.markdown("<hr style='margin: 0px 0px 20px 0px; border-top: 1px solid #bbb;'>", unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-
-    raw_rec = get_latest_record(user)
 
 
     # DB Defaults (FIX for sqlite3.Row error)
