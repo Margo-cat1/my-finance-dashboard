@@ -191,20 +191,41 @@ if not st.session_state.get("authentication_status"):
             except Exception as e:
                 st.error(f"Ошибка при регистрации: {e}")
 
+
 # --- 4. MAIN APP ---
 if st.session_state.get("authentication_status"):
     user = st.session_state["username"]
 
-    # Header & Multilingual
-    c1, c2, c3 = st.columns([3, 1, 1])
-    with c2:
-        lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2, format_func=lambda x: UI_TEXTS[x]['name'])
-        t = UI_TEXTS[lang]
-    with c3:
-        curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[st.selectbox("", options=["GEL", "USD", "EUR"])]
-    with c1:
-        st.subheader(t["title"])
-    st.markdown("---")
+    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
+    with st.container():
+        nav_col1, nav_col2, nav_col3 = st.columns([3, 1.2, 1])
+        with nav_col1:
+            st.markdown(f"## 🏦 FinMarge PRO")
+
+        with nav_col2:
+            lang = st.selectbox(
+                "Language",  # Можно оставить пустым "", если хочешь совсем чисто
+                options=list(UI_TEXTS.keys()),
+                index=2,
+                format_func=lambda x: UI_TEXTS[x]['name'],
+                key="nav_lang"
+            )
+            t = UI_TEXTS[lang]
+
+        with nav_col3:
+            target_currency = st.selectbox(
+                "Currency",
+                options=["GEL", "USD", "EUR"],
+                key="nav_curr"
+            )
+            curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
+
+    # Тонкий разделитель для красоты
+    st.markdown("<hr style='margin: 0px 0px 20px 0px; border-top: 1px solid #bbb;'>", unsafe_allow_html=True)
+
+
+    raw_rec = get_latest_record(user)
+
 
     # DB Defaults (FIX for sqlite3.Row error)
     raw_rec = get_latest_record(user)
