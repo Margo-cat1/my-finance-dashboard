@@ -36,6 +36,18 @@ UI_TEXTS = {
         "months_label": "Месяцы",
         "capital_label": "Капитал",
         "payback_line": "Точка окупаемости",
+        'tab_plan': '🎯 План',
+        'bep_title': 'Точка безубыточности',
+        'bep_info': 'Введите ваши ежемесячные показатели, чтобы рассчитать порог выживаемости бизнеса.',
+        'rev_label': 'Текущая выручка в месяц',
+        'fc_label': 'Постоянные расходы (Аренда, ЗП)',
+        'vc_label': 'Переменные расходы (Закупка)',
+        'bep_metric': 'Точка безубыточности',
+        'curr_res': 'Текущий результат',
+        'prog_label': 'Прогресс самоокупаемости',
+        'loss_msg': '🔴 Вы работаете в убыток. Нужно еще {diff} выручки для выхода в ноль.',
+        'profit_msg': '🟢 Поздравляем! Вы прошли точку безубыточности. Операционная прибыль: {diff}',
+        'margin_msg': '💡 Маржинальность вашего бизнеса: {margin}%. Это значит, что каждый заработанный 1 {curr} приносит вам {val} {curr} на покрытие расходов.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Инвестиции. Сколько прибыли приносит каждый вложенный доллар.",
@@ -78,6 +90,18 @@ UI_TEXTS = {
         "months_label": "Months",
         "capital_label": "Equity",
         "payback_line": "Break-even Point",
+        'tab_plan': '🎯 Plan',
+        'bep_title': 'Break-even Point Analysis',
+        'bep_info': 'Enter your monthly figures to calculate the business survival threshold.',
+        'rev_label': 'Monthly Revenue',
+        'fc_label': 'Fixed Costs (Rent, Salaries)',
+        'vc_label': 'Variable Costs (COGS)',
+        'bep_metric': 'Break-even Point',
+        'curr_res': 'Current Result',
+        'prog_label': 'Self-sufficiency Progress',
+        'loss_msg': '🔴 You are operating at a loss. You need {diff} more in revenue to break even.',
+        'profit_msg': '🟢 Congratulations! You have passed the break-even point. Operating profit: {diff}',
+        'margin_msg': '💡 Your business margin is {margin}%. This means every 1 {curr} earned brings {val} {curr} to cover fixed costs and profit.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / Initial Investment. Total return on capital invested.",
@@ -120,6 +144,18 @@ UI_TEXTS = {
         "months_label": "თვეები",
         "capital_label": "კაპიტალი",
         "payback_line": "ანაზღაურების წერტილი",
+        'tab_plan': '🎯 გეგმა',
+        'bep_title': 'წამგებიანობის წერტილის ანალიზი',
+        'bep_info': 'შეიყვანეთ თქვენი ყოველთვიური მაჩვენებლები ბიზნესის გადარჩენის ზღვარის გამოსათვლელად.',
+        'rev_label': 'ყოველთვიური შემოსავალი',
+        'fc_label': 'ფიქსირებული ხარჯები (ქირა, ხელფასი)',
+        'vc_label': 'ცვლადი ხარჯები (შესყიდვები)',
+        'bep_metric': 'წამგებიანობის წერტილი',
+        'curr_res': 'მიმდინარე შედეგი',
+        'prog_label': 'თვითკმარობის პროგრესი',
+        'loss_msg': '🔴 თქვენ ზარალზე მუშაობთ. კიდევ {diff} შემოსავალი გჭირდებათ ნულზე გასასვლელად.',
+        'profit_msg': '🟢 გილოცავთ! თქვენ გადალახეთ წამგებიანობის წერტილი. საოპერაციო მოგება: {diff}',
+        'margin_msg': '💡 თქვენი ბიზნესის მარჟაა {margin}%. ეს ნიშნავს, რომ ყოველი გამომუშავებული 1 {curr} მოაქვს {val} {curr} ფიქსირებული ხარჯების დასაფარად და მოგების მისაღებად.',
         "targets": {"roi": 25.0, "sol": 50.0, "qr": 1.5},
         "hints": {
             "roi": "ROI = EBITDA / ინვესტიცია. გვიჩვენებს ყოველი ჩადებული ლარის უკუგებას.",
@@ -406,58 +442,44 @@ if st.session_state.get("authentication_status"):
             for r in r_list: st.error(r)
 
     with tab_bep:
-        st.write(f"### 🎯 План: Точка безубыточности ({curr_symbol})")
-
-        # Используем новые уникальные имена для колонок, чтобы ничего не "терялось"
-        st.info("Введите ваши ежемесячные показатели, чтобы рассчитать порог выживаемости бизнеса.")
+        st.write(f"### {t['bep_title']} ({curr_symbol})")
+        st.info(t['bep_info'])
 
         with st.container():
-            # Создаем 3 равные колонки для ввода
-            plan_col1, plan_col2, plan_col3 = st.columns(3)
-
-            with plan_col1:
-                rev_v = st.number_input("Текущая выручка", value=10000, key="plan_rev")
-            with plan_col2:
-                fc_v = st.number_input("Постоянные расходы", value=3000, key="plan_fc",
-                                       help="Аренда, зарплаты, налоги — то, что платим всегда")
-            with plan_col3:
-                vc_v = st.number_input("Переменные расходы", value=4000, key="plan_vc",
-                                       help="Закупка товара, процент с продаж, упаковка")
-
+            p_col1, p_col2, p_col3 = st.columns(3)
+            with p_col1:
+                rev_v = st.number_input(t['rev_label'], value=10000, key="p_rev")
+            with p_col2:
+                fc_v = st.number_input(t['fc_label'], value=3000, key="p_fc")
+            with p_col3:
+                vc_v = st.number_input(t['vc_label'], value=4000, key="p_vc")
 
         # Математика
         margin_v = rev_v - vc_v
         margin_pct = (margin_v / rev_v) if rev_v > 0 else 0
         bep_money_v = fc_v / margin_pct if margin_pct > 0 else 0
+        diff = rev_v - bep_money_v
 
         st.markdown("---")
 
-        # Визуализация результатов
-        col_res1, col_res2 = st.columns([1, 2])
-
-        with col_res1:
-            st.metric("Точка безубыточности", f"{bep_money_v:,.0f} {curr_symbol}",
-                      help="Сколько нужно продать, чтобы выйти в ноль")
-
-            diff = rev_v - bep_money_v
-            st.metric("Текущий результат", f"{rev_v:,.0f} {curr_symbol}",
+        c_res1, c_res2 = st.columns([1, 2])
+        with c_res1:
+            st.metric(t['bep_metric'], f"{bep_money_v:,.0f} {curr_symbol}")
+            st.metric(t['curr_res'], f"{rev_v:,.0f} {curr_symbol}",
                       delta=f"{diff:,.0f}", delta_color="normal" if diff >= 0 else "inverse")
 
-        with col_res2:
-            progress = min(rev_v / bep_money_v, 1.2) if bep_money_v > 0 else 0
-            st.write(f"**Прогресс самоокупаемости: {progress * 100:.1f}%**")
-            st.progress(progress if progress <= 1.0 else 1.0)
+        with c_res2:
+            progress = min(rev_v / bep_money_v, 1.0) if bep_money_v > 0 else 0
+            st.write(f"**{t['prog_label']}: {progress * 100:.1f}%**")
+            st.progress(progress)
 
             if diff < 0:
-                st.error(
-                    f"🔴 Вы работаете в убыток. Нужно еще **{abs(diff):,.0f} {curr_symbol}** выручки для выхода в ноль.")
+                st.error(t['loss_msg'].format(diff=f"{abs(diff):,.0f} {curr_symbol}"))
             else:
-                st.success(
-                    f"🟢 Поздравляем! Вы прошли точку безубыточности. Чистая операционная прибыль: **{diff:,.0f} {curr_symbol}**")
+                st.success(t['profit_msg'].format(diff=f"{diff:,.0f} {curr_symbol}"))
 
         # Маленький совет для владельца
-        st.info(
-            f"💡 **Маржинальность вашего бизнеса:** {margin_pct * 100:.1f}%. Это значит, что каждый заработанный 1 {curr_symbol} приносит вам {(margin_pct):.2f} {curr_symbol} на покрытие фиксированных расходов и формирование прибыли.")
+        st.info(t['margin_info'].format(margin=f"{margin_pct * 100:.1f}", curr=curr_symbol, val=f"{margin_pct:.2f}"))
 
     with tab2:
         st.write(f"### {t['tab2']}")
