@@ -196,66 +196,56 @@ if not st.session_state.get("authentication_status"):
 if st.session_state.get("authentication_status"):
     user = st.session_state["username"]
 
-    # --- УЛУЧШЕННЫЙ CSS ДЛЯ NAVBAR ---
+    # --- ОБНОВЛЕННЫЙ CSS ---
     st.markdown("""
             <style>
-                /* Убираем лишние отступы сверху страницы */
                 .block-container {
                     padding-top: 1rem !important;
                 }
-
-                /* Стиль для плашки Navbar */
-                .nav-box {
-                    background-color: #f8f9fb; /* Чуть светлее и чище */
-                    padding: 12px 24px;
+                /* Создаем обертку для навигации */
+                .nav-wrapper {
+                    background-color: #f8f9fb;
+                    padding: 15px 25px;
                     border-radius: 12px;
-                    margin-bottom: 25px;
-                    border: 1px solid #e6e9ef; /* Тонкая рамка для четкости */
+                    border: 1px solid #e6e9ef;
+                    margin-bottom: 30px;
                 }
-
-                /* Центрируем содержимое колонок по вертикали */
+                /* Скрываем заголовки селекторов */
+                div[data-testid="stSelectbox"] label {
+                    display: none;
+                }
+                /* Убираем лишние отступы у колонок */
                 [data-testid="column"] {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                }
-
-                /* Убираем отступы у заголовка внутри колонки */
-                .nav-title {
-                    margin: 0 !important;
-                    line-height: 1.6;
-                    white-space: nowrap;
-                }
-
-                /* Скрываем стандартные лейблы селекторов, чтобы они не занимали место */
-                div[data-testid="stSelectbox"] label {
-                    display: none;
                 }
             </style>
         """, unsafe_allow_html=True)
 
-    # --- ВЕРХНЯЯ ПАНЕЛЬ (NAVBAR) ---
-    with st.container():
-        # Используем HTML для фона
-        st.markdown('<div class="nav-box">', unsafe_allow_html=True)
+    # --- ВЕРХНЯЯ ПАНЕЛЬ ---
+    # Мы создаем одну общую плашку через Markdown,
+    # а затем используем колонки прямо под ней
+    st.markdown('<div class="nav-wrapper">', unsafe_allow_html=True)
 
-        # Создаем колонки. Коэффициенты [4, 1, 1] дадут больше места заголовку
+    # Важно: колонки должны быть ВНУТРИ контейнера, чтобы попасть на фон
+    nav_container = st.container()
+    with nav_container:
         c_nav1, c_nav2, c_nav3 = st.columns([4, 1.2, 1])
 
         with c_nav1:
-            # Заголовок без лишних тегов, чтобы CSS сработал правильно
-            st.markdown(f"<h2 class='nav-title'>🏦 FinMarge PRO</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='margin:0; color:#1f77b4; font-size:24px;'>🏦 FinMarge PRO</h2>",
+                        unsafe_allow_html=True)
 
         with c_nav2:
-            lang = st.selectbox("L", options=list(UI_TEXTS.keys()), index=2,
+            lang = st.selectbox("", options=list(UI_TEXTS.keys()), index=2,
                                 format_func=lambda x: UI_TEXTS[x]['name'], key="nav_lang")
             t = UI_TEXTS[lang]
 
         with c_nav3:
-            target_currency = st.selectbox("C", options=["GEL", "USD", "EUR"], key="nav_curr")
+            target_currency = st.selectbox("", options=["GEL", "USD", "EUR"], key="nav_curr")
             curr_symbol = {"USD": "$", "EUR": "€", "GEL": "₾"}[target_currency]
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 
